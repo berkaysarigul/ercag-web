@@ -1,0 +1,150 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String?  @unique
+  password  String
+  name      String
+  phone     String   @unique
+  role      String   @default("CUSTOMER") // "SUPER_ADMIN", "STAFF", "CUSTOMER"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]  @relation("CustomerOrders")
+  handledOrders Order[] @relation("HandledOrders")
+  reviews   Review[]
+  wishlist  Wishlist[]
+  stockAlerts StockAlert[]
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  image     String?
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String
+  price       Decimal
+  image       String?
+  categoryId  Int
+  category    Category    @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  orderItems  OrderItem[]
+  reviews     Review[]
+  wishlist    Wishlist[]
+  stock       Int         @default(0)
+  stockAlerts StockAlert[]
+}
+
+model Order {
+  id            Int         @id @default(autoincrement())
+  userId        Int
+  user          User        @relation("CustomerOrders", fields: [userId], references: [id])
+  // Customer Info for this specific order
+  fullName      String?
+  phoneNumber   String?
+  email         String?
+  note          String?
+  
+  // Click & Collect
+  pickupRequestedTime String?
+  pickupCode    String?     @unique
+  pickupCodeExpiresAt DateTime?
+  
+  // Status & Lifecycle
+  status        String      @default("PENDING") // PENDING, PREPARING, READY, COMPLETED, CANCELLED
+  statusHistory String      @default("[]") // JSON string of status updates
+  readyAt       DateTime?
+  completedAt   DateTime?
+  
+  // Staff handling
+  handledByUserId Int?
+  handledBy     User?       @relation("HandledOrders", fields: [handledByUserId], references: [id])
+
+  // Financials
+  totalAmount   Decimal
+  couponCode    String?
+  discountAmount Decimal    @default(0)
+  
+  items         OrderItem[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Decimal
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  comment   String?
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Wishlist {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+model Coupon {
+  id             Int      @id @default(autoincrement())
+  code           String   @unique
+  discountType   String   // "PERCENTAGE" or "FIXED"
+  discountValue  Decimal
+  minOrderAmount Decimal  @default(0)
+  expirationDate DateTime?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model StockAlert {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+model SystemSetting {
+  key   String @id
+  value String
+  updatedAt DateTime @updatedAt
+}
