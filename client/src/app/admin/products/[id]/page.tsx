@@ -26,8 +26,9 @@ export default function EditProductPage() {
         stock: '',
         categoryId: '',
     });
-    const [image, setImage] = useState<File | null>(null);
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [newImages, setNewImages] = useState<File[]>([]);
+    const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
+    const [existingImages, setExistingImages] = useState<{ id: number; url: string; isMain: boolean }[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -46,8 +47,13 @@ export default function EditProductPage() {
                     stock: (product.stock || 0).toString(),
                     categoryId: product.categoryId.toString()
                 });
-                if (product.image) {
-                    setImagePreview(`http://localhost:3001/uploads/${product.image}`);
+
+                // Populate existing images
+                if (product.images && product.images.length > 0) {
+                    setExistingImages(product.images);
+                } else if (product.image) {
+                    // Fallback for legacy single image
+                    setExistingImages([{ id: 0, url: product.image, isMain: true }]);
                 }
             } catch (error) {
                 console.error('Failed to fetch data', error);
@@ -63,11 +69,18 @@ export default function EditProductPage() {
     }, [id, router]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            setImage(file);
-            setImagePreview(URL.createObjectURL(file));
+        if (e.target.files) {
+            const files = Array.from(e.target.files);
+            setNewImages(prev => [...prev, ...files]);
+
+            const newPreviews = files.map(file => URL.createObjectURL(file));
+            setNewImagePreviews(prev => [...prev, ...newPreviews]);
         }
+    };
+
+    const removeNewImage = (index: number) => {
+        setNewImages(prev => prev.filter((_, i) => i !== index));
+        setNewImagePreviews(prev => prev.filter((_, i) => i !== index));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -86,9 +99,10 @@ export default function EditProductPage() {
         data.append('price', formData.price);
         data.append('stock', formData.stock);
         data.append('categoryId', formData.categoryId);
-        if (image) {
-            data.append('image', image);
-        }
+
+        newImages.forEach((file) => {
+            data.append('images', file);
+        });
 
         try {
             await api.put(`/products/${id}`, data, {
@@ -126,22 +140,51 @@ export default function EditProductPage() {
                                     <input
                                         type="file"
                                         accept="image/*"
+                                        multiple
                                         onChange={handleImageChange}
                                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                     />
-                                    {imagePreview ? (
-                                        <div className="relative aspect-square w-full max-w-[200px] mx-auto overflow-hidden rounded-lg">
-                                            <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
-                                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white font-medium">
-                                                Değiştir
+                                    <div className="py-4">
+                                        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-400">
+                                            <Upload size={24} />
+                                        </div>
+                                        <p className="text-sm text-gray-500">Yeni görsel eklemek için tıklayın</p>
+                                    </div>
+                                </div>
+
+                                <div className="mt-4 space-y-4">
+                                    {/* Existing Images */}
+                                    {existingImages.length > 0 && (
+                                        <div>
+                                            <p className="text-xs font-semibold text-gray-500 mb-2 uppercase">Mevcut Görseller</p>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                {existingImages.map((img, index) => (
+                                                    <div key={index} className="relative aspect-square border rounded-lg overflow-hidden group">
+                                                        <img src={`http://localhost:3001/uploads/${img.url}`} alt={`Existing ${index}`} className="w-full h-full object-cover" />
+                                                    </div>
+                                                ))}
                                             </div>
                                         </div>
-                                    ) : (
-                                        <div className="py-8">
-                                            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-400">
-                                                <Upload size={24} />
+                                    )}
+
+                                    {/* New Images */}
+                                    {newImagePreviews.length > 0 && (
+                                        <div>
+                                            <p className="text-xs font-semibold text-green-600 mb-2 uppercase">Yeni Eklenecekler</p>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                {newImagePreviews.map((preview, index) => (
+                                                    <div key={index} className="relative aspect-square border rounded-lg overflow-hidden group border-green-200">
+                                                        <img src={preview} alt={`Preview ${index}`} className="w-full h-full object-cover" />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeNewImage(index)}
+                                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 transition-opacity"
+                                                        >
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                                        </button>
+                                                    </div>
+                                                ))}
                                             </div>
-                                            <p className="text-sm text-gray-500">Görsel yüklemek için tıklayın veya sürükleyin</p>
                                         </div>
                                     )}
                                 </div>

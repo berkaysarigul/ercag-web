@@ -6,6 +6,7 @@ const { authorize, isAdmin } = require('../middleware/adminMiddleware');
 
 router.post('/', authenticateToken, orderController.createOrder);
 router.get('/', authenticateToken, orderController.getUserOrders);
+router.put('/:id/cancel', authenticateToken, orderController.cancelMyOrder);
 
 // Admin Order Routes (STAFF can manage orders)
 router.get('/all', authenticateToken, authorize('STAFF', 'ADMIN'), orderController.getAllOrders);

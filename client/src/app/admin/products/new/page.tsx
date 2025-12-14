@@ -23,19 +23,26 @@ export default function NewProductPage() {
         stock: '100', // Default stock
         categoryId: '',
     });
-    const [image, setImage] = useState<File | null>(null);
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [images, setImages] = useState<File[]>([]);
+    const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
     useEffect(() => {
         api.get('/categories').then(res => setCategories(res.data));
     }, []);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            setImage(file);
-            setImagePreview(URL.createObjectURL(file));
+        if (e.target.files) {
+            const files = Array.from(e.target.files);
+            setImages(prev => [...prev, ...files]);
+
+            const newPreviews = files.map(file => URL.createObjectURL(file));
+            setImagePreviews(prev => [...prev, ...newPreviews]);
         }
+    };
+
+    const removeImage = (index: number) => {
+        setImages(prev => prev.filter((_, i) => i !== index));
+        setImagePreviews(prev => prev.filter((_, i) => i !== index));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -54,9 +61,10 @@ export default function NewProductPage() {
         data.append('price', formData.price);
         data.append('stock', formData.stock);
         data.append('categoryId', formData.categoryId);
-        if (image) {
-            data.append('image', image);
-        }
+
+        images.forEach((file) => {
+            data.append('images', file);
+        });
 
         try {
             await api.post('/products', data, {
@@ -87,30 +95,40 @@ export default function NewProductPage() {
                         {/* Left Column: Image & Basic Info */}
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Ürün Görseli</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Ürün Görselleri</label>
                                 <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:bg-gray-50 transition-colors relative group">
                                     <input
                                         type="file"
                                         accept="image/*"
+                                        multiple
                                         onChange={handleImageChange}
                                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                     />
-                                    {imagePreview ? (
-                                        <div className="relative aspect-square w-full max-w-[200px] mx-auto overflow-hidden rounded-lg">
-                                            <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
-                                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white font-medium">
-                                                Değiştir
-                                            </div>
+                                    <div className="py-4">
+                                        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-400">
+                                            <Upload size={24} />
                                         </div>
-                                    ) : (
-                                        <div className="py-8">
-                                            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-400">
-                                                <Upload size={24} />
-                                            </div>
-                                            <p className="text-sm text-gray-500">Görsel yüklemek için tıklayın veya sürükleyin</p>
-                                        </div>
-                                    )}
+                                        <p className="text-sm text-gray-500">Görselleri yüklemek için tıklayın veya sürükleyin</p>
+                                        <p className="text-xs text-gray-400 mt-1">Birden fazla dosya seçebilirsiniz</p>
+                                    </div>
                                 </div>
+
+                                {imagePreviews.length > 0 && (
+                                    <div className="grid grid-cols-3 gap-2 mt-4">
+                                        {imagePreviews.map((preview, index) => (
+                                            <div key={index} className="relative aspect-square border rounded-lg overflow-hidden group">
+                                                <img src={preview} alt={`Preview ${index}`} className="w-full h-full object-cover" />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeImage(index)}
+                                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
 
                             <div>

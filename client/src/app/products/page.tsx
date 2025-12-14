@@ -28,11 +28,20 @@ function ProductList() {
 
     const [filters, setFilters] = useState({
         categoryId: searchParams.get('category') || null,
-        minPrice: '',
-        maxPrice: '',
-        search: '',
-        sort: 'newest'
+        minPrice: searchParams.get('minPrice') || '',
+        maxPrice: searchParams.get('maxPrice') || '',
+        search: searchParams.get('search') || '',
+        sort: searchParams.get('sort') || 'newest'
     });
+
+    // Listen for URL changes (e.g. from Header search)
+    useEffect(() => {
+        setFilters(prev => ({
+            ...prev,
+            search: searchParams.get('search') || '',
+            categoryId: searchParams.get('category') || null,
+        }));
+    }, [searchParams]);
 
     const fetchProducts = useCallback(async () => {
         setLoading(true);
@@ -64,9 +73,9 @@ function ProductList() {
     return (
         <div className="container py-8">
             <Breadcrumb />
-            <div style={{ display: 'flex', gap: '2rem', padding: '2rem 0' }}>
+            <div className="flex flex-col md:flex-row gap-8 py-8">
                 {/* Sidebar */}
-                <div style={{ width: '250px', flexShrink: 0 }}>
+                <div className="w-full md:w-64 flex-shrink-0">
                     <FilterSidebar
                         onFilterChange={handleFilterChange}
                         initialCategory={filters.categoryId ? Number(filters.categoryId) : null}
@@ -74,22 +83,27 @@ function ProductList() {
                 </div>
 
                 {/* Main Content */}
-                <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', alignItems: 'center' }}>
-                        <h1 style={{ fontSize: '2rem', color: 'var(--primary)', margin: 0 }}>Tüm Ürünler</h1>
+                <div className="flex-1">
+                    <div className="flex justify-between items-center mb-8">
+                        <div className="flex items-center gap-4">
+                            <h1 className="text-3xl font-bold text-gray-900">
+                                {filters.search ? `"${filters.search}" için sonuçlar` : 'Tüm Ürünler'}
+                            </h1>
+                            {filters.search && (
+                                <Link
+                                    href="/products"
+                                    className="text-sm bg-red-100 text-red-600 px-3 py-1 rounded-full hover:bg-red-200 transition-colors flex items-center gap-1"
+                                >
+                                    Aramayı Temizle
+                                </Link>
+                            )}
+                        </div>
 
-                        <div style={{ display: 'flex', gap: '1rem' }}>
-                            <input
-                                type="text"
-                                placeholder="Ürün Ara..."
-                                value={filters.search}
-                                onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                                style={{ padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}
-                            />
+                        <div className="flex items-center gap-4">
                             <select
                                 value={filters.sort}
                                 onChange={(e) => setFilters(prev => ({ ...prev, sort: e.target.value }))}
-                                style={{ padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}
+                                className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent bg-white"
                             >
                                 <option value="newest">En Yeni</option>
                                 <option value="price_asc">Fiyat (Artan)</option>

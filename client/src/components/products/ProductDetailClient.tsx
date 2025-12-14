@@ -10,6 +10,7 @@ import api from '@/lib/api';
 import { useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
+import Image from 'next/image';
 import toast from 'react-hot-toast';
 
 interface Product {
@@ -18,6 +19,7 @@ interface Product {
     description: string;
     price: string;
     image: string | null;
+    images?: { url: string; isMain: boolean }[];
     category: { name: string };
     stock: number;
 }
@@ -31,6 +33,19 @@ export default function ProductDetailClient({ product }: { product: Product }) {
     const [inWishlist, setInWishlist] = useState(false);
     const [quantity, setQuantity] = useState(1);
     const [alertSubscribed, setAlertSubscribed] = useState(false);
+
+    // Resolve initial images: If product.images exists, use it. Else fallback to [product.image].
+    const allImages = product.images && product.images.length > 0
+        ? product.images.map(img => img.url)
+        : (product.image ? [product.image] : []);
+
+    const [selectedImage, setSelectedImage] = useState<string | null>(allImages[0] || null);
+
+    useEffect(() => {
+        if (allImages.length > 0) {
+            setSelectedImage(allImages[0]);
+        }
+    }, [product]);
 
     useEffect(() => {
         if (user) {
@@ -116,10 +131,10 @@ export default function ProductDetailClient({ product }: { product: Product }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
                 {/* Image Gallery */}
                 <div className="space-y-4">
-                    <div className="bg-gray-50 rounded-xl overflow-hidden aspect-square relative border">
-                        {product.image ? (
+                    <div className="bg-gray-50 rounded-xl overflow-hidden aspect-square relative border group">
+                        {selectedImage ? (
                             <img
-                                src={`http://localhost:3001/uploads/${product.image}`}
+                                src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${selectedImage}`}
                                 alt={product.name}
                                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-zoom-in"
                             />
@@ -128,15 +143,29 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                                 Görsel Yok
                             </div>
                         )}
+                        {/* Discount Badge if needed logic here */}
                     </div>
-                    {/* Thumbnails (Mock) */}
-                    <div className="grid grid-cols-4 gap-4">
-                        {[1, 2, 3, 4].map((i) => (
-                            <div key={i} className="aspect-square rounded-lg bg-gray-100 border cursor-pointer hover:border-[var(--primary)] transition-colors">
-                                {/* Placeholder for thumbnails */}
-                            </div>
-                        ))}
-                    </div>
+                    {/* Thumbnails */}
+                    {allImages.length > 1 && (
+                        <div className="grid grid-cols-5 gap-2">
+                            {allImages.map((img, i) => (
+                                <div
+                                    key={i}
+                                    onClick={() => setSelectedImage(img)}
+                                    className={cn(
+                                        "aspect-square rounded-lg bg-gray-50 border cursor-pointer overflow-hidden relative transition-all",
+                                        selectedImage === img ? "border-[var(--primary)] ring-2 ring-[var(--primary)] ring-offset-1" : "hover:border-[var(--primary)]"
+                                    )}
+                                >
+                                    <img
+                                        src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${img}`}
+                                        alt={`${product.name} - ${i + 1}`}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Product Info */}

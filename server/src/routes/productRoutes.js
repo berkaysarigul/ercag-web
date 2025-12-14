@@ -13,8 +13,8 @@ router.put('/categories/:id', authenticateToken, isAdmin, require('../controller
 router.delete('/categories/:id', authenticateToken, isAdmin, require('../controllers/categoryController').deleteCategory);
 
 // Admin Product Routes
-router.post('/products', authenticateToken, isAdmin, upload.single('image'), productController.createProduct);
-router.put('/products/:id', authenticateToken, isAdmin, upload.single('image'), productController.updateProduct);
+router.post('/products', authenticateToken, isAdmin, upload.array('images', 5), productController.createProduct);
+router.put('/products/:id', authenticateToken, isAdmin, upload.array('images', 5), productController.updateProduct);
 router.delete('/products/:id', authenticateToken, isAdmin, productController.deleteProduct);
 
 module.exports = router;

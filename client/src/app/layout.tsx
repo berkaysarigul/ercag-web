@@ -1,7 +1,18 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import "./globals.css";
-import { Toaster } from 'react-hot-toast';
+import { Inter } from 'next/font/google';
+import { Toaster } from 'sonner';
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+
+import { CartProvider } from "@/context/CartContext";
+import { AuthProvider } from "@/context/AuthContext";
+import ClientLayout from "@/components/layout/ClientLayout";
 
 export const metadata: Metadata = {
   title: {
@@ -19,27 +30,17 @@ export const metadata: Metadata = {
   },
 };
 
-import { CartProvider } from "@/context/CartContext";
-import { AuthProvider } from "@/context/AuthContext";
-import ClientLayout from "@/components/layout/ClientLayout";
-
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="tr">
-      <body>
+    <html lang="tr" className={inter.variable}>
+      <body className="font-sans antialiased text-gray-900 bg-gray-50">
         <AuthProvider>
           <CartProvider>
-            <Toaster position="top-right" toastOptions={{
-              style: {
-                background: '#333',
-                color: '#fff',
-              },
-            }} />
+            <Toaster richColors position="top-right" />
             <ClientLayout>
               {children}
             </ClientLayout>

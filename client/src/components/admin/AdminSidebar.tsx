@@ -10,7 +10,8 @@ import {
     MessageSquare,
     Users,
     Settings,
-    LogOut
+    LogOut,
+    ScanBarcode // Added
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
@@ -20,6 +21,7 @@ export default function AdminSidebar() {
 
     const allMenuItems = [
         { name: 'Dashboard', href: '/admin', icon: LayoutDashboard, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] },
+        { name: 'Teslimat Doğrula', href: '/admin/verify-pickup', icon: ScanBarcode, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] }, // New
         { name: 'Siparişler', href: '/admin/orders', icon: ShoppingBag, badge: 3, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] }, // Mock badge
         { name: 'Ürünler', href: '/admin/products', icon: Package, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Kategoriler', href: '/admin/categories', icon: Package, roles: ['SUPER_ADMIN', 'ADMIN'] },

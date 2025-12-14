@@ -143,6 +143,8 @@ const getAllOrders = async (req, res) => {
     }
 };
 
+const { sendOrderStatusNotification } = require('../services/notificationService');
+
 const updateOrderStatus = async (req, res) => {
     try {
         const { id } = req.params;
@@ -151,7 +153,10 @@ const updateOrderStatus = async (req, res) => {
 
         const order = await prisma.order.findUnique({
             where: { id: parseInt(id) },
-            include: { items: true }
+            include: {
+                items: true,
+                user: true
+            }
         });
 
         if (!order) return res.status(404).json({ error: 'Sipariş bulunamadı' });
@@ -164,7 +169,12 @@ const updateOrderStatus = async (req, res) => {
             'CANCELLED': []
         };
 
+        // Force Allow COMPLETED from any state if it's a Pickup Verification
+        // But strictly speaking, standard flow is READY -> COMPLETED. 
+        // We will keep standard flow for manual updates.
+
         if (!ALLOWED_TRANSITIONS[order.status]?.includes(status)) {
+            // Exception: Allow forceful completion if needed? No, stick to rules for now to ensure consistency.
             return res.status(400).json({ error: `Geçersiz durum geçişi: ${order.status} -> ${status}` });
         }
 
@@ -179,8 +189,8 @@ const updateOrderStatus = async (req, res) => {
 
         // Transaction for Stock Updates
         await prisma.$transaction(async (tx) => {
-            // STOCK REDUCTION logic: When moving to PREPARING
-            if (status === 'PREPARING' && order.status === 'PENDING') {
+            // STOCK REDUCTION logic: When moving to PREPARING (or CONFIRMED in new specs)
+            if ((status === 'PREPARING' || status === 'CONFIRMED') && order.status === 'PENDING') {
                 for (const item of order.items) {
                     await tx.product.update({
                         where: { id: item.productId },
@@ -189,12 +199,15 @@ const updateOrderStatus = async (req, res) => {
                 }
             }
             // STOCK RESTORATION logic: When CANCELLED
-            else if (status === 'CANCELLED' && (order.status === 'PREPARING' || order.status === 'READY')) {
-                for (const item of order.items) {
-                    await tx.product.update({
-                        where: { id: item.productId },
-                        data: { stock: { increment: item.quantity } }
-                    });
+            else if (status === 'CANCELLED' && order.status !== 'PENDING' && order.status !== 'CANCELLED') {
+                // Check if we actually decremented stock previously (i.e. was PREPARING or READY or CONFIRMED)
+                if (order.status === 'PREPARING' || order.status === 'READY') {
+                    for (const item of order.items) {
+                        await tx.product.update({
+                            where: { id: item.productId },
+                            data: { stock: { increment: item.quantity } }
+                        });
+                    }
                 }
             }
 
@@ -213,13 +226,21 @@ const updateOrderStatus = async (req, res) => {
             });
         });
 
+        // Send Notification AFTER transaction success
+        // Use user email/phone from order details (snapshot) or fallback to user profile
+        const email = order.email || order.user?.email;
+        const phone = order.phoneNumber || order.user?.phone;
+
+        if (email) {
+            await sendOrderStatusNotification(order.id, status, email, phone);
+        }
+
         const updatedOrder = await prisma.order.findUnique({ where: { id: parseInt(id) } });
         res.json(updatedOrder);
 
     } catch (error) {
         console.error(error);
         if (error.code === 'P2025') {
-            // Stock update failed (negative stock)
             return res.status(400).json({ error: 'Stok yetersiz, işlem yapılamadı.' });
         }
         res.status(500).json({ error: 'Failed to update order status' });
@@ -234,7 +255,7 @@ const verifyPickupCode = async (req, res) => {
         const order = await prisma.order.findUnique({
             where: { pickupCode: code },
             include: {
-                user: { select: { name: true, email: true } },
+                user: { select: { name: true, email: true, phone: true } },
                 items: { include: { product: true } }
             }
         });
@@ -243,12 +264,54 @@ const verifyPickupCode = async (req, res) => {
             return res.status(404).json({ error: 'Geçersiz teslimat kodu.' });
         }
 
-        // Return order even if not ready, frontend can show warning status
-        res.json(order);
+        // Return full details including calculated total vs items total check?
+        // Just return the order object for the frontend review page
+        res.json({ success: true, order });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to verify code' });
     }
 };
 
-module.exports = { createOrder, getUserOrders, getAllOrders, updateOrderStatus, verifyPickupCode };
+const cancelMyOrder = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { id } = req.params;
+
+        const order = await prisma.order.findUnique({
+            where: { id: parseInt(id) }
+        });
+
+        if (!order) return res.status(404).json({ error: 'Sipariş bulunamadı' });
+        if (order.userId !== userId) return res.status(403).json({ error: 'Bu sipariş size ait değil' });
+
+        if (order.status !== 'PENDING') {
+            return res.status(400).json({ error: 'Sadece "Bekliyor" durumundaki siparişler iptal edilebilir. Lütfen mağaza ile iletişime geçin.' });
+        }
+
+        let history = [];
+        try { history = JSON.parse(order.statusHistory || '[]'); } catch (e) { }
+        history.push({
+            status: 'CANCELLED',
+            timestamp: new Date(),
+            changedBy: userId, // User themselves
+            note: 'Kullanıcı tarafından iptal edildi'
+        });
+
+        const updatedOrder = await prisma.order.update({
+            where: { id: parseInt(id) },
+            data: {
+                status: 'CANCELLED',
+                statusHistory: JSON.stringify(history)
+            }
+        });
+
+        res.json(updatedOrder);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Sipariş iptal edilemedi' });
+    }
+};
+
+module.exports = { createOrder, getUserOrders, getAllOrders, updateOrderStatus, verifyPickupCode, cancelMyOrder };

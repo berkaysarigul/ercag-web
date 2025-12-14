@@ -3,14 +3,11 @@ const prisma = new PrismaClient();
 
 const getAllProducts = async (req, res) => {
     try {
-        console.log('GET /products query:', req.query);
         const { categoryId, minPrice, maxPrice, search, sort } = req.query;
 
         const where = {};
 
-        if (categoryId) {
-            where.categoryId = parseInt(categoryId);
-        }
+        if (categoryId) where.categoryId = parseInt(categoryId);
 
         if (minPrice || maxPrice) {
             where.price = {};
@@ -33,7 +30,7 @@ const getAllProducts = async (req, res) => {
 
         const products = await prisma.product.findMany({
             where,
-            include: { category: true },
+            include: { category: true, images: true },
             orderBy
         });
         res.json(products);
@@ -48,7 +45,7 @@ const getProductById = async (req, res) => {
         const { id } = req.params;
         const product = await prisma.product.findUnique({
             where: { id: parseInt(id) },
-            include: { category: true }
+            include: { category: true, images: true }
         });
         if (!product) return res.status(404).json({ error: 'Product not found' });
         res.json(product);
@@ -60,14 +57,20 @@ const getProductById = async (req, res) => {
 
 const createProduct = async (req, res) => {
     try {
-        console.log('POST /products body:', req.body);
-        console.log('POST /products file:', req.file);
         const { name, description, price, categoryId } = req.body;
-        const image = req.file ? req.file.filename : null;
+        const files = req.files || [];
+
+        let mainImage = null;
+        if (files.length > 0) {
+            mainImage = files[0].filename;
+        }
 
         if (!categoryId) {
             return res.status(400).json({ error: 'Category ID is required' });
         }
+
+        // Prepare image data
+        const date = new Date(); // timestamp needed? No.
 
         const product = await prisma.product.create({
             data: {
@@ -76,22 +79,31 @@ const createProduct = async (req, res) => {
                 price: parseFloat(price),
                 categoryId: parseInt(categoryId),
                 stock: req.body.stock ? parseInt(req.body.stock) : 0,
-                image
-            }
+                image: mainImage, // Backward compatibility
+                images: {
+                    create: files.map((file, index) => ({
+                        url: file.filename,
+                        isMain: index === 0
+                    }))
+                }
+            },
+            include: { images: true }
         });
         res.status(201).json(product);
     } catch (error) {
         console.error('Create Product Error:', error);
-        require('fs').writeFileSync('server_error.log', String(error) + '\n' + JSON.stringify(error, null, 2));
         res.status(500).json({ error: 'Failed to create product', details: error.message });
     }
 };
 
 const updateProduct = async (req, res) => {
+
     try {
         const { id } = req.params;
+        console.log('Update Product Request:', { id, body: req.body, files: req.files }); // DEBUG LOG
+
         const { name, description, price, categoryId } = req.body;
-        const image = req.file ? req.file.filename : undefined;
+        const files = req.files || [];
 
         const data = {
             name,
@@ -101,17 +113,44 @@ const updateProduct = async (req, res) => {
             stock: req.body.stock ? parseInt(req.body.stock) : undefined
         };
 
-        if (image) {
-            data.image = image;
+        // If new files are uploaded, append them
+        // And update main image if none exists or if overwritten?
+        // Current logic: If new files, they are added.
+        // If product has no main image, first new file becomes main.
+
+        // Note: Managing deletions of specific images is complex in a simple update.
+        // We will assume this adds images.
+
+        if (files.length > 0) {
+            // Logic to add images (SQLite does not support createMany, use Promise.all)
+            await Promise.all(files.map(file =>
+                prisma.productImage.create({
+                    data: {
+                        productId: parseInt(id),
+                        url: file.filename,
+                        isMain: false
+                    }
+                })
+            ));
+
+            // Also update 'image' column if user wants? 
+            // Strategy: We won't touch 'image' column here unless we implement a specific "Set Main" logic.
+            // But for ensuring the card shows *something*, if 'image' is null, we should update it.
+            const currentProduct = await prisma.product.findUnique({ where: { id: parseInt(id) } });
+            if (!currentProduct.image) {
+                data.image = files[0].filename;
+            }
         }
 
         const product = await prisma.product.update({
             where: { id: parseInt(id) },
-            data
+            data,
+            include: { images: true }
         });
         res.json(product);
     } catch (error) {
         console.error(error);
+        try { fs.writeFileSync('error_log.txt', error.stack + '\n\n' + JSON.stringify(error)); } catch (e) { }
         res.status(500).json({ error: 'Failed to update product' });
     }
 };

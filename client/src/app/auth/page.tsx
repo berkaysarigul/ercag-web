@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function AuthPage() {
     const [isLogin, setIsLogin] = useState(true);
@@ -99,6 +100,13 @@ export default function AuthPage() {
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                         />
+                        {isLogin && (
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                                <Link href="/auth/forgot-password" style={{ fontSize: '0.8rem', color: '#2563eb', textDecoration: 'none' }}>
+                                    Şifremi Unuttum?
+                                </Link>
+                            </div>
+                        )}
                     </div>
 
                     {!isLogin && (

@@ -8,13 +8,19 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+const { apiLimiter } = require('./src/middleware/rateLimitMiddleware');
+
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Global Rate Limit
+app.use('/api', apiLimiter);
+
 // Routes
 const authRoutes = require('./src/routes/authRoutes');
+const cartRoutes = require('./src/routes/cartRoutes');
 const productRoutes = require('./src/routes/productRoutes');
 const orderRoutes = require('./src/routes/orderRoutes');
 const reviewRoutes = require('./src/routes/reviewRoutes');
@@ -25,6 +31,7 @@ const userRoutes = require('./src/routes/userRoutes');
 const settingsRoutes = require('./src/routes/settingsRoutes');
 
 app.use('/api/auth', authRoutes);
+app.use('/api/cart', cartRoutes);
 app.use('/api', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/reviews', reviewRoutes);

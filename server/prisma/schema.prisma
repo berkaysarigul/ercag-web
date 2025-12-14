@@ -24,6 +24,33 @@ model User {
   reviews   Review[]
   wishlist  Wishlist[]
   stockAlerts StockAlert[]
+
+  // Auth & Security
+  resetPasswordToken   String?
+  resetPasswordExpires DateTime?
+  isEmailVerified      Boolean   @default(false)
+  emailVerificationToken String?
+  
+  cart                 Cart?
+}
+
+model Cart {
+  id        Int        @id @default(autoincrement())
+  userId    Int        @unique
+  user      User       @relation(fields: [userId], references: [id])
+  items     CartItem[]
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        Int     @id @default(autoincrement())
+  cartId    Int
+  cart      Cart    @relation(fields: [cartId], references: [id])
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+
+  @@unique([cartId, productId])
 }
 
 model Category {
@@ -50,6 +77,16 @@ model Product {
   wishlist    Wishlist[]
   stock       Int         @default(0)
   stockAlerts StockAlert[]
+  cartItems   CartItem[]
+  images      ProductImage[]
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  url       String
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  isMain    Boolean @default(false)
 }
 
 model Order {

@@ -249,6 +249,24 @@ export default function ProfilePage() {
                                                         <p className="text-sm text-gray-500 mt-1">
                                                             {new Date(order.createdAt).toLocaleDateString('tr-TR')} - {new Date(order.createdAt).toLocaleTimeString('tr-TR')}
                                                         </p>
+                                                        {order.status === 'PENDING' && (
+                                                            <button
+                                                                onClick={async () => {
+                                                                    if (window.confirm('Siparişi iptal etmek istediğinize emin misiniz?')) {
+                                                                        try {
+                                                                            await api.put(`/orders/${order.id}/cancel`);
+                                                                            toast.success('Sipariş iptal edildi');
+                                                                            fetchOrders(); // Refresh list
+                                                                        } catch (err: any) {
+                                                                            toast.error(err.response?.data?.error || 'İptal edilemedi');
+                                                                        }
+                                                                    }
+                                                                }}
+                                                                className="text-xs text-red-600 hover:text-red-800 underline mt-2"
+                                                            >
+                                                                Siparişi İptal Et
+                                                            </button>
+                                                        )}
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="font-bold text-primary text-xl">{Number(order.totalAmount).toFixed(2)} ₺</p>
