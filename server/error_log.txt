@@ -1,0 +1,5 @@
+{
+  "name": "PrismaClientInitializationError",
+  "clientVersion": "5.22.0",
+  "errorCode": "P1001"
+}

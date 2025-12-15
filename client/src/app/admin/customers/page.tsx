@@ -5,6 +5,8 @@ import api from '@/lib/api';
 import { Search, User, ShoppingBag, Calendar, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+import UserRoleModal from '@/components/admin/UserRoleModal';
+
 interface Order {
     id: number;
     totalAmount: number;
@@ -32,6 +34,7 @@ export default function AdminCustomersPage() {
     const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
     const [userOrders, setUserOrders] = useState<Order[]>([]);
     const [ordersLoading, setOrdersLoading] = useState(false);
+    const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
 
     useEffect(() => {
         fetchUsers();
@@ -63,6 +66,25 @@ export default function AdminCustomersPage() {
         }
     };
 
+    const handleRoleUpdate = async (newRole: string) => {
+        if (!selectedUser) return;
+
+        try {
+            await api.put(`/users/${selectedUser.id}/role`, { role: newRole });
+            toast.success('Kullanıcı rolü güncellendi');
+            fetchUsers(search); // Refresh list
+        } catch (error) {
+            console.error('Role update error:', error);
+            toast.error('Rol güncellenemedi');
+            throw error;
+        }
+    };
+
+    const openRoleModal = (user: UserData) => {
+        setSelectedUser(user);
+        setIsRoleModalOpen(true);
+    };
+
     const handleViewOrders = async (user: UserData) => {
         setSelectedUser(user);
         setOrdersLoading(true);
@@ -80,8 +102,8 @@ export default function AdminCustomersPage() {
         <div className="p-8">
             <div className="flex justify-between items-center mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Müşteriler</h1>
-                    <p className="text-gray-500">Kayıtlı kullanıcıları yönetin.</p>
+                    <h1 className="text-3xl font-bold text-gray-900">Kullanıcı Yönetimi</h1>
+                    <p className="text-gray-500">Müşterileri ve personeli yönetin.</p>
                 </div>
             </div>
 
@@ -147,7 +169,14 @@ export default function AdminCustomersPage() {
                                             {user._count.orders} Sipariş
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-right">
+                                    <td className="px-6 py-4 text-right flex justify-end gap-2">
+                                        <button
+                                            onClick={() => openRoleModal(user)}
+                                            className="text-gray-400 hover:text-purple-600 transition-colors"
+                                            title="Rolü Düzenle"
+                                        >
+                                            <User size={20} />
+                                        </button>
                                         <button
                                             onClick={() => handleViewOrders(user)}
                                             className="text-gray-400 hover:text-primary transition-colors"
@@ -227,6 +256,15 @@ export default function AdminCustomersPage() {
                         </div>
                     </div>
                 </div>
+            )}
+            {isRoleModalOpen && selectedUser && (
+                <UserRoleModal
+                    isOpen={isRoleModalOpen}
+                    onClose={() => setIsRoleModalOpen(false)}
+                    currentRole={selectedUser.role}
+                    userName={selectedUser.name}
+                    onSave={handleRoleUpdate}
+                />
             )}
         </div>
     );

@@ -4,6 +4,8 @@ import { usePathname } from 'next/navigation';
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
+import MobileBottomNav from "@/components/layout/MobileBottomNav";
+
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const isAdmin = pathname?.startsWith('/admin');
@@ -11,10 +13,11 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     return (
         <>
             {!isAdmin && <Header />}
-            <main className={!isAdmin ? "flex-grow py-8 min-h-[calc(100vh-160px)]" : ""}>
+            <main className={!isAdmin ? "flex-grow py-8 min-h-[calc(100vh-160px)] pb-24 md:pb-8" : ""}>
                 {children}
             </main>
             {!isAdmin && <Footer />}
+            {!isAdmin && <MobileBottomNav />}
         </>
     );
 }

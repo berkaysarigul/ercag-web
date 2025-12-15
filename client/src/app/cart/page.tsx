@@ -324,6 +324,16 @@ export default function CartPage() {
                             </div>
                         )}
 
+                        <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
+                            <p className="font-bold flex items-center gap-2 mb-1">
+                                <span className="text-xl">💳</span> Ödeme Bilgisi
+                            </p>
+                            <p>
+                                Online ödeme sistemimiz bakım aşamasındadır. Siparişinizin ödemesini
+                                <strong> mağazada ürünleri teslim alırken</strong> nakit veya kredi kartı ile yapabilirsiniz.
+                            </p>
+                        </div>
+
                         <p className="text-xs text-gray-400 mt-4 text-center">
                             Ödemeniz mağazada ürünleri teslim alırken yapılacaktır.
                         </p>
@@ -341,6 +351,6 @@ export default function CartPage() {
                     // Let's just toast and let them click "Complete" since they might want to review details.
                 }}
             />
-        </div>
+        </div >
     );
 }

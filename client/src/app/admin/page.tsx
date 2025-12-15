@@ -10,7 +10,8 @@ export default function AdminDashboard() {
         totalOrders: 0,
         pendingOrders: 0,
         totalProducts: 0,
-        totalRevenue: 0
+        totalRevenue: 0,
+        chartData: [] // Add chartData to state
     });
     const [recentOrders, setRecentOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -93,26 +94,34 @@ export default function AdminDashboard() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Chart Section (Mock) */}
+                {/* Chart Section */}
                 <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-lg font-bold text-gray-800">Haftalık Satış Grafiği</h3>
-                        <select className="text-sm border-gray-200 rounded-lg text-gray-500">
-                            <option>Son 7 Gün</option>
-                            <option>Son 30 Gün</option>
-                        </select>
+                        <h3 className="text-lg font-bold text-gray-800">Haftalık Gelir (Son 7 Gün)</h3>
                     </div>
-                    <div className="h-64 flex items-end justify-between gap-2 px-4">
-                        {[40, 70, 45, 90, 65, 85, 55].map((h, i) => (
-                            <div key={i} className="w-full bg-primary/10 rounded-t-lg relative group hover:bg-primary/20 transition-colors" style={{ height: `${h}%` }}>
-                                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                    {h * 10} ₺
+                    {/* Simple Bar Chart Visualization */}
+                    <div className="h-64 flex items-end justify-between gap-2 px-4 relative">
+                        {stats.chartData && stats.chartData.map((d: any, i: number) => {
+                            // Find max value for scaling
+                            const maxVal = Math.max(...stats.chartData.map((d: any) => Number(d.revenue)), 1);
+                            const height = (Number(d.revenue) / maxVal) * 100;
+
+                            return (
+                                <div key={i} className="w-full bg-primary/10 rounded-t-lg relative group hover:bg-primary/20 transition-colors" style={{ height: `${height || 1}%` }}>
+                                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                                        {Number(d.revenue).toFixed(2)} ₺
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
+                        {(!stats.chartData || stats.chartData.length === 0) && (
+                            <div className="w-full h-full flex items-center justify-center text-gray-400">Veri yok</div>
+                        )}
                     </div>
                     <div className="flex justify-between mt-4 text-xs text-gray-400 px-4">
-                        <span>Pzt</span><span>Sal</span><span>Çar</span><span>Per</span><span>Cum</span><span>Cmt</span><span>Paz</span>
+                        {stats.chartData && stats.chartData.map((d: any, i: number) => (
+                            <span key={i} className="text-center w-full">{d.day}</span>
+                        ))}
                     </div>
                 </div>
 

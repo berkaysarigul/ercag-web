@@ -9,9 +9,10 @@ import MiniCart from "@/components/cart/MiniCart";
 import { Search, ShoppingCart, Menu, User, Heart, ArrowRight } from 'lucide-react';
 
 import { useRouter } from 'next/navigation';
+import api from '@/lib/api';
 
 export default function Header() {
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [settings, setSettings] = useState<any>({});
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const { items } = useCart();
@@ -21,6 +22,16 @@ export default function Header() {
     const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
     useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await api.get('/settings/public');
+                setSettings(res.data);
+            } catch (error) {
+                console.error('Failed to fetch settings');
+            }
+        };
+        fetchSettings();
+
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 10);
         };
@@ -32,7 +43,6 @@ export default function Header() {
         e.preventDefault();
         const query = (e.currentTarget.elements.namedItem('search') as HTMLInputElement).value;
         if (query.trim()) {
-            setIsMobileMenuOpen(false);
             router.push(`/products?search=${encodeURIComponent(query)}`);
         }
     };
@@ -42,7 +52,13 @@ export default function Header() {
             <header className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/90 backdrop-blur-md shadow-md border-b border-gray-100' : 'bg-white border-b border-gray-200'}`}>
                 <div className="container h-20 flex items-center justify-between">
                     <Link href="/" className="flex items-center">
-                        <Image src="/logo.png" alt="Erçağ Kırtasiye" width={150} height={50} className="object-contain" />
+                        <div className="relative h-16 w-52">
+                            <img
+                                src={settings.site_logo ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${settings.site_logo}` : "/logo.png"}
+                                alt={settings.site_title || "Erçağ Kırtasiye"}
+                                className="h-full w-full object-contain object-left"
+                            />
+                        </div>
                     </Link>
 
                     {/* Desktop Navigation */}
@@ -104,37 +120,12 @@ export default function Header() {
                         </div>
                     </nav>
 
-                    {/* Mobile Menu Button */}
-                    <div className="flex md:hidden items-center gap-4">
-                        <button onClick={() => setIsCartOpen(true)} className="relative p-2">
-                            <ShoppingCart size={24} />
-                            {cartItemCount > 0 && <span className="absolute -top-2 -right-2 bg-[var(--primary)] text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">{cartItemCount}</span>}
-                        </button>
-                        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2">
-                            <Menu size={24} />
-                        </button>
-                    </div>
+                    {/* Mobile Menu Button - OPTIONAL: We can keep this for extra links or hide since we have bottom nav */}
+                    {/* For now, just show Logo centered or keep simpler. Let's hide these since Bottom Nav has everything. */}
+                    <div className="flex md:hidden w-8"></div> {/* Spacer to balance logo if needed */}
                 </div>
 
-                {/* Mobile Menu Overlay */}
-                {isMobileMenuOpen && (
-                    <div className="md:hidden absolute top-20 left-0 w-full bg-white border-b border-gray-200 shadow-lg p-4 flex flex-col gap-4 animate-in slide-in-from-top-2">
-                        <form onSubmit={handleSearch} className="flex items-center border border-gray-300 rounded-lg px-4 py-3 bg-gray-50">
-                            <input name="search" type="text" placeholder="Ürün ara..." className="bg-transparent border-none outline-none w-full text-base placeholder:text-gray-500" />
-                            <button type="submit" className="text-gray-500">
-                                <Search size={20} />
-                            </button>
-                        </form>
-                        <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 hover:bg-gray-50 rounded-lg text-lg font-medium">Ana Sayfa</Link>
-                        <Link href="/products" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 hover:bg-gray-50 rounded-lg text-lg font-medium">Ürünler</Link>
-                        <Link href="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 hover:bg-gray-50 rounded-lg text-lg font-medium flex items-center gap-2"><Heart size={20} /> Favorilerim</Link>
-                        {user ? (
-                            <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 hover:bg-gray-50 rounded-lg text-lg font-medium flex items-center gap-2"><User size={20} /> Hesabım</Link>
-                        ) : (
-                            <Link href="/auth" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 hover:bg-gray-50 rounded-lg text-lg font-medium flex items-center gap-2"><User size={20} /> Giriş Yap</Link>
-                        )}
-                    </div>
-                )}
+
             </header>
 
             <MiniCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />

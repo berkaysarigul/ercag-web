@@ -2,18 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
-import { Settings, Power, Bell, Clock, Save, Loader2 } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
+import { Save, Loader2, Globe, Phone, MapPin, Instagram, Facebook } from 'lucide-react';
 
-export default function AdminSettingsPage() {
+export default function AdminSettings() {
+    const [settings, setSettings] = useState<any>({});
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [settings, setSettings] = useState({
-        storeOpen: 'true',
-        defaultPrepTime: '15',
-        orderNotifications: 'true',
-        promoNotifications: 'false'
-    });
 
     useEffect(() => {
         fetchSettings();
@@ -22,144 +17,222 @@ export default function AdminSettingsPage() {
     const fetchSettings = async () => {
         try {
             const res = await api.get('/settings');
-            // Merge defaults with fetched
-            if (res.data) {
-                setSettings(prev => ({ ...prev, ...res.data }));
-            }
+            // Convert array to object for easier form handling if API returns array
+            // If API returns array:
+            const settingsMap = res.data.reduce((acc: any, curr: any) => {
+                acc[curr.key] = curr.value;
+                return acc;
+            }, {});
+            setSettings(settingsMap);
         } catch (error) {
-            console.error('Settings fetch error', error);
+            console.error('Failed to fetch settings', error);
+            toast.error('Ayarlar yüklenemedi');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleSave = async () => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setSettings((prev: any) => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
         setSaving(true);
         try {
-            await api.post('/settings', settings);
+            await api.put('/settings', settings);
             toast.success('Ayarlar kaydedildi');
         } catch (error) {
-            toast.error('Kaydedilemedi');
+            console.error('Failed to save settings', error);
+            toast.error('Ayarlar kaydedilemedi');
         } finally {
             setSaving(false);
         }
     };
 
-    const handleChange = (key: string, value: string) => {
-        setSettings(prev => ({ ...prev, [key]: value }));
+    const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files || !e.target.files[0]) return;
+
+        const file = e.target.files[0];
+        const formData = new FormData();
+        formData.append('logo', file);
+
+        const toastId = toast.loading('Logo yükleniyor...');
+
+        try {
+            const res = await api.post('/settings/logo', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            setSettings((prev: any) => ({ ...prev, site_logo: res.data.logoUrl }));
+            toast.success('Logo güncellendi', { id: toastId });
+            // Force refresh explicitly or rely on state update
+            window.location.reload();
+        } catch (error) {
+            console.error('Logo upload error:', error);
+            toast.error('Logo yüklenemedi', { id: toastId });
+        }
     };
 
-    if (loading) return <div className="p-8"><Loader2 className="animate-spin text-primary" size={32} /></div>;
+    if (loading) return <div className="p-8"><Loader2 className="animate-spin" /></div>;
 
     return (
-        <div className="p-8 max-w-4xl">
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Mağaza Ayarları</h1>
-                    <p className="text-gray-500">Sistem yapılandırması.</p>
-                </div>
-                <button
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="btn btn-primary px-6 py-2 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
-                >
-                    {saving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
-                    Kaydet
-                </button>
-            </div>
+        <div className="space-y-6">
+            <h1 className="text-2xl font-bold text-gray-800">Site Ayarları</h1>
 
-            <div className="grid gap-6">
-                {/* Store Status */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <Power className={settings.storeOpen === 'true' ? 'text-green-500' : 'text-red-500'} />
-                        Mağaza Durumu
-                    </h2>
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={() => handleChange('storeOpen', 'true')}
-                            className={`flex-1 py-3 rounded-lg border-2 font-bold transition-all ${settings.storeOpen === 'true'
-                                    ? 'border-green-500 bg-green-50 text-green-700'
-                                    : 'border-gray-200 text-gray-400 hover:border-green-200'
-                                }`}
-                        >
-                            AÇIK
-                        </button>
-                        <button
-                            onClick={() => handleChange('storeOpen', 'false')}
-                            className={`flex-1 py-3 rounded-lg border-2 font-bold transition-all ${settings.storeOpen === 'false'
-                                    ? 'border-red-500 bg-red-50 text-red-700'
-                                    : 'border-gray-200 text-gray-400 hover:border-red-200'
-                                }`}
-                        >
-                            KAPALI
-                        </button>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-2">
-                        Mağaza kapalıyken müşteriler sipariş oluşturamaz (Sadece görüntüleyebilir).
-                    </p>
-                </div>
+            <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-6">
 
-                {/* Preparation Time */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <Clock className="text-primary" />
-                        Varsayılan Hazırlık Süresi
+                {/* General Settings */}
+                <div className="space-y-4">
+                    <h2 className="text-lg font-semibold text-gray-700 flex items-center gap-2">
+                        <Globe size={20} /> Genel Bilgiler
                     </h2>
-                    <div className="flex items-center gap-4">
-                        <input
-                            type="number"
-                            className="input w-32 font-bold text-lg"
-                            value={settings.defaultPrepTime}
-                            onChange={(e) => handleChange('defaultPrepTime', e.target.value)}
-                        />
-                        <span className="text-gray-700 font-medium">Dakika</span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Site Başlığı</label>
+                            <input
+                                type="text"
+                                name="site_title"
+                                value={settings.site_title || ''}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
+                                placeholder="Örn: Erçağ Kırtasiye"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Site Açıklaması</label>
+                            <input
+                                type="text"
+                                name="site_description"
+                                value={settings.site_description || ''}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
+                                placeholder="SEO için site açıklaması"
+                            />
+                        </div>
                     </div>
                 </div>
 
-                {/* Notifications */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <Bell className="text-yellow-500" />
-                        Bildirimler (Sanal)
+                <hr />
+
+                {/* Logo Settings */}
+                <div className="space-y-4">
+                    <h2 className="text-lg font-semibold text-gray-700 flex items-center gap-2">
+                        <Loader2 className={loading ? "animate-spin" : "hidden"} /> Logo Ayarları
                     </h2>
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <span className="text-gray-700 font-medium">Yeni Sipariş Bildirimi</span>
-                            <div className="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
-                                <input
-                                    type="checkbox"
-                                    name="toggle"
-                                    id="notifications"
-                                    className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
-                                    checked={settings.orderNotifications === 'true'}
-                                    onChange={(e) => handleChange('orderNotifications', e.target.checked ? 'true' : 'false')}
-                                />
-                                <label
-                                    htmlFor="notifications"
-                                    className={`toggle-label block overflow-hidden h-6 rounded-full cursor-pointer ${settings.orderNotifications === 'true' ? 'bg-green-400' : 'bg-gray-300'}`}
-                                ></label>
+                    <div className="flex items-start gap-6">
+                        <div className="w-40 h-40 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center bg-gray-50 overflow-hidden relative group">
+                            {settings.site_logo ? (
+                                <img src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${settings.site_logo}`} alt="Site Logo" className="w-full h-full object-contain p-2" />
+                            ) : (
+                                <span className="text-gray-400 text-sm">Logo Yok</span>
+                            )}
+                            <label className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer font-medium">
+                                Değiştir
+                                <input type="file" className="hidden" accept="image/*" onChange={handleLogoUpload} />
+                            </label>
+                        </div>
+                        <div className="flex-1">
+                            <h3 className="font-medium text-gray-900">Site Logosu</h3>
+                            <p className="text-sm text-gray-500 mt-1">
+                                PNG, JPG veya SVG formatında yükleyin. Önerilen boyut: 200x60px.
+                            </p>
+                            <div className="mt-4">
+                                <label className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors shadow-sm">
+                                    <input type="file" className="hidden" accept="image/*" onChange={handleLogoUpload} />
+                                    Yeni Logo Yükle
+                                </label>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <style jsx>{`
-                .toggle-checkbox:checked {
-                    right: 0;
-                    border-color: #68D391;
-                }
-                .toggle-checkbox {
-                    right: auto;
-                    left: 0;
-                    border-color: #CBD5E0;
-                    transition: all 0.3s;
-                }
-                .toggle-label {
-                    transition: background-color 0.3s;
-                }
-            `}</style>
-        </div>
+                <hr />
+
+                {/* Contact Settings */}
+                <div className="space-y-4">
+                    <h2 className="text-lg font-semibold text-gray-700 flex items-center gap-2">
+                        <Phone size={20} /> İletişim Bilgileri
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Telefon Numarası</label>
+                            <input
+                                type="text"
+                                name="site_phone"
+                                value={settings.site_phone || ''}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">E-posta Adresi</label>
+                            <input
+                                type="email"
+                                name="site_email"
+                                value={settings.site_email || ''}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
+                            />
+                        </div>
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1"><MapPin size={14} /> Adres</label>
+                            <textarea
+                                name="site_address"
+                                value={settings.site_address || ''}
+                                onChange={handleChange}
+                                rows={3}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+
+                {/* Social Media */}
+                <div className="space-y-4">
+                    <h2 className="text-lg font-semibold text-gray-700 flex items-center gap-2">
+                        <Instagram size={20} /> Sosyal Medya
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="flex items-center gap-2">
+                            <Instagram size={20} className="text-pink-600" />
+                            <input
+                                type="text"
+                                name="social_instagram"
+                                value={settings.social_instagram || ''}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
+                                placeholder="Instagram Link"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Facebook size={20} className="text-blue-600" />
+                            <input
+                                type="text"
+                                name="social_facebook"
+                                value={settings.social_facebook || ''}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
+                                placeholder="Facebook Link"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex justify-end pt-4">
+                    <button
+                        type="submit"
+                        disabled={saving}
+                        className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition-colors flex items-center gap-2 disabled:opacity-50"
+                    >
+                        {saving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
+                        Kaydet
+                    </button>
+                </div>
+            </form >
+        </div >
     );
 }

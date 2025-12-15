@@ -13,17 +13,17 @@ const createReview = async (req, res) => {
             return res.status(404).json({ error: 'Product not found' });
         }
 
-        // Optional: Check if user has purchased the product
-        // const hasPurchased = await prisma.order.findFirst({
-        //     where: {
-        //         userId: userId,
-        //         status: 'COMPLETED',
-        //         items: { some: { productId: parseInt(productId) } }
-        //     }
-        // });
-        // if (!hasPurchased) {
-        //     return res.status(403).json({ error: 'You can only review products you have purchased.' });
-        // }
+        // Check if user has purchased the product
+        const hasPurchased = await prisma.order.findFirst({
+            where: {
+                userId: userId,
+                status: 'COMPLETED',
+                items: { some: { productId: parseInt(productId) } }
+            }
+        });
+        if (!hasPurchased) {
+            return res.status(403).json({ error: 'Bu ürünü değerlendirmek için satın almış olmanız gerekmektedir.' });
+        }
 
         const review = await prisma.review.create({
             data: {

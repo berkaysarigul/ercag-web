@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import Link from 'next/link';
-import { Edit, Trash2, Plus, Package } from 'lucide-react';
+import { Edit, Trash2, Plus, Package, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface Product {
@@ -13,6 +13,7 @@ interface Product {
     category: { name: string };
     stock: number;
     image: string | null;
+    isFeatured: boolean;
 }
 
 export default function AdminProductsPage() {
@@ -32,6 +33,26 @@ export default function AdminProductsPage() {
             toast.error('Ürünler yüklenemedi');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleToggleFeatured = async (product: Product) => {
+        try {
+            // Optimistic update
+            const updatedProducts = products.map(p =>
+                p.id === product.id ? { ...p, isFeatured: !p.isFeatured } : p
+            );
+            setProducts(updatedProducts);
+
+            await api.put(`/products/${product.id}`, {
+                isFeatured: !product.isFeatured
+            });
+
+            toast.success(product.isFeatured ? 'Öne çıkanlardan kaldırıldı' : 'Öne çıkanlara eklendi');
+        } catch (error) {
+            console.error('Failed to update product', error);
+            toast.error('Güncelleme başarısız');
+            fetchProducts(); // Revert on error
         }
     };
 
@@ -65,6 +86,7 @@ export default function AdminProductsPage() {
                                 <th className="px-6 py-4 font-semibold text-gray-600">Kategori</th>
                                 <th className="px-6 py-4 font-semibold text-gray-600">Fiyat</th>
                                 <th className="px-6 py-4 font-semibold text-gray-600">Stok</th>
+                                <th className="px-6 py-4 font-semibold text-gray-600">Zirve</th>
                                 <th className="px-6 py-4 font-semibold text-gray-600 text-right">İşlemler</th>
                             </tr>
                         </thead>
@@ -92,6 +114,15 @@ export default function AdminProductsPage() {
                                             }`}>
                                             {product.stock} Adet
                                         </span>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <button
+                                            onClick={() => handleToggleFeatured(product)}
+                                            className={`p-1 rounded-full hover:bg-gray-100 transition-colors ${product.isFeatured ? 'text-yellow-500' : 'text-gray-300'}`}
+                                            title={product.isFeatured ? "Öne Çıkanlardan Kaldır" : "Öne Çıkanlara Ekle"}
+                                        >
+                                            <Star size={20} fill={product.isFeatured ? "currentColor" : "none"} />
+                                        </button>
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex items-center justify-end gap-2">

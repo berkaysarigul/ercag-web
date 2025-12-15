@@ -2,17 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-    LayoutDashboard,
-    ShoppingBag,
-    Package,
-    Ticket,
-    MessageSquare,
-    Users,
-    Settings,
-    LogOut,
-    ScanBarcode // Added
-} from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, Users, LogOut, Ticket, Settings, MessageSquare, ScanBarcode } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 export default function AdminSidebar() {
@@ -28,6 +18,7 @@ export default function AdminSidebar() {
         { name: 'Kuponlar', href: '/admin/coupons', icon: Ticket, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Değerlendirmeler', href: '/admin/reviews', icon: MessageSquare, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] },
         { name: 'Müşteriler', href: '/admin/customers', icon: Users, roles: ['SUPER_ADMIN', 'ADMIN'] },
+        { name: 'Vitrin / Slider', href: '/admin/sliders', icon: LayoutDashboard, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Ayarlar', href: '/admin/settings', icon: Settings, roles: ['SUPER_ADMIN', 'ADMIN'] },
     ];
 

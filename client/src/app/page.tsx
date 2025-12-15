@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { ArrowRight, ShoppingBag, Star, TrendingUp, Rocket } from "lucide-react";
+import HeroSlider from "@/components/home/HeroSlider";
+import FeaturedProducts from "@/components/home/FeaturedProducts";
 
 interface Category {
   id: number;
@@ -25,94 +27,11 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 min-h-[600px] flex items-center pt-10">
-        {/* Animated Background Pattern */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 left-0 w-72 h-72 bg-white rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse delay-1000"></div>
-        </div>
+      {/* Hero Section */}
+      <HeroSlider />
 
-        <div className="container mx-auto px-4 relative z-10 w-full">
-          <div className="max-w-3xl mx-auto text-center lg:text-left lg:mx-0">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-6 py-2 bg-white rounded-full mb-8 animate-fade-in mx-auto lg:mx-0 shadow-lg">
-              <Rocket className="w-5 h-5 text-blue-600" />
-              <span className="text-blue-700 text-sm font-bold uppercase tracking-wide">
-                Mağazadan Hızlı Teslimat
-              </span>
-            </div>
-
-            {/* Heading */}
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight animate-slide-up drop-shadow-md">
-              Kırtasiye Alışverişinin
-              <span className="block text-yellow-400 mt-2">
-                En Modern Hali
-              </span>
-            </h1>
-
-            {/* Subheading */}
-            <p className="text-xl md:text-2xl text-white mb-10 max-w-2xl mx-auto lg:mx-0 animate-slide-up delay-100 font-medium">
-              Okul, ofis ve sanatsal tüm ihtiyaçlarınız tek tıkla sepetinizde.
-              Sıra beklemeden, mağazadan teslim alın.
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-slide-up delay-200">
-              <Link href="/products" className="
-              group
-              px-8 py-4 
-              bg-white text-blue-700
-              font-bold text-lg
-              rounded-xl
-              shadow-xl hover:shadow-2xl hover:bg-gray-50
-              transform hover:scale-105
-              transition-all duration-300
-              flex items-center justify-center gap-3
-            ">
-                <ShoppingBag className="w-6 h-6 group-hover:rotate-12 transition-transform" />
-                Alışverişe Başla
-              </Link>
-
-              <button className="
-              px-8 py-4
-              border-2 border-white/50
-              text-white font-semibold text-lg
-              rounded-xl
-              backdrop-blur-sm
-              hover:bg-white/10 hover:border-white
-              transition-all duration-300
-            ">
-                Nasıl Çalışır?
-              </button>
-            </div>
-
-            {/* Stats */}
-            <div className="mt-12 grid grid-cols-3 gap-6 animate-fade-in delay-300 bg-white/10 rounded-2xl p-6 backdrop-blur-md border border-white/20 shadow-inner">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-1">500+</div>
-                <div className="text-blue-100 text-sm font-medium">Ürün Çeşidi</div>
-              </div>
-              <div className="text-center border-l border-white/20">
-                <div className="text-3xl font-bold text-white mb-1">10dk</div>
-                <div className="text-blue-100 text-sm font-medium">Ortalama Hazırlık</div>
-              </div>
-              <div className="text-center border-l border-white/20">
-                <div className="text-3xl font-bold text-white mb-1">4.9⭐</div>
-                <div className="text-blue-100 text-sm font-medium">Müşteri Memnuniyeti</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Decorative Wave */}
-        <div className="absolute -bottom-1 left-0 right-0 text-white z-20">
-          <svg viewBox="0 0 1440 120" className="w-full h-auto fill-white block">
-            <path
-              d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
-            ></path>
-          </svg>
-        </div>
-      </section>
+      {/* Featured Products */}
+      <FeaturedProducts />
 
       {/* Features Strip */}
       <div className="bg-white border-b border-gray-100 py-12">

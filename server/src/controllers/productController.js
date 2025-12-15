@@ -22,6 +22,10 @@ const getAllProducts = async (req, res) => {
             ];
         }
 
+        if (req.query.isFeatured) {
+            where.isFeatured = req.query.isFeatured === 'true';
+        }
+
         let orderBy = {};
         if (sort === 'price_asc') orderBy = { price: 'asc' };
         else if (sort === 'price_desc') orderBy = { price: 'desc' };
@@ -57,7 +61,7 @@ const getProductById = async (req, res) => {
 
 const createProduct = async (req, res) => {
     try {
-        const { name, description, price, categoryId } = req.body;
+        const { name, description, price, categoryId, isFeatured } = req.body;
         const files = req.files || [];
 
         let mainImage = null;
@@ -79,6 +83,7 @@ const createProduct = async (req, res) => {
                 price: parseFloat(price),
                 categoryId: parseInt(categoryId),
                 stock: req.body.stock ? parseInt(req.body.stock) : 0,
+                isFeatured: isFeatured === 'true' || isFeatured === true,
                 image: mainImage, // Backward compatibility
                 images: {
                     create: files.map((file, index) => ({
@@ -102,7 +107,7 @@ const updateProduct = async (req, res) => {
         const { id } = req.params;
         console.log('Update Product Request:', { id, body: req.body, files: req.files }); // DEBUG LOG
 
-        const { name, description, price, categoryId } = req.body;
+        const { name, description, price, categoryId, isFeatured } = req.body;
         const files = req.files || [];
 
         const data = {
@@ -110,7 +115,8 @@ const updateProduct = async (req, res) => {
             description,
             price: price ? parseFloat(price) : undefined,
             categoryId: categoryId ? parseInt(categoryId) : undefined,
-            stock: req.body.stock ? parseInt(req.body.stock) : undefined
+            stock: req.body.stock ? parseInt(req.body.stock) : undefined,
+            isFeatured: isFeatured !== undefined ? (isFeatured === 'true' || isFeatured === true) : undefined
         };
 
         // If new files are uploaded, append them

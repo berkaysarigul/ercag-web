@@ -55,8 +55,37 @@ const getUserOrders = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+const updateUserRole = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { role } = req.body;
+
+        // Valid roles
+        const validRoles = ['SUPER_ADMIN', 'STAFF', 'CUSTOMER'];
+        if (!validRoles.includes(role)) {
+            return res.status(400).json({ message: 'Invalid role' });
+        }
+
+        const user = await prisma.user.update({
+            where: { id: parseInt(id) },
+            data: { role },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true
+            }
+        });
+
+        res.json(user);
+    } catch (error) {
+        console.error('Update Role Error:', error);
+        res.status(500).json({ message: 'Failed to update role' });
+    }
+};
 
 module.exports = {
     getAllUsers,
-    getUserOrders
+    getUserOrders,
+    updateUserRole
 };

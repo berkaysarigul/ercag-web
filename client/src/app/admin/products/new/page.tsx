@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, Upload, Save } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import RichTextEditor from '@/components/admin/RichTextEditor';
 
 interface Category {
     id: number;
@@ -148,12 +149,10 @@ export default function NewProductPage() {
                         <div className="space-y-6">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Açıklama</label>
-                                <textarea
-                                    required
-                                    className="input w-full min-h-[120px]"
-                                    placeholder="Ürün özelliklerini detaylıca yazınız..."
+                                <RichTextEditor
                                     value={formData.description}
-                                    onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                    onChange={(value) => setFormData({ ...formData, description: value })}
+                                    placeholder="Ürün özelliklerini detaylıca yazınız..."
                                 />
                             </div>
 

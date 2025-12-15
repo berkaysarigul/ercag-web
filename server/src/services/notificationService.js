@@ -5,8 +5,8 @@ const nodemailer = require('nodemailer');
 // For now we will use console log if envs are missing
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: process.env.EMAIL_PORT || 587,
-    secure: false, // true for 465, false for other ports
+    port: parseInt(process.env.EMAIL_PORT || '587'),
+    secure: process.env.EMAIL_SECURE === 'true', // true for 465, false for other ports
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD,
@@ -15,8 +15,8 @@ const transporter = nodemailer.createTransport({
 
 const sendEmail = async (to, subject, htmlContent) => {
     try {
-        if (!process.env.EMAIL_USER) {
-            console.log('======== EMAIL MOCK ========');
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+            console.log('======== EMAIL MOCK (No Credentials Provided) ========');
             console.log(`To: ${to}`);
             console.log(`Subject: ${subject}`);
             console.log('--- Content ---');

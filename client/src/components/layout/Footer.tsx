@@ -2,8 +2,27 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState, useEffect } from 'react';
+import api from '@/lib/api';
 
 export default function Footer() {
+    const [settings, setSettings] = useState<any>({});
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await api.get('/settings/public');
+                setSettings(res.data);
+            } catch (error) {
+                console.error('Failed to fetch settings', error);
+            }
+        };
+        fetchSettings();
+    }, []);
+
+    // Get current year
+    const year = new Date().getFullYear();
+
     return (
         <footer className="bg-[var(--primary)] text-white pt-16 pb-8 mt-auto">
             <div className="container">
@@ -13,24 +32,27 @@ export default function Footer() {
                         <div className="bg-white p-2 w-fit rounded-lg">
                             <Image
                                 src="/logo.png"
-                                alt="Erçağ Kırtasiye"
+                                alt={settings.site_title || "Erçağ Kırtasiye"}
                                 width={120}
                                 height={40}
                                 className="object-contain"
                             />
                         </div>
                         <p className="text-gray-300 text-sm leading-relaxed">
-                            Okul, ofis ve sanatsal tüm ihtiyaçlarınız için güvenilir adresiniz.
-                            Kaliteli ürünler, uygun fiyatlar ve güler yüzlü hizmet.
+                            {settings.site_description || "Okul, ofis ve sanatsal tüm ihtiyaçlarınız için güvenilir adresiniz. Kaliteli ürünler, uygun fiyatlar ve güler yüzlü hizmet."}
                         </p>
                         <div className="flex gap-4">
-                            {/* Social Media Icons (Mock) */}
-                            <a href="#" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-[var(--accent)] transition-colors">
-                                📷
-                            </a>
-                            <a href="#" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-[var(--accent)] transition-colors">
-                                📘
-                            </a>
+                            {/* Social Media Icons (Dynamic) */}
+                            {settings.social_instagram && (
+                                <a href={settings.social_instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-[var(--accent)] transition-colors">
+                                    📷
+                                </a>
+                            )}
+                            {settings.social_facebook && (
+                                <a href={settings.social_facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-[var(--accent)] transition-colors">
+                                    📘
+                                </a>
+                            )}
                             <a href="#" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-[var(--accent)] transition-colors">
                                 🐦
                             </a>
@@ -81,18 +103,17 @@ export default function Footer() {
                         <ul className="space-y-4">
                             <li className="flex items-start gap-3">
                                 <span className="text-[var(--accent)] mt-1">📍</span>
-                                <span className="text-gray-300 text-sm">
-                                    Örnek Mahallesi, Kırtasiye Caddesi No: 123<br />
-                                    Kadıköy / İstanbul
+                                <span className="text-gray-300 text-sm whitespace-pre-line">
+                                    {settings.site_address || "Atatürk Caddesi No: 123\nMerkez, İstanbul"}
                                 </span>
                             </li>
                             <li className="flex items-center gap-3">
                                 <span className="text-[var(--accent)]">📞</span>
-                                <span className="text-gray-300 text-sm">+90 (212) 123 45 67</span>
+                                <span className="text-gray-300 text-sm">{settings.site_phone || "+90 (212) 123 45 67"}</span>
                             </li>
                             <li className="flex items-center gap-3">
                                 <span className="text-[var(--accent)]">✉️</span>
-                                <span className="text-gray-300 text-sm">info@ercagkirtasiye.com</span>
+                                <span className="text-gray-300 text-sm">{settings.site_email || "info@ercagkirtasiye.com"}</span>
                             </li>
                             <li className="flex items-center gap-3">
                                 <span className="text-[var(--accent)]">⏰</span>
@@ -103,7 +124,7 @@ export default function Footer() {
                 </div>
 
                 <div className="border-t border-white/10 pt-8 text-center text-sm text-gray-400">
-                    <p>&copy; {new Date().getFullYear()} Erçağ Kırtasiye. Tüm hakları saklıdır.</p>
+                    <p>&copy; {year} {settings.site_title || "Erçağ Kırtasiye"}. Tüm hakları saklıdır.</p>
                 </div>
             </div>
         </footer>
