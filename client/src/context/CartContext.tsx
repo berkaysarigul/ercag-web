@@ -29,7 +29,7 @@ import api from '@/lib/api';
 export function CartProvider({ children }: { children: React.ReactNode }) {
     const [items, setItems] = useState<CartItem[]>([]);
     const [loaded, setLoaded] = useState(false);
-    const { user, loading: authLoading } = useAuth(); // Assuming AuthContext provides 'loading'
+    const { user, loading: authLoading, logout } = useAuth(); // Assuming AuthContext provides 'loading' and 'logout'
 
     // Load cart from local storage on mount (Guest)
     // Or from API (User)
@@ -76,9 +76,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                     })) : [];
                     setItems(mappedItems);
 
-                } catch (error) {
+                } catch (error: any) {
                     console.error("Failed to fetch cart", error);
-                    // Fallback or error handling
+                    if (error.response && (error.response.status === 403 || error.response.status === 401)) {
+                        // Invalid token or user not found, logout
+                        logout();
+                    }
                 }
             } else {
                 // Guest: Load from Local Storage

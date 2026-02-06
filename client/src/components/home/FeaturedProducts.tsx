@@ -86,7 +86,7 @@ export default function FeaturedProducts() {
                             {/* Image */}
                             <div className="relative aspect-square mb-4 overflow-hidden rounded-xl bg-gray-50 p-6 flex items-center justify-center">
                                 <img
-                                    src={product.image || 'https://placehold.co/400?text=Urun'}
+                                    src={product.image ? (product.image.startsWith('http') ? product.image : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${product.image}`) : 'https://placehold.co/400?text=Urun'}
                                     alt={product.name}
                                     className="object-contain w-full h-full mix-blend-multiply group-hover:scale-110 transition-transform duration-500"
                                 />

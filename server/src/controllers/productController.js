@@ -34,10 +34,29 @@ const getAllProducts = async (req, res) => {
 
         const products = await prisma.product.findMany({
             where,
-            include: { category: true, images: true },
+            include: {
+                category: true,
+                images: true,
+                reviews: {
+                    select: { rating: true }
+                }
+            },
             orderBy
         });
-        res.json(products);
+
+        // Calculate average rating for each product
+        const productsWithRating = products.map(product => {
+            const totalRating = product.reviews.reduce((sum, review) => sum + review.rating, 0);
+            const averageRating = product.reviews.length > 0 ? (totalRating / product.reviews.length) : 0;
+
+            return {
+                ...product,
+                rating: parseFloat(averageRating.toFixed(1)),
+                reviewCount: product.reviews.length
+            };
+        });
+
+        res.json(productsWithRating);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to fetch products' });
@@ -110,6 +129,7 @@ const updateProduct = async (req, res) => {
         const { name, description, price, categoryId, isFeatured } = req.body;
         const files = req.files || [];
 
+        // Create a data object for update
         const data = {
             name,
             description,
@@ -119,16 +139,60 @@ const updateProduct = async (req, res) => {
             isFeatured: isFeatured !== undefined ? (isFeatured === 'true' || isFeatured === true) : undefined
         };
 
-        // If new files are uploaded, append them
-        // And update main image if none exists or if overwritten?
-        // Current logic: If new files, they are added.
-        // If product has no main image, first new file becomes main.
+        // Handle Image Deletion
+        let deletedIds = [];
+        if (req.body.deletedImageIds) {
+            try {
+                // If sent as FormData string "1,2,3" or JSON "[1,2,3]"
+                const raw = req.body.deletedImageIds;
+                if (typeof raw === 'string') {
+                    if (raw.startsWith('[')) deletedIds = JSON.parse(raw);
+                    else deletedIds = raw.split(',').map(id => parseInt(id)).filter(id => !isNaN(id));
+                } else if (Array.isArray(raw)) {
+                    deletedIds = raw.map(id => parseInt(id));
+                }
+            } catch (e) {
+                console.error('Failed to parse deletedImageIds', e);
+            }
+        }
 
-        // Note: Managing deletions of specific images is complex in a simple update.
-        // We will assume this adds images.
+        if (deletedIds.length > 0) {
+            // Get images to delete to check filenames
+            const imagesToDelete = await prisma.productImage.findMany({
+                where: { id: { in: deletedIds }, productId: parseInt(id) }
+            });
 
+            // Delete from DB
+            await prisma.productImage.deleteMany({
+                where: { id: { in: deletedIds }, productId: parseInt(id) }
+            });
+
+            // Check if any deleted image was the main 'image' column
+            // We need to fetch current product
+            const currentProduct = await prisma.product.findUnique({ where: { id: parseInt(id) } });
+
+            // If the main image (product.image) is among the deleted files' URLs
+            const isMainDeleted = imagesToDelete.some(img => img.url === currentProduct.image);
+
+            // Or if existingImages was manually cleared from frontend but we don't have separate product.image logic?
+            // Let's assume complex sync. simplest: if main deleted, pick another one.
+            if (isMainDeleted) {
+                // Find remaining images
+                const remainingImages = await prisma.productImage.findMany({
+                    where: { productId: parseInt(id) },
+                    orderBy: { id: 'asc' }
+                });
+
+                if (remainingImages.length > 0) {
+                    data.image = remainingImages[0].url;
+                } else {
+                    data.image = null; // No images left
+                }
+            }
+        }
+
+        // Handle New Images
         if (files.length > 0) {
-            // Logic to add images (SQLite does not support createMany, use Promise.all)
             await Promise.all(files.map(file =>
                 prisma.productImage.create({
                     data: {
@@ -139,11 +203,14 @@ const updateProduct = async (req, res) => {
                 })
             ));
 
-            // Also update 'image' column if user wants? 
-            // Strategy: We won't touch 'image' column here unless we implement a specific "Set Main" logic.
-            // But for ensuring the card shows *something*, if 'image' is null, we should update it.
-            const currentProduct = await prisma.product.findUnique({ where: { id: parseInt(id) } });
-            if (!currentProduct.image) {
+            // If product has no main image (or we just cleared it above), set first new file as main
+            // Re-check current state to be safe, but we can rely on data.image being set if we deleted it.
+            // If data.image is undefined, we verify current db state.
+            if (data.image === undefined) {
+                const currentProduct = await prisma.product.findUnique({ where: { id: parseInt(id) } });
+                if (!currentProduct.image) data.image = files[0].filename;
+            } else if (data.image === null) {
+                // We just deleted the main image and found no replacements, so use new file
                 data.image = files[0].filename;
             }
         }
@@ -156,7 +223,6 @@ const updateProduct = async (req, res) => {
         res.json(product);
     } catch (error) {
         console.error(error);
-        try { fs.writeFileSync('error_log.txt', error.stack + '\n\n' + JSON.stringify(error)); } catch (e) { }
         res.status(500).json({ error: 'Failed to update product' });
     }
 };
@@ -174,4 +240,29 @@ const deleteProduct = async (req, res) => {
     }
 };
 
-module.exports = { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct };
+const bulkDeleteProducts = async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ error: 'IDs array is required' });
+        }
+
+        // Optional: Delete images from filesystem too?
+        // For now, just DB deletion which cascades if configured, or manually delete images.
+        // Prisma cascade delete on Product -> ProductImage handles DB.
+        // Filesystem cleanup is harder without tracking. We skip FS cleanup for V1.
+
+        await prisma.product.deleteMany({
+            where: {
+                id: { in: ids.map(id => parseInt(id)) }
+            }
+        });
+
+        res.json({ message: `${ids.length} products deleted successfully` });
+    } catch (error) {
+        console.error('Bulk Delete Error:', error);
+        res.status(500).json({ error: 'Failed to delete products' });
+    }
+};
+
+module.exports = { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, bulkDeleteProducts };

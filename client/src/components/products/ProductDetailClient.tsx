@@ -134,7 +134,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                     <div className="bg-gray-50 rounded-xl overflow-hidden aspect-square relative border group">
                         {selectedImage ? (
                             <img
-                                src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${selectedImage}`}
+                                src={selectedImage?.startsWith('http') ? selectedImage : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${selectedImage}`}
                                 alt={product.name}
                                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 cursor-zoom-in"
                             />
@@ -158,7 +158,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                                     )}
                                 >
                                     <img
-                                        src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${img}`}
+                                        src={img.startsWith('http') ? img : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${img}`}
                                         alt={`${product.name} - ${i + 1}`}
                                         className="w-full h-full object-cover"
                                     />

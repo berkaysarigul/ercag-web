@@ -16,18 +16,21 @@ interface Product {
     images?: { url: string; isMain: boolean; }[];
     category?: { name: string };
     stock?: number;
+    rating?: number;
+    reviewCount?: number;
 }
 
 export default function ProductCard({ product }: { product: Product }) {
+    // ... existing hooks ...
     const { addToCart } = useCart();
     const [isHovered, setIsHovered] = useState(false);
 
     // Determine the image to show
-    // 1. Legacy/Main 'image' field
-    // 2. First image in 'images' array
     const displayImage = product.image || product.images?.[0]?.url;
 
+    // ... existing handlers ...
     const handleAddToCart = (e: React.MouseEvent) => {
+        // ...
         e.preventDefault();
         e.stopPropagation();
         if (product.stock === 0) {
@@ -38,6 +41,7 @@ export default function ProductCard({ product }: { product: Product }) {
     };
 
     const handleWishlist = async (e: React.MouseEvent) => {
+        // ...
         e.preventDefault();
         e.stopPropagation();
         try {
@@ -51,11 +55,12 @@ export default function ProductCard({ product }: { product: Product }) {
     return (
         <Link
             href={`/products/${product.id}`}
+            // ... className ...
             className="group bg-white rounded-2xl border border-gray-100 shadow-soft hover:shadow-hover overflow-hidden transition-all duration-300 hover:-translate-y-2 animate-scale-in flex flex-col h-full"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            {/* Image Container */}
+            {/* ... Image Container ... */}
             <div className="relative aspect-square bg-gray-50 overflow-hidden">
                 {/* Stock Badge */}
                 <div className="absolute top-3 left-3 z-10">
@@ -83,7 +88,7 @@ export default function ProductCard({ product }: { product: Product }) {
                 {displayImage ? (
                     <div className="relative w-full h-full">
                         <img
-                            src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${displayImage}`}
+                            src={displayImage?.startsWith('http') ? displayImage : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${displayImage}`}
                             alt={product.name}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />
@@ -94,7 +99,7 @@ export default function ProductCard({ product }: { product: Product }) {
                     </div>
                 )}
 
-                {/* Quick View Overlay (Visual only for now since we link to detail) */}
+                {/* Quick View Overlay */}
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <button className="px-4 py-2 bg-white text-gray-900 font-semibold text-sm rounded-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 flex items-center gap-2 shadow-lg hover:bg-gray-50">
                         <Eye size={16} />
@@ -111,8 +116,9 @@ export default function ProductCard({ product }: { product: Product }) {
                         {product.category?.name || 'Genel'}
                     </span>
                     <div className="flex items-center gap-1 text-xs text-gray-500">
-                        <Star size={12} className="fill-warning-400 text-warning-400" />
-                        <span className="font-semibold">4.8</span>
+                        <Star size={12} className={`fill-warning-400 ${product.rating ? 'text-warning-400' : 'text-gray-300'}`} />
+                        <span className="font-semibold">{product.rating ? product.rating : '0.0'}</span>
+                        {product.reviewCount !== undefined && <span className="text-gray-400">({product.reviewCount})</span>}
                     </div>
                 </div>
 

@@ -16,5 +16,6 @@ router.delete('/categories/:id', authenticateToken, isAdmin, require('../control
 router.post('/products', authenticateToken, isAdmin, upload.array('images', 5), productController.createProduct);
 router.put('/products/:id', authenticateToken, isAdmin, upload.array('images', 5), productController.updateProduct);
 router.delete('/products/:id', authenticateToken, isAdmin, productController.deleteProduct);
+router.post('/products/bulk-delete', authenticateToken, isAdmin, productController.bulkDeleteProducts);
 
 module.exports = router;

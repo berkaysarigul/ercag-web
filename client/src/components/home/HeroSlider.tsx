@@ -51,7 +51,7 @@ export default function HeroSlider() {
                                 <div
                                     className="absolute inset-0 bg-cover bg-center"
                                     style={{
-                                        backgroundImage: `url(http://localhost:3001/uploads/${slide.imageUrl})`
+                                        backgroundImage: `url(${slide.imageUrl.startsWith('http') ? slide.imageUrl : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${slide.imageUrl}`})`
                                     }}
                                 />
 

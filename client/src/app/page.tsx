@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { ArrowRight, ShoppingBag, Star, TrendingUp, Rocket } from "lucide-react";
 import HeroSlider from "@/components/home/HeroSlider";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
+import Skeleton from "@/components/ui/Skeleton";
 
 interface Category {
   id: number;
@@ -18,10 +19,13 @@ export default function Home() {
   const { user } = useAuth();
   const [categories, setCategories] = useState<Category[]>([]);
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     api.get('/categories')
       .then(res => setCategories(res.data))
-      .catch(err => console.error(err));
+      .catch(err => console.error(err))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -123,7 +127,19 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {categories.map((cat) => (
+            {loading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
+                  <div className="flex justify-center mb-6">
+                    <Skeleton variant="circular" width={80} height={80} />
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <Skeleton variant="text" width="60%" height={24} />
+                    <Skeleton variant="text" width="40%" height={16} />
+                  </div>
+                </div>
+              ))
+            ) : categories.map((cat) => (
               <Link
                 href={`/products?category=${cat.id}`}
                 key={cat.id}

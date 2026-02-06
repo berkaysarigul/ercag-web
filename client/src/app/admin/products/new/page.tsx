@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Upload, Save } from 'lucide-react';
+import { ArrowLeft, Save } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import RichTextEditor from '@/components/admin/RichTextEditor';
+import ImageUpload from '@/components/admin/ImageUpload';
 
 interface Category {
     id: number;
@@ -31,15 +32,7 @@ export default function NewProductPage() {
         api.get('/categories').then(res => setCategories(res.data));
     }, []);
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const files = Array.from(e.target.files);
-            setImages(prev => [...prev, ...files]);
-
-            const newPreviews = files.map(file => URL.createObjectURL(file));
-            setImagePreviews(prev => [...prev, ...newPreviews]);
-        }
-    };
+    // handleImageChange removed as ImageUpload handles it
 
     const removeImage = (index: number) => {
         setImages(prev => prev.filter((_, i) => i !== index));
@@ -97,22 +90,13 @@ export default function NewProductPage() {
                         <div className="space-y-6">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Ürün Görselleri</label>
-                                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:bg-gray-50 transition-colors relative group">
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        multiple
-                                        onChange={handleImageChange}
-                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                    />
-                                    <div className="py-4">
-                                        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-400">
-                                            <Upload size={24} />
-                                        </div>
-                                        <p className="text-sm text-gray-500">Görselleri yüklemek için tıklayın veya sürükleyin</p>
-                                        <p className="text-xs text-gray-400 mt-1">Birden fazla dosya seçebilirsiniz</p>
-                                    </div>
-                                </div>
+                                <ImageUpload
+                                    onImagesSelected={(files) => {
+                                        setImages(prev => [...prev, ...files]);
+                                        const newPreviews = files.map(file => URL.createObjectURL(file));
+                                        setImagePreviews(prev => [...prev, ...newPreviews]);
+                                    }}
+                                />
 
                                 {imagePreviews.length > 0 && (
                                     <div className="grid grid-cols-3 gap-2 mt-4">
