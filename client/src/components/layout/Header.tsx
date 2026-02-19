@@ -11,8 +11,10 @@ import { Search, ShoppingCart, Menu, User, Heart, ArrowRight } from 'lucide-reac
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 
+import { useSettings } from "@/context/SettingsContext";
+
 export default function Header() {
-    const [settings, setSettings] = useState<any>({});
+    const { settings } = useSettings();
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const { items } = useCart();
@@ -22,16 +24,7 @@ export default function Header() {
     const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
     useEffect(() => {
-        const fetchSettings = async () => {
-            try {
-                const res = await api.get('/settings/public');
-                setSettings(res.data);
-            } catch (error) {
-                console.error('Failed to fetch settings');
-            }
-        };
-        fetchSettings();
-
+        // Scroll handler only
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 10);
         };

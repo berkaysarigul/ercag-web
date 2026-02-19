@@ -6,9 +6,12 @@ import { useAuth } from '@/context/AuthContext';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import AdminHeader from '@/components/admin/AdminHeader';
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+import { AdminProvider, useAdmin } from '@/context/AdminContext';
+
+function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     const { user, loading } = useAuth();
     const router = useRouter();
+    const { sidebarOpen, setSidebarOpen } = useAdmin();
 
     useEffect(() => {
         if (!loading && (!user || !['SUPER_ADMIN', 'STAFF', 'ADMIN'].includes(user.role))) {
@@ -25,7 +28,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
 
     if (!user || !['SUPER_ADMIN', 'STAFF', 'ADMIN'].includes(user.role)) {
-        return null;
+        return null; // Or redirect handled by useEffect
     }
 
     return (
@@ -33,16 +36,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {/* Sidebar */}
             <AdminSidebar />
 
+            {/* Overlay for mobile */}
+            {sidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                    onClick={() => setSidebarOpen(false)}
+                />
+            )}
+
             {/* Main Content Area */}
-            <div className="flex-1 ml-64 flex flex-col min-h-screen">
+            <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 md:ml-64`}>
                 {/* Header */}
                 <AdminHeader />
 
                 {/* Page Content */}
-                <main className="flex-1 p-8 overflow-y-auto">
+                <main className="flex-1 p-4 md:p-8 overflow-y-auto w-full">
                     {children}
                 </main>
             </div>
         </div>
+    );
+}
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+    return (
+        <AdminProvider>
+            <AdminLayoutContent>{children}</AdminLayoutContent>
+        </AdminProvider>
     );
 }

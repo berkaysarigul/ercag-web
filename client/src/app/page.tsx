@@ -15,7 +15,10 @@ interface Category {
   image: string | null;
 }
 
+import { useSettings } from "@/context/SettingsContext";
+
 export default function Home() {
+  const { settings } = useSettings();
   const { user } = useAuth();
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -30,7 +33,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
       {/* Hero Section */}
       <HeroSlider />
 
@@ -78,7 +80,7 @@ export default function Home() {
             <div className="space-y-6 bg-gray-50 p-8 rounded-2xl border border-gray-100">
               <div>
                 <h4 className="font-bold text-gray-900 mb-2">Adres</h4>
-                <p className="text-gray-600">Atatürk Caddesi No: 123, Merkez, İstanbul</p>
+                <p className="text-gray-600 whitespace-pre-line">{settings.site_address || "Atatürk Caddesi No: 123, Merkez, İstanbul"}</p>
               </div>
               <div>
                 <h4 className="font-bold text-gray-900 mb-2">Çalışma Saatleri</h4>
@@ -87,8 +89,8 @@ export default function Home() {
               </div>
               <div>
                 <h4 className="font-bold text-gray-900 mb-2">İletişim</h4>
-                <p className="text-gray-600">Telefon: 0212 123 45 67</p>
-                <p className="text-gray-600">WhatsApp: 0555 123 45 67</p>
+                <p className="text-gray-600">Telefon: {settings.site_phone || "0212 123 45 67"}</p>
+                <p className="text-gray-600">Email: {settings.site_email || "info@ercagkirtasiye.com"}</p>
               </div>
             </div>
           </div>

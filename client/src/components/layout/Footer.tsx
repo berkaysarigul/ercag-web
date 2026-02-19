@@ -5,20 +5,10 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 
-export default function Footer() {
-    const [settings, setSettings] = useState<any>({});
+import { useSettings } from "@/context/SettingsContext";
 
-    useEffect(() => {
-        const fetchSettings = async () => {
-            try {
-                const res = await api.get('/settings/public');
-                setSettings(res.data);
-            } catch (error) {
-                console.error('Failed to fetch settings', error);
-            }
-        };
-        fetchSettings();
-    }, []);
+export default function Footer() {
+    const { settings } = useSettings();
 
     // Get current year
     const year = new Date().getFullYear();

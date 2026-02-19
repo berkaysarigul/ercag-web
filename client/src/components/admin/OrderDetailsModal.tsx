@@ -15,7 +15,10 @@ interface OrderDetailsModalProps {
 
 import { robotoBase64 } from '@/lib/robotoBase64';
 
+import { useSettings } from "@/context/SettingsContext";
+
 export default function OrderDetailsModal({ isOpen, onClose, order, onStatusChange }: OrderDetailsModalProps) {
+    const { settings } = useSettings();
     if (!order) return null;
 
     const downloadInvoice = () => {
@@ -28,7 +31,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order, onStatusChan
 
         // Header
         doc.setFontSize(20);
-        doc.text('Erçağ Kırtasiye', 105, 15, { align: 'center' });
+        doc.text(settings.site_title || 'Erçağ Kırtasiye', 105, 15, { align: 'center' });
         doc.setFontSize(12);
         doc.text('Sipariş Fişi', 105, 22, { align: 'center' });
 

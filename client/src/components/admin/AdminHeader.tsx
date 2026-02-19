@@ -1,10 +1,12 @@
 'use client';
 
-import { Bell, Search, User } from 'lucide-react';
+import { Bell, Search, User, Menu } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { useAdmin } from '@/context/AdminContext';
 
 export default function AdminHeader() {
     const pathname = usePathname();
+    const { toggleSidebar } = useAdmin();
 
     const getPageTitle = () => {
         if (pathname === '/admin') return 'Dashboard';
@@ -17,10 +19,16 @@ export default function AdminHeader() {
     };
 
     return (
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-40 shadow-sm">
-            {/* Left: Title */}
-            <div>
-                <h2 className="text-xl font-bold text-gray-800">{getPageTitle()}</h2>
+        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-8 sticky top-0 z-40 shadow-sm">
+            {/* Left: Title & Toggle */}
+            <div className="flex items-center gap-4">
+                <button
+                    className="p-2 -ml-2 text-gray-600 hover:bg-gray-100 rounded-lg md:hidden"
+                    onClick={toggleSidebar}
+                >
+                    <Menu size={20} />
+                </button>
+                <h2 className="text-lg md:text-xl font-bold text-gray-800 truncate">{getPageTitle()}</h2>
             </div>
 
             {/* Right: Actions */}
