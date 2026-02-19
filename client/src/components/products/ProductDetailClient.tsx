@@ -22,6 +22,8 @@ interface Product {
     images?: { url: string; isMain: boolean }[];
     category: { name: string };
     stock: number;
+    rating?: number;
+    numReviews?: number;
 }
 
 export default function ProductDetailClient({ product }: { product: Product }) {
@@ -33,6 +35,12 @@ export default function ProductDetailClient({ product }: { product: Product }) {
     const [inWishlist, setInWishlist] = useState(false);
     const [quantity, setQuantity] = useState(1);
     const [alertSubscribed, setAlertSubscribed] = useState(false);
+
+    // Initialize stats from product prop (Server Side / Static Data)
+    const [stats, setStats] = useState({
+        average: product.rating || 0,
+        count: product.numReviews || 0
+    });
 
     // Resolve initial images: If product.images exists, use it. Else fallback to [product.image].
     const allImages = product.images && product.images.length > 0
@@ -74,7 +82,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
         }
     };
 
-    const [stats, setStats] = useState({ average: 0, count: 0 });
+    // ... existing ...
 
     const fetchReviews = async () => {
         try {
@@ -83,7 +91,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
             const data = res.data;
             setReviews(data);
 
-            // Calculate Stats
+            // Update stats from fresh reviews (client-side sync)
             if (data.length > 0) {
                 const total = data.reduce((acc: number, review: any) => acc + review.rating, 0);
                 setStats({

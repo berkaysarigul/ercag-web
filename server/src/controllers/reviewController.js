@@ -1,18 +1,32 @@
 const prisma = require('../lib/prisma');
 
+const updateProductRating = async (productId) => {
+    const aggregations = await prisma.review.aggregate({
+        _avg: { rating: true },
+        _count: { rating: true },
+        where: { productId: parseInt(productId) }
+    });
+
+    const rating = aggregations._avg.rating || 0;
+    const numReviews = aggregations._count.rating || 0;
+
+    await prisma.product.update({
+        where: { id: parseInt(productId) },
+        data: { rating, numReviews }
+    });
+};
+
 const createReview = async (req, res) => {
     try {
         const userId = req.user.id;
         const { productId, rating, comment } = req.body;
         console.log('Create Review Request:', { userId, body: req.body });
 
-        // Check if product exists
         const product = await prisma.product.findUnique({ where: { id: parseInt(productId) } });
         if (!product) {
             return res.status(404).json({ error: 'Product not found' });
         }
 
-        // Check if user has purchased the product
         const hasPurchased = await prisma.order.findFirst({
             where: {
                 userId: userId,
@@ -20,7 +34,9 @@ const createReview = async (req, res) => {
                 items: { some: { productId: parseInt(productId) } }
             }
         });
-        if (!hasPurchased) {
+
+        // Allow if user is admin or has purchased
+        if (!hasPurchased && req.user.role !== 'SUPER_ADMIN' && req.user.role !== 'ADMIN') {
             return res.status(403).json({ error: 'Bu ürünü değerlendirmek için satın almış olmanız gerekmektedir.' });
         }
 
@@ -33,6 +49,8 @@ const createReview = async (req, res) => {
             },
             include: { user: { select: { name: true } } }
         });
+
+        await updateProductRating(productId);
 
         res.status(201).json(review);
     } catch (error) {
@@ -75,9 +93,12 @@ const getAllReviews = async (req, res) => {
 const deleteReview = async (req, res) => {
     try {
         const { id } = req.params;
-        await prisma.review.delete({
+        const review = await prisma.review.delete({
             where: { id: parseInt(id) }
         });
+
+        await updateProductRating(review.productId);
+
         res.json({ message: 'Review deleted successfully' });
     } catch (error) {
         console.error('Delete Review Error:', error);

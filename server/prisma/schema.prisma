@@ -81,6 +81,8 @@ model Product {
   cartItems   CartItem[]
   images      ProductImage[]
   isDeleted   Boolean     @default(false)
+  rating      Float       @default(0)
+  numReviews  Int         @default(0)
 }
 
 model ProductImage {
