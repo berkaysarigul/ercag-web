@@ -3,6 +3,9 @@ const prisma = require('../lib/prisma');
 const getAllUsers = async (req, res) => {
     try {
         const { search } = req.query;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        const skip = (page - 1) * limit;
 
         let where = {};
         if (search) {
@@ -15,23 +18,34 @@ const getAllUsers = async (req, res) => {
             };
         }
 
-        const users = await prisma.user.findMany({
-            where,
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                phone: true,
-                role: true,
-                createdAt: true,
-                _count: {
-                    select: { orders: true }
-                }
-            },
-            orderBy: { createdAt: 'desc' }
-        });
+        const [total, users] = await Promise.all([
+            prisma.user.count({ where }),
+            prisma.user.findMany({
+                where,
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    phone: true,
+                    role: true,
+                    createdAt: true,
+                    _count: {
+                        select: { orders: true }
+                    }
+                },
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take: limit
+            })
+        ]);
 
-        res.json(users);
+        res.json({
+            users,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
+            limit
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });

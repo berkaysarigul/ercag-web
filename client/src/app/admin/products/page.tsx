@@ -20,23 +20,44 @@ interface Product {
 export default function AdminProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const [pagination, setPagination] = useState({
+        page: 1,
+        totalPages: 1,
+        total: 0
+    });
 
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
     useEffect(() => {
-        fetchProducts();
-    }, []);
+        fetchProducts(pagination.page);
+    }, [pagination.page]);
 
-    const fetchProducts = async () => {
+    const fetchProducts = async (page: number) => {
+        setLoading(true);
         try {
-            const res = await api.get('/products');
-            setProducts(res.data);
+            const res = await api.get(`/products?page=${page}&limit=20`); // Admin might want to see more
+            if (res.data.products) {
+                setProducts(res.data.products);
+                setPagination(prev => ({
+                    ...prev,
+                    totalPages: res.data.totalPages,
+                    total: res.data.total
+                }));
+            } else if (Array.isArray(res.data)) {
+                setProducts(res.data);
+            }
             setSelectedIds([]); // Reset selection on refresh
         } catch (error) {
             console.error('Failed to fetch products', error);
             toast.error('Ürünler yüklenemedi');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage >= 1 && newPage <= pagination.totalPages) {
+            setPagination(prev => ({ ...prev, page: newPage }));
         }
     };
 
@@ -61,7 +82,7 @@ export default function AdminProductsPage() {
         try {
             await api.post('/products/bulk-delete', { ids: selectedIds });
             toast.success('Seçilen ürünler silindi');
-            fetchProducts();
+            fetchProducts(pagination.page);
         } catch (error) {
             console.error('Failed to bulk delete', error);
             toast.error('Toplu silme başarısız');
@@ -84,7 +105,7 @@ export default function AdminProductsPage() {
         } catch (error) {
             console.error('Failed to update product', error);
             toast.error('Güncelleme başarısız');
-            fetchProducts(); // Revert on error
+            fetchProducts(pagination.page); // Revert on error
         }
     };
 
@@ -93,7 +114,7 @@ export default function AdminProductsPage() {
         try {
             await api.delete(`/products/${id}`);
             toast.success('Ürün silindi');
-            fetchProducts();
+            fetchProducts(pagination.page);
         } catch (error) {
             console.error('Failed to delete product', error);
             toast.error('Ürün silinirken bir hata oluştu');

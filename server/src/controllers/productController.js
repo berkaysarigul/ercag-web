@@ -2,9 +2,16 @@ const prisma = require('../lib/prisma');
 
 const getAllProducts = async (req, res) => {
     try {
-        const { categoryId, minPrice, maxPrice, search, sort } = req.query;
+        const { categoryId, minPrice, maxPrice, search, sort, isFeatured } = req.query;
 
-        const where = {};
+        // Pagination
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        const skip = (page - 1) * limit;
+
+        const where = {
+            isDeleted: false // Default filter for soft deleted products
+        };
 
         if (categoryId) where.categoryId = parseInt(categoryId);
 
@@ -16,13 +23,15 @@ const getAllProducts = async (req, res) => {
 
         if (search) {
             where.OR = [
-                { name: { contains: search } },
+                { name: { contains: search } }, // Case insensitive usually requires mode: 'insensitive' in Postgres, but if not enabled in schema, it might be case sensitive. 
+                // But let's keep it simple for now or adding mode: 'insensitive' if using Postgres.
+                // Prisma default for Postgres is case sensitive unless mode: 'insensitive' is specified.
                 { description: { contains: search } }
             ];
         }
 
-        if (req.query.isFeatured) {
-            where.isFeatured = req.query.isFeatured === 'true';
+        if (isFeatured) {
+            where.isFeatured = isFeatured === 'true';
         }
 
         let orderBy = {};
@@ -31,17 +40,20 @@ const getAllProducts = async (req, res) => {
         else if (sort === 'newest') orderBy = { createdAt: 'desc' };
         else orderBy = { id: 'asc' };
 
-        const products = await prisma.product.findMany({
-            where,
-            include: {
-                category: true,
-                images: true,
-                reviews: {
-                    select: { rating: true }
-                }
-            },
-            orderBy
-        });
+        const [total, products] = await Promise.all([
+            prisma.product.count({ where }),
+            prisma.product.findMany({
+                where,
+                include: {
+                    category: true,
+                    images: true,
+                    reviews: { select: { rating: true } }
+                },
+                orderBy,
+                skip,
+                take: limit
+            })
+        ]);
 
         // Calculate average rating for each product
         const productsWithRating = products.map(product => {
@@ -55,18 +67,28 @@ const getAllProducts = async (req, res) => {
             };
         });
 
-        res.json(productsWithRating);
+        res.json({
+            products: productsWithRating,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
+            limit
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to fetch products' });
     }
 };
 
+
 const getProductById = async (req, res) => {
     try {
         const { id } = req.params;
-        const product = await prisma.product.findUnique({
-            where: { id: parseInt(id) },
+        const product = await prisma.product.findFirst({
+            where: {
+                id: parseInt(id),
+                isDeleted: false
+            },
             include: { category: true, images: true }
         });
         if (!product) return res.status(404).json({ error: 'Product not found' });
@@ -77,9 +99,20 @@ const getProductById = async (req, res) => {
     }
 };
 
+const { createProductSchema } = require('../utils/validationSchemas');
+
 const createProduct = async (req, res) => {
     try {
-        const { name, description, price, categoryId, isFeatured } = req.body;
+        const validation = createProductSchema.safeParse(req.body);
+
+        if (!validation.success) {
+            return res.status(400).json({
+                error: 'Invalid input',
+                details: validation.error.flatten().fieldErrors
+            });
+        }
+
+        const { name, description, price, categoryId, stock, isFeatured } = validation.data;
         const files = req.files || [];
 
         let mainImage = null;
@@ -87,22 +120,15 @@ const createProduct = async (req, res) => {
             mainImage = files[0].filename;
         }
 
-        if (!categoryId) {
-            return res.status(400).json({ error: 'Category ID is required' });
-        }
-
-        // Prepare image data
-        const date = new Date(); // timestamp needed? No.
-
         const product = await prisma.product.create({
             data: {
                 name,
                 description,
-                price: parseFloat(price),
-                categoryId: parseInt(categoryId),
-                stock: req.body.stock ? parseInt(req.body.stock) : 0,
-                isFeatured: isFeatured === 'true' || isFeatured === true,
-                image: mainImage, // Backward compatibility
+                price: price,
+                categoryId: categoryId,
+                stock: stock,
+                isFeatured: isFeatured,
+                image: mainImage,
                 images: {
                     create: files.map((file, index) => ({
                         url: file.filename,
@@ -229,10 +255,11 @@ const updateProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        await prisma.product.delete({
-            where: { id: parseInt(id) }
+        await prisma.product.update({
+            where: { id: parseInt(id) },
+            data: { isDeleted: true }
         });
-        res.json({ message: 'Product deleted successfully' });
+        res.json({ message: 'Product deleted successfully (soft delete)' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to delete product' });
@@ -251,13 +278,14 @@ const bulkDeleteProducts = async (req, res) => {
         // Prisma cascade delete on Product -> ProductImage handles DB.
         // Filesystem cleanup is harder without tracking. We skip FS cleanup for V1.
 
-        await prisma.product.deleteMany({
+        await prisma.product.updateMany({
             where: {
                 id: { in: ids.map(id => parseInt(id)) }
-            }
+            },
+            data: { isDeleted: true }
         });
 
-        res.json({ message: `${ids.length} products deleted successfully` });
+        res.json({ message: `${ids.length} products deleted successfully (soft delete)` });
     } catch (error) {
         console.error('Bulk Delete Error:', error);
         res.status(500).json({ error: 'Failed to delete products' });

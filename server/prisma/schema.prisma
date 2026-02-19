@@ -80,6 +80,7 @@ model Product {
   isFeatured  Boolean     @default(false)
   cartItems   CartItem[]
   images      ProductImage[]
+  isDeleted   Boolean     @default(false)
 }
 
 model ProductImage {

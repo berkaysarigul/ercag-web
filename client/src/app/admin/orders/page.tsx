@@ -40,21 +40,49 @@ export default function AdminOrdersPage() {
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    useEffect(() => {
-        fetchOrders();
-    }, []);
+    const [pagination, setPagination] = useState({
+        page: 1,
+        totalPages: 1,
+        total: 0
+    });
 
     useEffect(() => {
-        filterOrders();
-    }, [orders, activeTab, searchQuery]);
+        fetchOrders(pagination.page);
+    }, [pagination.page]);
 
-    const fetchOrders = async () => {
+    const fetchOrders = async (page: number) => {
+        setLoading(true);
         try {
-            const res = await api.get('/orders/all');
-            setOrders(res.data);
+            // Using /orders/all as per original code, but ensuring it supports pagination query params
+            const res = await api.get(`/orders/all?page=${page}&limit=20`);
+
+            if (res.data.orders) {
+                setOrders(res.data.orders);
+                setPagination(prev => ({
+                    ...prev,
+                    totalPages: res.data.totalPages,
+                    total: res.data.total
+                }));
+            } else if (Array.isArray(res.data)) {
+                setOrders(res.data);
+            }
         } catch (error) {
             console.error('Failed to fetch orders', error);
             toast.error('Siparişler yüklenemedi');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage >= 1 && newPage <= pagination.totalPages) {
+            setPagination(prev => ({ ...prev, page: newPage }));
+        }
+    };
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage >= 1 && newPage <= pagination.totalPages) {
+            setPagination(prev => ({ ...prev, page: newPage }));
         }
     };
 
@@ -89,7 +117,7 @@ export default function AdminOrdersPage() {
             setIsModalOpen(false);
 
             // Refresh Data
-            fetchOrders();
+            fetchOrders(pagination.page);
         } catch (error: any) {
             console.error('Failed to update status', error);
             toast.error(error.response?.data?.error || 'Durum güncellenemedi');
@@ -215,6 +243,7 @@ export default function AdminOrdersPage() {
                     </div>
                 ))}
 
+
                 {filteredOrders.length === 0 && (
                     <div className="text-center py-16 bg-white rounded-xl border border-dashed border-gray-300">
                         <Package className="mx-auto h-16 w-16 text-gray-300 mb-4" />
@@ -223,6 +252,29 @@ export default function AdminOrdersPage() {
                     </div>
                 )}
             </div>
+
+            {/* Pagination */}
+            {pagination.totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-4">
+                    <button
+                        onClick={() => handlePageChange(pagination.page - 1)}
+                        disabled={pagination.page === 1}
+                        className="px-4 py-2 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed bg-white"
+                    >
+                        Önceki
+                    </button>
+                    <span className="text-gray-600">
+                        Sayfa {pagination.page} / {pagination.totalPages}
+                    </span>
+                    <button
+                        onClick={() => handlePageChange(pagination.page + 1)}
+                        disabled={pagination.page === pagination.totalPages}
+                        className="px-4 py-2 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed bg-white"
+                    >
+                        Sonraki
+                    </button>
+                </div>
+            )}
 
             <OrderDetailsModal
                 isOpen={isModalOpen}

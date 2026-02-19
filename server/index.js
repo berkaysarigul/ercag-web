@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const dotenv = require('dotenv');
 const path = require('path');
 
@@ -11,12 +12,23 @@ const PORT = process.env.PORT || 3001;
 const { apiLimiter } = require('./src/middleware/rateLimitMiddleware');
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+    origin: [process.env.FRONTEND_URL || 'http://localhost:3000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" } // Allow serving static files
+}));
 app.use(express.json());
+
 const uploadPath = path.join(__dirname, 'uploads');
 console.log('Serving static files from:', uploadPath);
 app.use('/uploads', (req, res, next) => {
-    console.log('Static file request:', req.url);
+    // console.log('Static file request:', req.url); // Reduce log noise
     next();
 }, express.static(uploadPath));
 
@@ -44,13 +56,28 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/stock-alerts', stockAlertRoutes);
-app.use('/api/stock-alerts', stockAlertRoutes);
+// Duplicate stockAlertRoutes removed from line 47
 app.use('/api/users', userRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/hero-slides', heroSlideRoutes);
 
 app.get('/', (req, res) => {
     res.send('Erçağ Kırtasiye API is running');
+});
+
+// 404 Handler
+app.use((req, res) => {
+    res.status(404).json({ error: 'Route not found' });
+});
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error('Unhandled Error:', err);
+    res.status(err.status || 500).json({
+        error: process.env.NODE_ENV === 'production'
+            ? 'Internal server error'
+            : err.message
+    });
 });
 
 // Start Server

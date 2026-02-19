@@ -36,25 +36,40 @@ export default function AdminCustomersPage() {
     const [ordersLoading, setOrdersLoading] = useState(false);
     const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
 
+    const [pagination, setPagination] = useState({
+        page: 1,
+        totalPages: 1,
+        total: 0
+    });
+
     useEffect(() => {
-        fetchUsers();
-    }, []);
+        fetchUsers(search, pagination.page);
+    }, [pagination.page]); // Depend on page
 
     // Debounce search
     useEffect(() => {
         const timer = setTimeout(() => {
-            fetchUsers(search);
+            setPagination(prev => ({ ...prev, page: 1 })); // Reset page on search
+            fetchUsers(search, 1);
         }, 500);
         return () => clearTimeout(timer);
     }, [search]);
 
-    const fetchUsers = async (searchTerm = '') => {
+    const fetchUsers = async (searchTerm = '', page = 1) => {
         try {
-            const res = await api.get(`/users?search=${searchTerm}`);
-            if (Array.isArray(res.data)) {
+            const res = await api.get(`/users?search=${searchTerm}&page=${page}&limit=20`);
+            if (res.data.users) {
+                setUsers(res.data.users);
+                setPagination(prev => ({
+                    ...prev,
+                    totalPages: res.data.totalPages,
+                    total: res.data.total,
+                    page: res.data.page // Ensure sync
+                }));
+            } else if (Array.isArray(res.data)) {
                 setUsers(res.data);
             } else {
-                console.error('API response is not an array:', res.data);
+                console.error('API response format error:', res.data);
                 setUsers([]);
                 toast.error('Beklenmeyen veri formatı');
             }
@@ -63,6 +78,12 @@ export default function AdminCustomersPage() {
             console.error(error);
             toast.error('Kullanıcılar yüklenemedi');
             setLoading(false);
+        }
+    };
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage >= 1 && newPage <= pagination.totalPages) {
+            setPagination(prev => ({ ...prev, page: newPage }));
         }
     };
 
@@ -198,6 +219,30 @@ export default function AdminCustomersPage() {
                     </table>
                 </div>
             </div>
+
+            {/* Pagination */}
+            {pagination.totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-4">
+                    <button
+                        onClick={() => handlePageChange(pagination.page - 1)}
+                        disabled={pagination.page === 1}
+                        className="px-4 py-2 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed bg-white"
+                    >
+                        Önceki
+                    </button>
+                    <span className="text-gray-600">
+                        Sayfa {pagination.page} / {pagination.totalPages}
+                    </span>
+                    <button
+                        onClick={() => handlePageChange(pagination.page + 1)}
+                        disabled={pagination.page === pagination.totalPages}
+                        className="px-4 py-2 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed bg-white"
+                    >
+                        Sonraki
+                    </button>
+                </div>
+            )}
+
 
             {/* Order History Modal */}
             {selectedUser && (

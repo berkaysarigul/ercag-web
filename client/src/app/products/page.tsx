@@ -34,6 +34,12 @@ function ProductList() {
         sort: searchParams.get('sort') || 'newest'
     });
 
+    const [pagination, setPagination] = useState({
+        page: 1,
+        totalPages: 1,
+        total: 0
+    });
+
     // Listen for URL changes (e.g. from Header search)
     useEffect(() => {
         setFilters(prev => ({
@@ -41,6 +47,7 @@ function ProductList() {
             search: searchParams.get('search') || '',
             categoryId: searchParams.get('category') || null,
         }));
+        setPagination(prev => ({ ...prev, page: 1 })); // Reset page on filter change
     }, [searchParams]);
 
     const fetchProducts = useCallback(async () => {
@@ -52,15 +59,27 @@ function ProductList() {
             if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
             if (filters.search) params.append('search', filters.search);
             if (filters.sort) params.append('sort', filters.sort);
+            params.append('page', pagination.page.toString());
+            params.append('limit', '12');
 
             const res = await api.get(`/products?${params.toString()}`);
-            setProducts(res.data);
+            // Check if response is paginated (object with products) or array (legacy/error)
+            if (res.data.products) {
+                setProducts(res.data.products);
+                setPagination(prev => ({
+                    ...prev,
+                    totalPages: res.data.totalPages,
+                    total: res.data.total
+                }));
+            } else if (Array.isArray(res.data)) {
+                setProducts(res.data);
+            }
         } catch (error) {
             console.error('Failed to fetch products', error);
         } finally {
             setLoading(false);
         }
-    }, [filters]);
+    }, [filters, pagination.page]);
 
     useEffect(() => {
         fetchProducts();
@@ -68,6 +87,14 @@ function ProductList() {
 
     const handleFilterChange = (newFilters: any) => {
         setFilters(prev => ({ ...prev, ...newFilters }));
+        setPagination(prev => ({ ...prev, page: 1 }));
+    };
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage >= 1 && newPage <= pagination.totalPages) {
+            setPagination(prev => ({ ...prev, page: newPage }));
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     };
 
     return (
@@ -102,7 +129,10 @@ function ProductList() {
                         <div className="flex items-center gap-4">
                             <select
                                 value={filters.sort}
-                                onChange={(e) => setFilters(prev => ({ ...prev, sort: e.target.value }))}
+                                onChange={(e) => {
+                                    setFilters(prev => ({ ...prev, sort: e.target.value }));
+                                    setPagination(prev => ({ ...prev, page: 1 }));
+                                }}
                                 className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent bg-white"
                             >
                                 <option value="newest">En Yeni</option>
@@ -119,16 +149,41 @@ function ProductList() {
                             ))}
                         </div>
                     ) : (
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {products.map((product) => (
-                                <ProductCard key={product.id} product={product} />
-                            ))}
-                            {products.length === 0 && (
-                                <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>
-                                    Aradığınız kriterlere uygun ürün bulunamadı.
+                        <>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+                                {products.map((product) => (
+                                    <ProductCard key={product.id} product={product} />
+                                ))}
+                                {products.length === 0 && (
+                                    <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>
+                                        Aradığınız kriterlere uygun ürün bulunamadı.
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Pagination */}
+                            {pagination.totalPages > 1 && (
+                                <div className="flex justify-center items-center gap-2 mt-8">
+                                    <button
+                                        onClick={() => handlePageChange(pagination.page - 1)}
+                                        disabled={pagination.page === 1}
+                                        className="px-4 py-2 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Önceki
+                                    </button>
+                                    <span className="text-gray-600">
+                                        Sayfa {pagination.page} / {pagination.totalPages}
+                                    </span>
+                                    <button
+                                        onClick={() => handlePageChange(pagination.page + 1)}
+                                        disabled={pagination.page === pagination.totalPages}
+                                        className="px-4 py-2 border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Sonraki
+                                    </button>
                                 </div>
                             )}
-                        </div>
+                        </>
                     )}
                 </div>
             </div>

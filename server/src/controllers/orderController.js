@@ -12,17 +12,21 @@ const generatePickupCode = async () => {
     return code;
 };
 
+const { createOrderSchema } = require('../utils/validationSchemas');
+
 const createOrder = async (req, res) => {
     try {
         const userId = req.user ? req.user.id : null;
-        const { items, couponCode, fullName, phoneNumber, email, note, pickupRequestedTime } = req.body;
 
-        if (!items || items.length === 0) {
-            return res.status(400).json({ error: 'Cart is empty' });
+        const validation = createOrderSchema.safeParse(req.body);
+        if (!validation.success) {
+            return res.status(400).json({
+                error: 'Invalid input',
+                details: validation.error.flatten().fieldErrors
+            });
         }
-        if (!fullName || !phoneNumber) {
-            return res.status(400).json({ error: 'Ad Soyad ve Telefon zorunludur.' });
-        }
+
+        const { items, couponCode, fullName, phoneNumber, email, note, pickupRequestedTime } = validation.data;
 
         // Calculate total and verify prices
         let totalAmount = 0;
