@@ -49,6 +49,7 @@ const settingsRoutes = require('./src/routes/settingsRoutes');
 const heroSlideRoutes = require('./src/routes/heroSlideRoutes');
 const categoryRoutes = require('./src/routes/categoryRoutes'); // Added
 const stockRoutes = require('./src/routes/stockRoutes'); // Added
+const auditRoutes = require('./src/routes/auditRoutes'); // Added
 
 app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
@@ -64,6 +65,7 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/hero-slides', heroSlideRoutes);
 app.use('/api/categories', categoryRoutes); // Added
 app.use('/api/stock', stockRoutes); // Added
+app.use('/api/audit', auditRoutes); // Added
 
 app.get('/', (req, res) => {
     res.send('Erçağ Kırtasiye API is running');

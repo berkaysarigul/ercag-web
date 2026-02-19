@@ -31,7 +31,22 @@ model User {
   isEmailVerified      Boolean   @default(false)
   emailVerificationToken String?
   
+  twoFactorEnabled     Boolean   @default(false)
+  twoFactorCode        String?
+  twoFactorCodeExpires DateTime?
+
   cart                 Cart?
+}
+
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  action      String   // "product.create", "order.status_update", "user.role_change", "stock.bulk_update"
+  entityType  String   // "Product", "Order", "User", "Settings"
+  entityId    Int?
+  details     String?  // JSON
+  ipAddress   String?
+  createdAt   DateTime @default(now())
 }
 
 model Cart {
@@ -112,8 +127,8 @@ model StockMovement {
 
 model Order {
   id            Int         @id @default(autoincrement())
-  userId        Int
-  user          User        @relation("CustomerOrders", fields: [userId], references: [id])
+  userId        Int?
+  user          User?       @relation("CustomerOrders", fields: [userId], references: [id])
   // Customer Info for this specific order
   fullName      String?
   phoneNumber   String?
