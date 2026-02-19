@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 interface CartItem {
     id: number;
@@ -14,6 +14,7 @@ interface CartItem {
 interface CartContextType {
     items: CartItem[];
     addToCart: (product: any) => void;
+    updateQuantity: (id: number, quantity: number) => void;
     decreaseQuantity: (id: number) => void;
     removeFromCart: (id: number) => void;
     clearCart: () => void;
@@ -140,43 +141,36 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    const decreaseQuantity = async (id: number) => {
+    const updateQuantity = async (id: number, quantity: number) => {
+        if (quantity < 1) {
+            removeFromCart(id);
+            return;
+        }
+
         const existing = items.find((item) => item.id === id);
         if (!existing) return;
 
-        if (existing.quantity > 1) {
-            setItems((prev) => prev.map((item) =>
-                item.id === id ? { ...item, quantity: item.quantity - 1 } : item
-            ));
+        setItems((prev) => prev.map((item) =>
+            item.id === id ? { ...item, quantity } : item
+        ));
 
-            if (user) {
-                try {
-                    // Note: We need the cartItem ID for update, but here we have productId (id).
-                    // Logic mismatch: frontend ID is productId, backend update expects CartItem ID or we need a new route for updating by ProductID.
-                    // Let's assume we can update by product ID or change backend.
-                    // Making a quick fix: Use a specific route for decreasing by productId or handle finding the item on backend.
-                    // Actually getting the item from cart array in backend is easy if we search by productId.
-                    // Or we let the backend handle the logic. 
-                    // Let's verify `cartController`. It uses `itemId` which it treats as `productId` in some places but verifies CartItem.
-                    // Let's update backend to be robust or frontend to send CartItem ID.
-                    // Frontend doesn't have CartItem ID easily unless mapped.
-                    // Simplest: Send productId and let backend find the item.
-                    // Backend `updateCartItem` expects `itemId` (cartItem.id).
-                    // I will update backend `cartRoutes` to allow updating by ProductID, or changing frontend `items` to include `cartItemId`.
-                    // For now, let's assume `update` endpoint can handle finding it.
-                    // Let's look at `cartController.js` `updateCartItem`. It does `where: { id: itemId }`.
-                    // We need to fix that or this.
-                    // I will change backend `updateCartItem` to find by user + product or change context to store CartItemId.
-                    // Storing CartItemId is cleaner but `addToCart` just adds product.
-                    // I will update Backend Logic in a sec. Let's send productId and quantity.
-                    await api.put('/cart/update', { productId: id, quantity: existing.quantity - 1 });
-                } catch (error) {
-                    console.error("Failed to decrease quantity", error);
-                }
+        if (user) {
+            try {
+                // Assuming backend has /cart/update route that takes productId and absolute quantity
+                // Or we calculate diff? 
+                // Let's assume standard PUT /cart/update with productId and quantity
+                await api.put('/cart/update', { productId: id, quantity });
+            } catch (error) {
+                console.error("Failed to update quantity", error);
+                toast.error('Adet güncellenemedi');
             }
-        } else {
-            removeFromCart(id);
         }
+    };
+
+    const decreaseQuantity = async (id: number) => {
+        const existing = items.find((item) => item.id === id);
+        if (!existing) return;
+        updateQuantity(id, existing.quantity - 1);
     };
 
     const removeFromCart = async (id: number) => {
@@ -204,7 +198,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     return (
-        <CartContext.Provider value={{ items, addToCart, decreaseQuantity, removeFromCart, clearCart, total, loaded }}>
+        <CartContext.Provider value={{ items, addToCart, updateQuantity, decreaseQuantity, removeFromCart, clearCart, total, loaded }}>
             {children}
         </CartContext.Provider>
     );

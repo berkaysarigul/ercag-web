@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { useState, useEffect } from 'react';
 import { CartSkeleton } from '@/components/cart/CartSkeleton';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { Trash2, ArrowRight, ShoppingBag, Minus, Plus, User, Phone, Mail, Clock, FileText } from 'lucide-react';
 import AuthModal from '@/components/auth/AuthModal';
 

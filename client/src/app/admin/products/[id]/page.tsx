@@ -5,7 +5,7 @@ import api from '@/lib/api';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, Upload, Save } from 'lucide-react';
 import Link from 'next/link';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import RichTextEditor from '@/components/admin/RichTextEditor';
 import ImageUpload from '@/components/admin/ImageUpload';
 

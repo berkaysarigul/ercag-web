@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import { Plus, Trash2, Edit, Loader2, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { Search, User, ShoppingBag, Calendar, Eye } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 import UserRoleModal from '@/components/admin/UserRoleModal';
 

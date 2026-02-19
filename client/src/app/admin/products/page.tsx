@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import Link from 'next/link';
 import { Edit, Trash2, Plus, Package, Star } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import Skeleton from '@/components/ui/Skeleton';
 
 interface Product {

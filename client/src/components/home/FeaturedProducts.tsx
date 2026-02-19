@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ShoppingCart, Star, Eye } from 'lucide-react';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { useCart } from '@/context/CartContext';
 
 interface Product {

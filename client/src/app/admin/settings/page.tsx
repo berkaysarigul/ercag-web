@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import { Save, Loader2, Globe, Phone, MapPin, Instagram, Facebook } from 'lucide-react';
 
 export default function AdminSettings() {

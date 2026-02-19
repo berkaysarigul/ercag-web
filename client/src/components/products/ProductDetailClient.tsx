@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import Image from 'next/image';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 interface Product {
     id: number;

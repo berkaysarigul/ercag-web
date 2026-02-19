@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
 import { User, ShoppingBag, Key, LogOut, Package, Clock, CheckCircle, XCircle } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { ProfileSkeleton } from '@/components/profile/ProfileSkeleton';
 import Skeleton from '@/components/ui/Skeleton';
