@@ -83,6 +83,10 @@ model Product {
   isDeleted   Boolean     @default(false)
   rating      Float       @default(0)
   numReviews  Int         @default(0)
+  sku         String?     @unique
+  barcode     String?     @unique
+  lowStockThreshold Int   @default(5)
+  stockMovements StockMovement[]
 }
 
 model ProductImage {
@@ -91,6 +95,19 @@ model ProductImage {
   productId Int
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   isMain    Boolean @default(false)
+}
+
+model StockMovement {
+  id            Int      @id @default(autoincrement())
+  productId     Int
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  type          String   // "IN", "OUT", "ADJUSTMENT", "ORDER"
+  quantity      Int
+  previousStock Int
+  newStock      Int
+  reason        String?
+  createdBy     Int?
+  createdAt     DateTime @default(now())
 }
 
 model Order {

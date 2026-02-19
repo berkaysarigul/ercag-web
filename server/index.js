@@ -47,10 +47,12 @@ const stockAlertRoutes = require('./src/routes/stockAlertRoutes');
 const userRoutes = require('./src/routes/userRoutes');
 const settingsRoutes = require('./src/routes/settingsRoutes');
 const heroSlideRoutes = require('./src/routes/heroSlideRoutes');
+const categoryRoutes = require('./src/routes/categoryRoutes'); // Added
+const stockRoutes = require('./src/routes/stockRoutes'); // Added
 
 app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
-app.use('/api', productRoutes);
+app.use('/api/products', productRoutes); // Changed from '/api' to '/api/products'
 app.use('/api/orders', orderRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/wishlist', wishlistRoutes);
@@ -60,6 +62,8 @@ app.use('/api/stock-alerts', stockAlertRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/hero-slides', heroSlideRoutes);
+app.use('/api/categories', categoryRoutes); // Added
+app.use('/api/stock', stockRoutes); // Added
 
 app.get('/', (req, res) => {
     res.send('Erçağ Kırtasiye API is running');

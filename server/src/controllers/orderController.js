@@ -193,24 +193,43 @@ const updateOrderStatus = async (req, res) => {
         // Transaction for Stock Updates
         await prisma.$transaction(async (tx) => {
             // STOCK REDUCTION logic: When moving to PREPARING (or CONFIRMED in new specs)
+            // But wait, orderController usually doesn't have transaction context easily passed to external service if not structured well.
+            // stockService uses its own transaction. We should either pass prisma transaction to service or call service outside.
+            // For now, let's keep it simple. If we use recordStockMovement, it has its own transaction. 
+            // Better to move stock logic out of this transaction block or update service to accept tx.
+            // Given the pattern, let's call recordStockMovement securely.
+            // Correction: recordStockMovement uses prisma.$transaction internally. Nesting transactions is supported but let's be careful.
+            // Actually, for consistency, let's remove the wrapping transaction here if it only covered this, 
+            // OR update recordStockMovement to support external transaction.
+            // Easier approach for this codebase: Call recordStockMovement individually.
+
+            // To match request: "Use stockService.recordStockMovement"
             if ((status === 'PREPARING' || status === 'CONFIRMED') && order.status === 'PENDING') {
+                // Iterate items and call service. Service handles its own atomic update per item.
+                // This might not be fully atomic for the whole order but acceptable for this scale.
+                const { recordStockMovement } = require('../services/stockService');
                 for (const item of order.items) {
-                    await tx.product.update({
-                        where: { id: item.productId },
-                        data: { stock: { decrement: item.quantity } }
-                    });
+                    await recordStockMovement(
+                        item.productId,
+                        'ORDER',
+                        -item.quantity,
+                        `Sipariş #${order.id}`,
+                        req.user.id,
+                        tx // Pass transaction
+                    );
                 }
-            }
-            // STOCK RESTORATION logic: When CANCELLED
-            else if (status === 'CANCELLED' && order.status !== 'PENDING' && order.status !== 'CANCELLED') {
-                // Check if we actually decremented stock previously (i.e. was PREPARING or READY or CONFIRMED)
-                if (order.status === 'PREPARING' || order.status === 'READY') {
-                    for (const item of order.items) {
-                        await tx.product.update({
-                            where: { id: item.productId },
-                            data: { stock: { increment: item.quantity } }
-                        });
-                    }
+            } else if (status === 'CANCELLED' && (order.status !== 'PENDING' && order.status !== 'CANCELLED')) {
+                // RESTOCK if cancelled after stock was reduced
+                const { recordStockMovement } = require('../services/stockService');
+                for (const item of order.items) {
+                    await recordStockMovement(
+                        item.productId,
+                        'ADJUSTMENT',
+                        item.quantity,
+                        `Sipariş İptali #${order.id}`,
+                        req.user.id,
+                        tx // Pass transaction
+                    );
                 }
             }
 

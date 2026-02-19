@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ShoppingBag, Package, Users, LogOut, Ticket, Settings, MessageSquare, ScanBarcode } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-
 import { useAdmin } from '@/context/AdminContext';
+import { cn } from '@/lib/utils';
+import { LayoutDashboard, Package, ShoppingBag, Users, Star, FolderTree, Ticket, MessageSquare, Menu, X, LogOut, Settings, ScanBarcode, BarChart3 } from 'lucide-react';
 
 export default function AdminSidebar() {
     const pathname = usePathname();
@@ -18,6 +18,7 @@ export default function AdminSidebar() {
         { name: 'Teslimat Doğrula', href: '/admin/verify-pickup', icon: ScanBarcode, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] }, // New
         { name: 'Siparişler', href: '/admin/orders', icon: ShoppingBag, badge: 3, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] }, // Mock badge
         { name: 'Ürünler', href: '/admin/products', icon: Package, roles: ['SUPER_ADMIN', 'ADMIN'] },
+        { name: 'Stok Yönetimi', href: '/admin/stock', icon: BarChart3, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Kategoriler', href: '/admin/categories', icon: Package, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Kuponlar', href: '/admin/coupons', icon: Ticket, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Değerlendirmeler', href: '/admin/reviews', icon: MessageSquare, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] },
