@@ -6,6 +6,8 @@ import api from '@/lib/api';
 import { User, ShoppingBag, Key, LogOut, Package, Clock, CheckCircle, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { ProfileSkeleton } from '@/components/profile/ProfileSkeleton';
+import Skeleton from '@/components/ui/Skeleton';
 
 export default function ProfilePage() {
     const { user, logout, loading: authLoading } = useAuth();
@@ -106,7 +108,7 @@ export default function ProfilePage() {
         }
     };
 
-    if (authLoading || !user) return <div className="min-h-screen flex items-center justify-center">Yükleniyor...</div>;
+    if (authLoading || !user) return <ProfileSkeleton />;
 
     return (
         <div className="container py-12">
@@ -233,7 +235,23 @@ export default function ProfilePage() {
                             <div className="space-y-6">
                                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Sipariş Geçmişi</h2>
                                 {loading ? (
-                                    <p>Yükleniyor...</p>
+                                    <div className="space-y-4">
+                                        {[1, 2, 3].map((i) => (
+                                            <div key={i} className="border border-gray-200 rounded-xl p-6">
+                                                <div className="flex justify-between mb-4">
+                                                    <div className="space-y-2">
+                                                        <Skeleton className="h-6 w-32" />
+                                                        <Skeleton className="h-4 w-48" />
+                                                    </div>
+                                                    <div className="space-y-2 text-right">
+                                                        <Skeleton className="h-6 w-24 ml-auto" />
+                                                        <Skeleton className="h-4 w-16 ml-auto" />
+                                                    </div>
+                                                </div>
+                                                <Skeleton className="h-16 w-full rounded-lg" />
+                                            </div>
+                                        ))}
+                                    </div>
                                 ) : orders.length === 0 ? (
                                     <p className="text-gray-500">Henüz siparişiniz bulunmuyor.</p>
                                 ) : (

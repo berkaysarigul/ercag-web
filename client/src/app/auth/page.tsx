@@ -16,6 +16,7 @@ export default function AuthPage() {
         consent: false
     });
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
     const { login } = useAuth();
     const router = useRouter();
 
@@ -28,6 +29,7 @@ export default function AuthPage() {
             return;
         }
 
+        setLoading(true);
         try {
             const endpoint = isLogin ? '/auth/login' : '/auth/register';
             const res = await api.post(endpoint, formData);
@@ -38,6 +40,7 @@ export default function AuthPage() {
             router.back();
         } catch (err: any) {
             setError(err.response?.data?.message || 'Bir hata oluştu.');
+            setLoading(false);
         }
     };
 
@@ -123,8 +126,13 @@ export default function AuthPage() {
                         </div>
                     )}
 
-                    <button type="submit" className="btn btn-primary" style={{ marginTop: '1rem' }}>
-                        {isLogin ? 'Giriş Yap' : 'Üye Ol ve Devam Et'}
+                    <button
+                        type="submit"
+                        className="btn btn-primary"
+                        style={{ marginTop: '1rem' }}
+                        disabled={loading}
+                    >
+                        {loading ? 'İşleniyor...' : (isLogin ? 'Giriş Yap' : 'Üye Ol ve Devam Et')}
                     </button>
                 </form>
 
