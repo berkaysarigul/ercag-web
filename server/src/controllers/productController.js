@@ -10,7 +10,7 @@ const getAllProducts = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const where = {
-            isDeleted: false // Default filter for soft deleted products
+            // isDeleted: false // Default filter for soft deleted products
         };
 
         if (categoryId) where.categoryId = parseInt(categoryId);
@@ -300,4 +300,30 @@ const bulkDeleteProducts = async (req, res) => {
     }
 };
 
-module.exports = { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, bulkDeleteProducts };
+const searchSuggestions = async (req, res) => {
+    try {
+        const { query } = req.query;
+        if (!query || query.length < 2) {
+            return res.json([]);
+        }
+
+        const suggestions = await prisma.product.findMany({
+            where: {
+                OR: [
+                    { name: { contains: query, mode: 'insensitive' } },
+                    { description: { contains: query, mode: 'insensitive' } }
+                ],
+                isActive: true
+            },
+            select: { id: true, name: true, slug: true, images: true, price: true },
+            take: 5
+        });
+
+        res.json(suggestions);
+    } catch (error) {
+        console.error('Search Suggestions Error:', error);
+        res.status(500).json({ message: 'Search failed' });
+    }
+};
+
+module.exports = { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, bulkDeleteProducts, searchSuggestions };

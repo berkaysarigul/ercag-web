@@ -32,6 +32,7 @@ interface Order {
 
 export default function AdminOrdersPage() {
     const [orders, setOrders] = useState<Order[]>([]);
+    const [loading, setLoading] = useState(true);
     const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
     const [activeTab, setActiveTab] = useState('ALL');
     const [searchQuery, setSearchQuery] = useState('');
@@ -80,11 +81,7 @@ export default function AdminOrdersPage() {
         }
     };
 
-    const handlePageChange = (newPage: number) => {
-        if (newPage >= 1 && newPage <= pagination.totalPages) {
-            setPagination(prev => ({ ...prev, page: newPage }));
-        }
-    };
+
 
     const filterOrders = () => {
         let result = orders;

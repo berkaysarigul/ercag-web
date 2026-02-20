@@ -97,8 +97,56 @@ const updateUserRole = async (req, res) => {
     }
 };
 
+const deleteMyAccount = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        // Soft delete or anonymize
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                email: `deleted_${userId}_${Date.now()}@example.com`,
+                phone: `deleted_${userId}_${Date.now()}`,
+                name: 'Deleted User',
+                password: 'DELETED',
+                isActive: false // Assuming we have this field or similar logic
+            }
+        });
+        res.json({ message: 'Hesabınız silindi.' });
+    } catch (error) {
+        console.error('Delete Account Error:', error);
+        res.status(500).json({ message: 'Hesap silinemedi.' });
+    }
+};
+
+const exportMyData = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+                orders: { include: { items: true } },
+                addresses: true,
+                reviews: true
+            }
+        });
+
+        // Remove sensitive data
+        delete user.password;
+        delete user.twoFactorCode;
+
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Disposition', 'attachment; filename=my-data.json');
+        res.json(user);
+    } catch (error) {
+        console.error('Export Data Error:', error);
+        res.status(500).json({ message: 'Veri dışa aktarılamadı.' });
+    }
+};
+
 module.exports = {
     getAllUsers,
     getUserOrders,
-    updateUserRole
+    updateUserRole,
+    deleteMyAccount,
+    exportMyData
 };

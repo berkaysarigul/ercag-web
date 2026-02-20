@@ -116,93 +116,102 @@ const deleteCampaign = async (req, res) => {
 
 // Application Logic (Internal Service Function)
 const applyActiveCampaigns = async (items) => {
-    const now = new Date();
-    const campaigns = await prisma.campaign.findMany({
-        where: {
-            isActive: true,
-            startDate: { lte: now },
-            endDate: { gte: now }
+    try {
+        const now = new Date();
+        const campaigns = await prisma.campaign.findMany({
+            where: {
+                isActive: true,
+                startDate: { lte: now },
+                endDate: { gte: now }
+            }
+        });
+
+        let totalDiscount = 0;
+        const appliedCampaigns = [];
+
+        // Clone items to avoid mutating original array if passed by ref
+        // We need to track processed items for exclusive campaigns if needed
+
+        // For simplicity, let's assume multiple campaigns can apply but we should prioritize or sort them?
+        // Or just apply sequentially.
+
+        // Logic: Iterate campaigns, check applicability to items
+        for (const campaign of campaigns) {
+            try {
+                const config = JSON.parse(campaign.config);
+
+                if (campaign.type === 'CATEGORY_DISCOUNT') {
+                    const { categoryId, discountPercent } = config;
+                    for (const item of items) {
+                        // Determine category of item (This requires items to have categoryId or product populated)
+                        // Assuming items have product: { categoryId } populated
+                        if (item.product?.categoryId === parseInt(categoryId)) {
+                            const discount = (Number(item.price) * item.quantity * Number(discountPercent)) / 100;
+                            totalDiscount += discount;
+                            appliedCampaigns.push({ id: campaign.id, name: campaign.name, discount });
+                        }
+                    }
+                } else if (campaign.type === 'FLASH_SALE') {
+                    const { productIds, discountPercent } = config;
+                    // productIds might be array of IDs or comma separated string? standard: array
+                    const targetIds = Array.isArray(productIds)
+                        ? productIds.map(Number)
+                        : (productIds ? String(productIds).split(',').map(Number) : []);
+
+                    for (const item of items) {
+                        if (targetIds.includes(item.productId)) {
+                            const discount = (Number(item.price) * item.quantity * Number(discountPercent)) / 100;
+                            totalDiscount += discount;
+                            appliedCampaigns.push({ id: campaign.id, name: campaign.name, discount });
+                        }
+                    }
+                } else if (campaign.type === 'BUY_X_GET_Y') {
+                    const { buyQuantity, payQuantity, categoryId, productId } = config;
+                    // Complex logic: Group items by eligibility
+                    // If categoryId set, only items in category. If productId set, only specific product.
+                    // If neither, assuming store-wide? Or maybe error.
+
+                    let eligibleItems = [];
+                    if (productId) {
+                        eligibleItems = items.filter(i => i.productId === parseInt(productId));
+                    } else if (categoryId) {
+                        eligibleItems = items.filter(i => i.product?.categoryId === parseInt(categoryId));
+                    }
+
+                    // Calculate total quantity of eligible items
+                    const totalQty = eligibleItems.reduce((sum, i) => sum + i.quantity, 0);
+                    if (totalQty >= parseInt(buyQuantity)) {
+                        const freeSets = Math.floor(totalQty / parseInt(buyQuantity));
+                        const freeQty = freeSets * (parseInt(buyQuantity) - parseInt(payQuantity));
+
+                        // Apply discount to cheapest items or average? 
+                        // Standard BOGO: Cheapest item free.
+                        // Here, if it's mixed products, it gets complicated. 
+                        // Simplified: Average unit price of eligible items * freeQty
+                        if (freeQty > 0 && eligibleItems.length > 0) {
+                            // Check average price or sort items by price
+                            // Let's take the lowest price among eligible items to be safe/standard
+                            // Expand items to individual units to find cheapest? Expensive.
+                            // Fallback: Weighted average price
+                            const totalEligiblePrice = eligibleItems.reduce((sum, i) => sum + (Number(i.price) * i.quantity), 0);
+                            const avgPrice = totalEligiblePrice / totalQty;
+
+                            const discount = avgPrice * freeQty;
+                            totalDiscount += discount;
+                            appliedCampaigns.push({ id: campaign.id, name: campaign.name, discount });
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error(`Error processing campaign ${campaign.id}:`, err);
+            }
         }
-    });
 
-    let totalDiscount = 0;
-    const appliedCampaigns = [];
-
-    // Clone items to avoid mutating original array if passed by ref
-    // We need to track processed items for exclusive campaigns if needed
-
-    // For simplicity, let's assume multiple campaigns can apply but we should prioritize or sort them?
-    // Or just apply sequentially.
-
-    // Logic: Iterate campaigns, check applicability to items
-    for (const campaign of campaigns) {
-        const config = JSON.parse(campaign.config);
-
-        if (campaign.type === 'CATEGORY_DISCOUNT') {
-            const { categoryId, discountPercent } = config;
-            for (const item of items) {
-                // Determine category of item (This requires items to have categoryId or product populated)
-                // Assuming items have product: { categoryId } populated
-                if (item.product?.categoryId === parseInt(categoryId)) {
-                    const discount = (Number(item.price) * item.quantity * Number(discountPercent)) / 100;
-                    totalDiscount += discount;
-                    appliedCampaigns.push({ id: campaign.id, name: campaign.name, discount });
-                }
-            }
-        } else if (campaign.type === 'FLASH_SALE') {
-            const { productIds, discountPercent } = config;
-            // productIds might be array of IDs or comma separated string? standard: array
-            const targetIds = Array.isArray(productIds)
-                ? productIds.map(Number)
-                : (productIds ? String(productIds).split(',').map(Number) : []);
-
-            for (const item of items) {
-                if (targetIds.includes(item.productId)) {
-                    const discount = (Number(item.price) * item.quantity * Number(discountPercent)) / 100;
-                    totalDiscount += discount;
-                    appliedCampaigns.push({ id: campaign.id, name: campaign.name, discount });
-                }
-            }
-        } else if (campaign.type === 'BUY_X_GET_Y') {
-            const { buyQuantity, payQuantity, categoryId, productId } = config;
-            // Complex logic: Group items by eligibility
-            // If categoryId set, only items in category. If productId set, only specific product.
-            // If neither, assuming store-wide? Or maybe error.
-
-            let eligibleItems = [];
-            if (productId) {
-                eligibleItems = items.filter(i => i.productId === parseInt(productId));
-            } else if (categoryId) {
-                eligibleItems = items.filter(i => i.product?.categoryId === parseInt(categoryId));
-            }
-
-            // Calculate total quantity of eligible items
-            const totalQty = eligibleItems.reduce((sum, i) => sum + i.quantity, 0);
-            if (totalQty >= parseInt(buyQuantity)) {
-                const freeSets = Math.floor(totalQty / parseInt(buyQuantity));
-                const freeQty = freeSets * (parseInt(buyQuantity) - parseInt(payQuantity));
-
-                // Apply discount to cheapest items or average? 
-                // Standard BOGO: Cheapest item free.
-                // Here, if it's mixed products, it gets complicated. 
-                // Simplified: Average unit price of eligible items * freeQty
-                if (freeQty > 0 && eligibleItems.length > 0) {
-                    // Check average price or sort items by price
-                    // Let's take the lowest price among eligible items to be safe/standard
-                    // Expand items to individual units to find cheapest? Expensive.
-                    // Fallback: Weighted average price
-                    const totalEligiblePrice = eligibleItems.reduce((sum, i) => sum + (Number(i.price) * i.quantity), 0);
-                    const avgPrice = totalEligiblePrice / totalQty;
-
-                    const discount = avgPrice * freeQty;
-                    totalDiscount += discount;
-                    appliedCampaigns.push({ id: campaign.id, name: campaign.name, discount });
-                }
-            }
-        }
+        return { totalDiscount, appliedCampaigns };
+    } catch (error) {
+        console.error('Apply Active Campaigns Error:', error);
+        return { totalDiscount: 0, appliedCampaigns: [] }; // Fail safe
     }
-
-    return { totalDiscount, appliedCampaigns };
 };
 
 module.exports = {

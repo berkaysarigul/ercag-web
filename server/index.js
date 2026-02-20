@@ -53,11 +53,17 @@ const auditRoutes = require('./src/routes/auditRoutes'); // Added
 
 app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
-app.use('/api/products', productRoutes); // Changed from '/api' to '/api/products'
+app.use('/api', productRoutes); // Changed back to /api to match internal routes
 app.use('/api/orders', orderRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/coupons', couponRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/hero-slides', heroSlideRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/stock', stockRoutes);
+app.use('/api/audit', auditRoutes);
 app.use('/api/stock-alerts', stockAlertRoutes);
 // Duplicate stockAlertRoutes removed from line 47
 app.use('/api/users', userRoutes);

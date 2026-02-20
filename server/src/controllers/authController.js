@@ -213,68 +213,8 @@ const forgotPassword = async (req, res) => {
     }
 };
 
-const verifyResetCode = async (req, res) => {
-    try {
-        const { email, code } = req.body;
-        const user = await prisma.user.findUnique({ where: { email } });
+// verifyResetCode and resetPassword implementations below
 
-        if (!user || user.resetPasswordToken !== code || user.resetPasswordExpires < new Date()) {
-            return res.status(400).json({ message: 'Geçersiz veya süresi dolmuş kod.' });
-        }
-
-        res.json({ message: 'Kod doğrulandı.' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
-    }
-};
-
-const resetPassword = async (req, res) => {
-    try {
-        const { email, code, newPassword } = req.body;
-        const user = await prisma.user.findUnique({ where: { email } });
-
-        if (!user || user.resetPasswordToken !== code || user.resetPasswordExpires < new Date()) {
-            return res.status(400).json({ message: 'Geçersiz veya süresi dolmuş kod.' });
-        }
-
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-        await prisma.user.update({
-            where: { id: user.id },
-            data: {
-                password: hashedPassword,
-                resetPasswordToken: null,
-                resetPasswordExpires: null
-            }
-        });
-
-        res.json({ message: 'Şifreniz başarıyla güncellendi.' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
-    }
-};
-
-module.exports = { register, login, verify2FA, toggle2FA, forgotPassword, verifyResetCode, resetPassword };
-// Send Email
-const emailSubject = 'Şifre Sıfırlama Kodu - Erçağ Kırtasiye';
-const emailBody = `
-            <h2>Şifre Sıfırlama Talebi</h2>
-            <p>Merhaba ${user.name},</p>
-            <p>Hesabınız için şifre sıfırlama talebinde bulundunuz.</p>
-            <p>Kodunuz: <strong style="font-size: 24px;">${resetCode}</strong></p>
-            <p>Bu kod 15 dakika geçerlidir.</p>
-        `;
-
-await sendEmail(user.email, emailSubject, emailBody);
-
-res.json({ message: 'Sıfırlama kodu email adresinize gönderildi.' });
-    } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'İşlem başarısız.' });
-}
-};
 
 const verifyResetCode = async (req, res) => {
     try {
@@ -336,4 +276,4 @@ const resetPassword = async (req, res) => {
     }
 };
 
-module.exports = { register, login, forgotPassword, verifyResetCode, resetPassword };
+module.exports = { register, login, forgotPassword, verifyResetCode, resetPassword, verify2FA, toggle2FA };
