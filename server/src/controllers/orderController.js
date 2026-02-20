@@ -13,6 +13,7 @@ const generatePickupCode = async () => {
 };
 
 const { createOrderSchema } = require('../utils/validationSchemas');
+const { sendOrderConfirmation, sendOrderReady, sendOrderCompleted } = require('../services/whatsappService');
 
 const createOrder = async (req, res) => {
     try {
@@ -103,6 +104,9 @@ const createOrder = async (req, res) => {
                 createdAt: new Date()
             });
         }
+
+        // WhatsApp Notification
+        await sendOrderConfirmation(phoneNumber, order.id, pickupCode);
 
         res.status(201).json(order);
     } catch (error) {
@@ -369,4 +373,40 @@ const cancelMyOrder = async (req, res) => {
     }
 };
 
-module.exports = { createOrder, getUserOrders, getAllOrders, updateOrderStatus, verifyPickupCode, cancelMyOrder };
+const trackOrder = async (req, res) => {
+    try {
+        const { code } = req.params;
+        const order = await prisma.order.findUnique({
+            where: { pickupCode: code },
+            select: {
+                id: true,
+                status: true,
+                totalAmount: true,
+                createdAt: true,
+                readyAt: true,
+                items: {
+                    select: {
+                        quantity: true,
+                        product: { select: { name: true, image: true } }
+                    }
+                }
+            }
+        });
+
+        if (!order) return res.status(404).json({ error: 'Sipariş bulunamadı' });
+        res.json(order);
+    } catch (error) {
+        console.error('Track Order Error:', error);
+        res.status(500).json({ error: 'Sorgulama başarısız' });
+    }
+};
+
+module.exports = {
+    createOrder,
+    getUserOrders,
+    getAllOrders,
+    updateOrderStatus,
+    verifyPickupCode,
+    cancelMyOrder,
+    trackOrder
+};

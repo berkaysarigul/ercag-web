@@ -11,42 +11,43 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String?  @unique
-  password  String
-  name      String
-  phone     String   @unique
-  role      String   @default("CUSTOMER") // "SUPER_ADMIN", "STAFF", "CUSTOMER"
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  orders    Order[]  @relation("CustomerOrders")
-  handledOrders Order[] @relation("HandledOrders")
-  reviews   Review[]
-  wishlist  Wishlist[]
-  stockAlerts StockAlert[]
+  id            Int          @id @default(autoincrement())
+  email         String?      @unique
+  password      String
+  name          String
+  phone         String       @unique
+  role          String       @default("CUSTOMER") // "SUPER_ADMIN", "STAFF", "CUSTOMER"
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  orders        Order[]      @relation("CustomerOrders")
+  handledOrders Order[]      @relation("HandledOrders")
+  reviews       Review[]
+  wishlist      Wishlist[]
+  stockAlerts   StockAlert[]
 
   // Auth & Security
-  resetPasswordToken   String?
-  resetPasswordExpires DateTime?
-  isEmailVerified      Boolean   @default(false)
+  resetPasswordToken     String?
+  resetPasswordExpires   DateTime?
+  isEmailVerified        Boolean   @default(false)
   emailVerificationToken String?
-  
+
   twoFactorEnabled     Boolean   @default(false)
   twoFactorCode        String?
   twoFactorCodeExpires DateTime?
 
-  cart                 Cart?
+  cart          Cart?
+  loyaltyPoints LoyaltyPoints?
 }
 
 model AuditLog {
-  id          Int      @id @default(autoincrement())
-  userId      Int
-  action      String   // "product.create", "order.status_update", "user.role_change", "stock.bulk_update"
-  entityType  String   // "Product", "Order", "User", "Settings"
-  entityId    Int?
-  details     String?  // JSON
-  ipAddress   String?
-  createdAt   DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  action     String // "product.create", "order.status_update", "user.role_change", "stock.bulk_update"
+  entityType String // "Product", "Order", "User", "Settings"
+  entityId   Int?
+  details    String? // JSON
+  ipAddress  String?
+  createdAt  DateTime @default(now())
 }
 
 model Cart {
@@ -78,38 +79,33 @@ model Category {
 }
 
 model Product {
-  id          Int         @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   name        String
   description String
   price       Decimal
   image       String?
   categoryId  Int
-  campaigns       Campaign[]
-  benefitCampaigns Campaign[] @relation("BenefitProduct")
-  
   // Relations
   category    Category @relation(fields: [categoryId], references: [id])
-  
+
   // Relations
-  campaigns       Campaign[] @relation("TargetProduct")
-  benefitCampaigns Campaign[] @relation("BenefitProduct")
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  orderItems  OrderItem[]
-  reviews     Review[]
-  wishlist    Wishlist[]
-  stock       Int         @default(0)
-  stockAlerts StockAlert[]
-  isFeatured  Boolean     @default(false)
-  cartItems   CartItem[]
-  images      ProductImage[]
-  isDeleted   Boolean     @default(false)
-  rating      Float       @default(0)
-  numReviews  Int         @default(0)
-  sku         String?     @unique
-  barcode     String?     @unique
-  lowStockThreshold Int   @default(5)
-  stockMovements StockMovement[]
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  orderItems        OrderItem[]
+  reviews           Review[]
+  wishlist          Wishlist[]
+  stock             Int             @default(0)
+  stockAlerts       StockAlert[]
+  isFeatured        Boolean         @default(false)
+  cartItems         CartItem[]
+  images            ProductImage[]
+  isDeleted         Boolean         @default(false)
+  rating            Float           @default(0)
+  numReviews        Int             @default(0)
+  sku               String?         @unique
+  barcode           String?         @unique
+  lowStockThreshold Int             @default(5)
+  stockMovements    StockMovement[]
 }
 
 model ProductImage {
@@ -124,7 +120,7 @@ model StockMovement {
   id            Int      @id @default(autoincrement())
   productId     Int
   product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  type          String   // "IN", "OUT", "ADJUSTMENT", "ORDER"
+  type          String // "IN", "OUT", "ADJUSTMENT", "ORDER"
   quantity      Int
   previousStock Int
   newStock      Int
@@ -134,38 +130,38 @@ model StockMovement {
 }
 
 model Order {
-  id            Int         @id @default(autoincrement())
-  userId        Int?
-  user          User?       @relation("CustomerOrders", fields: [userId], references: [id])
+  id          Int     @id @default(autoincrement())
+  userId      Int?
+  user        User?   @relation("CustomerOrders", fields: [userId], references: [id])
   // Customer Info for this specific order
-  fullName      String?
-  phoneNumber   String?
-  email         String?
-  note          String?
-  
+  fullName    String?
+  phoneNumber String?
+  email       String?
+  note        String?
+
   // Click & Collect
   pickupRequestedTime String?
-  pickupCode    String?     @unique
+  pickupCode          String?   @unique
   pickupCodeExpiresAt DateTime?
-  
+
   // Status & Lifecycle
-  status        String      @default("PENDING") // PENDING, PREPARING, READY, COMPLETED, CANCELLED
-  statusHistory String      @default("[]") // JSON string of status updates
+  status        String    @default("PENDING") // PENDING, PREPARING, READY, COMPLETED, CANCELLED
+  statusHistory String    @default("[]") // JSON string of status updates
   readyAt       DateTime?
   completedAt   DateTime?
-  
+
   // Staff handling
   handledByUserId Int?
-  handledBy     User?       @relation("HandledOrders", fields: [handledByUserId], references: [id])
+  handledBy       User? @relation("HandledOrders", fields: [handledByUserId], references: [id])
 
   // Financials
-  totalAmount   Decimal
-  couponCode    String?
-  discountAmount Decimal    @default(0)
-  
-  items         OrderItem[]
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  totalAmount    Decimal
+  couponCode     String?
+  discountAmount Decimal @default(0)
+
+  items     OrderItem[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 }
 
 model OrderItem {
@@ -202,15 +198,15 @@ model Wishlist {
 }
 
 model Coupon {
-  id             Int      @id @default(autoincrement())
-  code           String   @unique
-  discountType   String   // "PERCENTAGE" or "FIXED"
+  id             Int       @id @default(autoincrement())
+  code           String    @unique
+  discountType   String // "PERCENTAGE" or "FIXED"
   discountValue  Decimal
-  minOrderAmount Decimal  @default(0)
+  minOrderAmount Decimal   @default(0)
   expirationDate DateTime?
-  isActive       Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 model StockAlert {
@@ -244,4 +240,33 @@ model SystemSetting {
   type        String   @default("text") // text, longtext, image, boolean, color
   group       String   @default("general") // general, contact, social, appearance
   updatedAt   DateTime @updatedAt
+}
+
+model Campaign {
+  id        Int      @id @default(autoincrement())
+  name      String
+  type      String // "BUY_X_GET_Y", "CATEGORY_DISCOUNT", "FLASH_SALE", "LOYALTY"
+  config    String // JSON config
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LoyaltyPoints {
+  id      Int              @id @default(autoincrement())
+  userId  Int              @unique
+  user    User             @relation(fields: [userId], references: [id])
+  points  Int              @default(0)
+  history LoyaltyHistory[]
+}
+
+model LoyaltyHistory {
+  id        Int           @id @default(autoincrement())
+  loyaltyId Int
+  loyalty   LoyaltyPoints @relation(fields: [loyaltyId], references: [id])
+  points    Int // Positive = earn, Negative = spend
+  reason    String // "Order #123", "Point usage", "Referral bonus"
+  createdAt DateTime      @default(now())
 }

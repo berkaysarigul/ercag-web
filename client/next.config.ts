@@ -1,3 +1,10 @@
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === 'development',
+});
+
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -22,8 +29,16 @@ const nextConfig: NextConfig = {
         port: '3001',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'placehold.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+      },
     ],
   },
 };
 
-export default nextConfig;
+export default withPWA(nextConfig);

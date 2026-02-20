@@ -1,4 +1,4 @@
-const { calculateCartDiscounts } = require('../services/campaignService');
+const prisma = require('../lib/prisma');
 
 const getCart = async (req, res) => {
     try {
@@ -15,14 +15,26 @@ const getCart = async (req, res) => {
             });
         }
 
-        // Calculate Totals and Discounts
-        const totalAmount = cart.items.reduce((sum, item) => sum + (Number(item.product.price) * item.quantity), 0);
-        const { discountAmount, finalAmount, appliedCampaigns } = await calculateCartDiscounts(cart.items, totalAmount);
+        // Apply Campaigns (New Logic)
+        const { applyActiveCampaigns } = require('./campaignController');
+
+        // Improve items structure for campaign logic if needed
+        // applyActiveCampaigns expects items with product: { categoryId }
+        // We might need to fetch full product details if not present in cart items or fetch freshly
+        const cartItemsWithProduct = await Promise.all(cart.items.map(async (item) => {
+            const product = await prisma.product.findUnique({ where: { id: item.productId } });
+            return { ...item, product, price: product.price };
+        }));
+
+        const { totalDiscount, appliedCampaigns } = await applyActiveCampaigns(cartItemsWithProduct);
+
+        const totalAmount = cartItemsWithProduct.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
+        const finalAmount = Math.max(0, totalAmount - totalDiscount);
 
         res.json({
-            ...cart,
+            items: cart.items,
             totalAmount,
-            discountAmount,
+            discountAmount: totalDiscount,
             finalAmount,
             appliedCampaigns
         });
@@ -72,13 +84,25 @@ const addToCart = async (req, res) => {
             include: { items: { include: { product: true } } }
         });
 
-        const totalAmount = updatedCart.items.reduce((sum, item) => sum + (Number(item.product.price) * item.quantity), 0);
-        const { discountAmount, finalAmount, appliedCampaigns } = await calculateCartDiscounts(updatedCart.items, totalAmount);
+        // Apply Campaigns (New Logic)
+        const { applyActiveCampaigns } = require('./campaignController');
 
-        res.json({
-            ...updatedCart,
+        const cartItemsWithProduct = await Promise.all(updatedCart.items.map(async (item) => {
+            // updatedCart.items already has product included via findUnique include: { items: { include: { product: true } } }
+            // See line 83: include: { items: { include: { product: true } } }
+            // So item.product is available
+            return { ...item, price: item.product.price };
+        }));
+
+        const { totalDiscount, appliedCampaigns } = await applyActiveCampaigns(cartItemsWithProduct);
+
+        const totalAmount = cartItemsWithProduct.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
+        const finalAmount = Math.max(0, totalAmount - totalDiscount);
+
+        res.status(200).json({
+            items: updatedCart.items,
             totalAmount,
-            discountAmount,
+            discountAmount: totalDiscount,
             finalAmount,
             appliedCampaigns
         });

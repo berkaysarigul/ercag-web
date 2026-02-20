@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
-import { Plus, Trash, Edit, Calendar, Percent, DollarSign, Gift, Truck } from 'lucide-react';
+import { Plus, Trash, Edit, Calendar, Percent, DollarSign, Gift, Truck, Zap, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function AdminCampaignsPage() {
@@ -10,17 +10,26 @@ export default function AdminCampaignsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
 
-    const [formData, setFormData] = useState({
+    // Initial state matching new schema
+    const initialFormState = {
         name: '',
-        description: '',
-        type: 'PERCENTAGE_OFF',
-        value: '',
-        minAmount: '',
-        targetProductId: '',
-        benefitProductId: '',
+        type: 'CATEGORY_DISCOUNT', // Default
+        config: {}, // Will hold type-specific data
         startDate: '',
         endDate: '',
         isActive: true
+    };
+
+    const [formData, setFormData] = useState(initialFormState);
+
+    // Config sub-states for easier form handling
+    const [configData, setConfigData] = useState<any>({
+        discountPercent: '',
+        categoryId: '',
+        productIds: '',
+        buyQuantity: '',
+        payQuantity: '',
+        benefitProductId: '',
     });
 
     const fetchCampaigns = async () => {
@@ -41,24 +50,42 @@ export default function AdminCampaignsPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Construct config object based on type
+        let finalConfig = {};
+        if (formData.type === 'CATEGORY_DISCOUNT') {
+            finalConfig = { categoryId: configData.categoryId, discountPercent: configData.discountPercent };
+        } else if (formData.type === 'FLASH_SALE') {
+            finalConfig = {
+                productIds: configData.productIds.split(',').map((s: string) => s.trim()).filter(Boolean),
+                discountPercent: configData.discountPercent
+            };
+        } else if (formData.type === 'BUY_X_GET_Y') {
+            finalConfig = {
+                buyQuantity: configData.buyQuantity,
+                payQuantity: configData.payQuantity,
+                categoryId: configData.categoryId, // Optional
+                productId: configData.productIds // reused field for target product ID
+            };
+        }
+
+        const payload = { ...formData, config: finalConfig };
+
         try {
             if (editingId) {
-                await api.put(`/campaigns/${editingId}`, formData);
+                await api.put(`/campaigns/${editingId}`, payload);
                 toast.success('Kampanya güncellendi');
             } else {
-                await api.post('/campaigns', formData);
+                await api.post('/campaigns', payload);
                 toast.success('Kampanya oluşturuldu');
             }
             setIsModalOpen(false);
             setEditingId(null);
-            setFormData({
-                name: '', description: '', type: 'PERCENTAGE_OFF', value: '',
-                minAmount: '', targetProductId: '', benefitProductId: '',
-                startDate: '', endDate: '', isActive: true
-            });
+            setFormData(initialFormState);
+            setConfigData({});
             fetchCampaigns();
-        } catch (error) {
-            toast.error('İşlem başarısız');
+        } catch (error: any) {
+            toast.error(error.response?.data?.error || 'İşlem başarısız');
         }
     };
 
@@ -75,27 +102,44 @@ export default function AdminCampaignsPage() {
 
     const handleEdit = (c: any) => {
         setEditingId(c.id);
+        const config = typeof c.config === 'string' ? JSON.parse(c.config) : c.config;
+
         setFormData({
             name: c.name,
-            description: c.description || '',
             type: c.type,
-            value: c.value || '',
-            minAmount: c.minAmount || '',
-            targetProductId: c.targetProductId || '',
-            benefitProductId: c.benefitProductId || '',
+            config: config,
             startDate: c.startDate ? new Date(c.startDate).toISOString().split('T')[0] : '',
             endDate: c.endDate ? new Date(c.endDate).toISOString().split('T')[0] : '',
             isActive: c.isActive
         });
+
+        // Populate config state
+        let newConfigData = {};
+        if (c.type === 'CATEGORY_DISCOUNT') {
+            newConfigData = { categoryId: config.categoryId, discountPercent: config.discountPercent };
+        } else if (c.type === 'FLASH_SALE') {
+            newConfigData = {
+                productIds: Array.isArray(config.productIds) ? config.productIds.join(',') : config.productIds,
+                discountPercent: config.discountPercent
+            };
+        } else if (c.type === 'BUY_X_GET_Y') {
+            newConfigData = {
+                buyQuantity: config.buyQuantity,
+                payQuantity: config.payQuantity,
+                categoryId: config.categoryId,
+                productIds: config.productId // mapping productId to productIds field for UI reuse
+            };
+        }
+        setConfigData(newConfigData);
         setIsModalOpen(true);
     };
 
     const getIcon = (type: string) => {
         switch (type) {
-            case 'PERCENTAGE_OFF': return <Percent className="text-blue-500" />;
-            case 'FIXED_AMOUNT': return <DollarSign className="text-green-500" />;
-            case 'BOGO': return <Gift className="text-purple-500" />;
-            case 'FREE_SHIPPING': return <Truck className="text-orange-500" />;
+            case 'CATEGORY_DISCOUNT': return <Percent className="text-blue-500" />;
+            case 'FLASH_SALE': return <Zap className="text-yellow-500" />;
+            case 'BUY_X_GET_Y': return <Gift className="text-purple-500" />;
+            case 'LOYALTY': return <ShoppingBag className="text-green-500" />;
             default: return <Calendar className="text-gray-500" />;
         }
     };
@@ -105,7 +149,12 @@ export default function AdminCampaignsPage() {
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-800">Kampanyalar</h1>
                 <button
-                    onClick={() => { setEditingId(null); setIsModalOpen(true); }}
+                    onClick={() => {
+                        setEditingId(null);
+                        setFormData(initialFormState);
+                        setConfigData({});
+                        setIsModalOpen(true);
+                    }}
                     className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 >
                     <Plus size={18} /> Yeni Kampanya
@@ -122,7 +171,7 @@ export default function AdminCampaignsPage() {
                                 <div className="p-3 bg-gray-50 rounded-lg">{getIcon(c.type)}</div>
                                 <div>
                                     <h3 className="font-semibold text-gray-900">{c.name}</h3>
-                                    <p className="text-sm text-gray-500">{c.description}</p>
+                                    <p className="text-sm text-gray-500">{c.type}</p>
                                     <div className="flex gap-2 mt-1 text-xs text-gray-400">
                                         <span>{new Date(c.startDate).toLocaleDateString()} - {new Date(c.endDate).toLocaleDateString()}</span>
                                         {c.isActive ? <span className="text-green-600 font-medium">Aktif</span> : <span className="text-red-500">Pasif</span>}
@@ -151,29 +200,15 @@ export default function AdminCampaignsPage() {
                                 <label className="block text-sm font-medium mb-1">Kampanya Adı</label>
                                 <input required type="text" className="w-full border rounded-lg p-2" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Açıklama</label>
-                                <textarea className="w-full border rounded-lg p-2" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
-                            </div>
+
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Tip</label>
                                     <select className="w-full border rounded-lg p-2" value={formData.type} onChange={e => setFormData({ ...formData, type: e.target.value })}>
-                                        <option value="PERCENTAGE_OFF">Yüzde İndirim</option>
-                                        <option value="FIXED_AMOUNT">Sabit Tutar</option>
-                                        <option value="BOGO">Al-Götür (BOGO)</option>
-                                        <option value="FREE_SHIPPING">Kargo Bedava</option>
+                                        <option value="CATEGORY_DISCOUNT">Kategori İndirimi</option>
+                                        <option value="FLASH_SALE">Flash Sale (Ürün)</option>
+                                        <option value="BUY_X_GET_Y">Al-Götür (BOGO)</option>
                                     </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Değer (Oran/Tutar)</label>
-                                    <input type="number" className="w-full border rounded-lg p-2" value={formData.value} onChange={e => setFormData({ ...formData, value: e.target.value })} />
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Min. Sepet Tutarı</label>
-                                    <input type="number" className="w-full border rounded-lg p-2" value={formData.minAmount} onChange={e => setFormData({ ...formData, minAmount: e.target.value })} />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Durum</label>
@@ -183,6 +218,7 @@ export default function AdminCampaignsPage() {
                                     </select>
                                 </div>
                             </div>
+
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Başlangıç Tarihi</label>
@@ -194,19 +230,55 @@ export default function AdminCampaignsPage() {
                                 </div>
                             </div>
 
-                            {/* Product specific fields could be added here similar to type logic */}
-                            {formData.type === 'BOGO' && (
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Hedef Ürün ID</label>
-                                        <input type="number" className="w-full border rounded-lg p-2" value={formData.targetProductId} onChange={e => setFormData({ ...formData, targetProductId: e.target.value })} />
+                            <div className="border-t pt-4">
+                                <h3 className="font-medium text-gray-700 mb-2">Ayarlar ({formData.type})</h3>
+
+                                {formData.type === 'CATEGORY_DISCOUNT' && (
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">Kategori ID</label>
+                                            <input required type="number" className="w-full border rounded-lg p-2" value={configData.categoryId || ''} onChange={e => setConfigData({ ...configData, categoryId: e.target.value })} />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">İndirim Oranı (%)</label>
+                                            <input required type="number" className="w-full border rounded-lg p-2" value={configData.discountPercent || ''} onChange={e => setConfigData({ ...configData, discountPercent: e.target.value })} />
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Hediye Ürün ID</label>
-                                        <input type="number" className="w-full border rounded-lg p-2" value={formData.benefitProductId} onChange={e => setFormData({ ...formData, benefitProductId: e.target.value })} />
+                                )}
+
+                                {formData.type === 'FLASH_SALE' && (
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">Ürün ID'leri (Virgülle ayır)</label>
+                                            <input required type="text" placeholder="1, 2, 3" className="w-full border rounded-lg p-2" value={configData.productIds || ''} onChange={e => setConfigData({ ...configData, productIds: e.target.value })} />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">İndirim Oranı (%)</label>
+                                            <input required type="number" className="w-full border rounded-lg p-2" value={configData.discountPercent || ''} onChange={e => setConfigData({ ...configData, discountPercent: e.target.value })} />
+                                        </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
+
+                                {formData.type === 'BUY_X_GET_Y' && (
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium mb-1">Alınacak Adet (X)</label>
+                                                <input required type="number" className="w-full border rounded-lg p-2" value={configData.buyQuantity || ''} onChange={e => setConfigData({ ...configData, buyQuantity: e.target.value })} />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium mb-1">Ödenecek Adet (Y)</label>
+                                                <input required type="number" className="w-full border rounded-lg p-2" value={configData.payQuantity || ''} onChange={e => setConfigData({ ...configData, payQuantity: e.target.value })} />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">Ürün ID (Opsiyonel)</label>
+                                            <input type="number" className="w-full border rounded-lg p-2" value={configData.productIds || ''} onChange={e => setConfigData({ ...configData, productIds: e.target.value })} />
+                                            <p className="text-xs text-gray-500">Boş bırakılırsa hangi ürün/kategoriye uygulanacağı belirsiz kalabilir.</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
 
                             <div className="flex gap-3 justify-end mt-6">
                                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">İptal</button>

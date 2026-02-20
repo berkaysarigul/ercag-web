@@ -18,4 +18,7 @@ router.post('/verify-code', authenticateToken, authorize('STAFF', 'ADMIN'), orde
 router.get('/stats', authenticateToken, isAdmin, adminController.getDashboardStats);
 router.get('/stats/detailed', authenticateToken, isAdmin, adminController.getDetailedStats); // New route
 
+// Public Tracking
+router.get('/track/:code', orderController.trackOrder);
+
 module.exports = router;

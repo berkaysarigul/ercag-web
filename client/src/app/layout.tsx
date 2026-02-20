@@ -29,14 +29,34 @@ export async function generateMetadata(): Promise<Metadata> {
       },
       description: settings.site_description || "Erçağ Kırtasiye ile okul, ofis ve sanat malzemeleri ihtiyaçlarınızı hızlı ve güvenilir bir şekilde karşılayın.",
       keywords: ['kırtasiye', 'okul malzemeleri', 'ofis malzemeleri', 'sanat malzemeleri', 'defter', 'kalem'],
+      manifest: '/manifest.json',
+      themeColor: '#1e3a8a',
+      appleWebApp: {
+        capable: true,
+        title: 'Erçağ Kırtasiye',
+        statusBarStyle: 'default',
+      },
     };
   } catch (error) {
+    console.error('Metadata generation error:', error);
     return {
-      title: {
-        template: '%s | Erçağ Kırtasiye',
-        default: 'Erçağ Kırtasiye - Okul, Ofis ve Sanat Malzemeleri',
-      },
+      title: 'Erçağ Kırtasiye | Okul, Ofis ve Sanat Malzemeleri',
       description: "Erçağ Kırtasiye ile okul, ofis ve sanat malzemeleri ihtiyaçlarınızı hızlı ve güvenilir bir şekilde karşılayın.",
+      keywords: ['kırtasiye', 'kalem', 'defter', 'ofis', 'okul', 'sanat', 'boya', 'kağıt'],
+      manifest: '/manifest.json',
+      themeColor: '#1e3a8a',
+      appleWebApp: {
+        capable: true,
+        title: 'Erçağ Kırtasiye',
+        statusBarStyle: 'default',
+      },
+      openGraph: {
+        title: 'Erçağ Kırtasiye',
+        description: 'En kaliteli kırtasiye ürünleri en uygun fiyatlarla.',
+        type: 'website',
+        locale: 'tr_TR',
+        url: process.env.NEXT_PUBLIC_URL || 'https://ercagkirtasiye.com',
+      }
     };
   }
 }
