@@ -1,4 +1,4 @@
-const prisma = require('../lib/prisma');
+const { calculateCartDiscounts } = require('../services/campaignService');
 
 const getCart = async (req, res) => {
     try {
@@ -15,7 +15,17 @@ const getCart = async (req, res) => {
             });
         }
 
-        res.json(cart);
+        // Calculate Totals and Discounts
+        const totalAmount = cart.items.reduce((sum, item) => sum + (Number(item.product.price) * item.quantity), 0);
+        const { discountAmount, finalAmount, appliedCampaigns } = await calculateCartDiscounts(cart.items, totalAmount);
+
+        res.json({
+            ...cart,
+            totalAmount,
+            discountAmount,
+            finalAmount,
+            appliedCampaigns
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });
@@ -62,7 +72,16 @@ const addToCart = async (req, res) => {
             include: { items: { include: { product: true } } }
         });
 
-        res.json(updatedCart);
+        const totalAmount = updatedCart.items.reduce((sum, item) => sum + (Number(item.product.price) * item.quantity), 0);
+        const { discountAmount, finalAmount, appliedCampaigns } = await calculateCartDiscounts(updatedCart.items, totalAmount);
+
+        res.json({
+            ...updatedCart,
+            totalAmount,
+            discountAmount,
+            finalAmount,
+            appliedCampaigns
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });

@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import AdminHeader from '@/components/admin/AdminHeader';
@@ -48,6 +49,11 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
             <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 md:ml-64`}>
                 {/* Header */}
                 <AdminHeader />
+
+                {/* New Links */}
+                <Link href="/admin/campaigns" className="block px-4 py-2 hover:bg-gray-800 rounded">Kampanyalar</Link>
+                <Link href="/admin/analytics" className="block px-4 py-2 hover:bg-gray-800 rounded">Analitik & Rapor</Link>
+                <Link href="/admin/audit-log" className="block px-4 py-2 hover:bg-gray-800 rounded">Denetim Günlüğü</Link>
 
                 {/* Page Content */}
                 <main className="flex-1 p-4 md:p-8 overflow-y-auto w-full">

@@ -3,6 +3,7 @@ const router = express.Router();
 const orderController = require('../controllers/orderController');
 const { authenticateToken } = require('../middleware/authMiddleware');
 const { authorize, isAdmin } = require('../middleware/adminMiddleware');
+const adminController = require('../controllers/adminController'); // Added import
 
 router.post('/', authenticateToken, orderController.createOrder);
 router.get('/', authenticateToken, orderController.getUserOrders);
@@ -14,6 +15,7 @@ router.put('/:id/status', authenticateToken, authorize('STAFF', 'ADMIN'), orderC
 router.post('/verify-code', authenticateToken, authorize('STAFF', 'ADMIN'), orderController.verifyPickupCode);
 
 // Admin Stats
-router.get('/stats', authenticateToken, isAdmin, require('../controllers/adminController').getDashboardStats);
+router.get('/stats', authenticateToken, isAdmin, adminController.getDashboardStats);
+router.get('/stats/detailed', authenticateToken, isAdmin, adminController.getDetailedStats); // New route
 
 module.exports = router;

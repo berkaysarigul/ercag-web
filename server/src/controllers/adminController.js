@@ -82,5 +82,116 @@ const getDashboardStats = async (req, res) => {
     }
 };
 
-module.exports = { getDashboardStats };
+const getDetailedStats = async (req, res) => {
+    try {
+        const { period } = req.query; // 'week', 'month', 'year'
+        const now = new Date();
+        let startDate;
+
+        switch (period) {
+            case 'week':
+                startDate = new Date(now);
+                startDate.setDate(now.getDate() - 7);
+                break;
+            case 'year':
+                startDate = new Date(now.getFullYear(), 0, 1);
+                break;
+            default: // month
+                startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        }
+
+        // 1. En çok satan ürünler (Top 10)
+        const topProducts = await prisma.orderItem.groupBy({
+            by: ['productId'],
+            _sum: { quantity: true },
+            where: { order: { status: 'COMPLETED', createdAt: { gte: startDate } } },
+            orderBy: { _sum: { quantity: 'desc' } },
+            take: 10
+        });
+
+        // Ürün isimlerini çek
+        const productIds = topProducts.map(p => p.productId);
+        const products = await prisma.product.findMany({
+            where: { id: { in: productIds } },
+            select: { id: true, name: true, price: true, image: true }
+        });
+
+        const topProductsWithNames = topProducts.map(tp => ({
+            ...tp,
+            product: products.find(p => p.id === tp.productId)
+        }));
+
+        // 2. Günlük satış trendi
+        // Prisma aggregation is limited for date grouping, usually require raw query for efficiency
+        // or fetching data and grouping in JS (fine for smaller datasets)
+        // Let's use groupBy on createdAt if possible or raw query.
+        // Prisma doesn't support grouping by date part easily without raw.
+        // Using raw query for postgres.
+
+        const dailySales = await prisma.$queryRaw`
+            SELECT DATE("createdAt") as date, SUM("totalAmount") as revenue, COUNT(*) as count
+            FROM "Order"
+            WHERE status = 'COMPLETED' AND "createdAt" >= ${startDate}
+            GROUP BY DATE("createdAt")
+            ORDER BY date ASC
+        `;
+
+        // 3. Kategori bazlı satışlar
+        const categorySales = await prisma.$queryRaw`
+            SELECT c.name as category, SUM(oi.quantity) as "totalQuantity", SUM(oi.price * oi.quantity) as "totalRevenue"
+            FROM "OrderItem" oi
+            JOIN "Product" p ON oi."productId" = p.id
+            JOIN "Category" c ON p."categoryId" = c.id
+            JOIN "Order" o ON oi."orderId" = o.id
+            WHERE o.status = 'COMPLETED' AND o."createdAt" >= ${startDate}
+            GROUP BY c.name
+            ORDER BY "totalRevenue" DESC
+        `;
+
+        // 4. Ortalama sepet tutarı
+        const avgOrder = await prisma.order.aggregate({
+            _avg: { totalAmount: true },
+            where: { status: 'COMPLETED', createdAt: { gte: startDate } }
+        });
+
+        // 5. Müşteri istatistikleri
+        const totalCustomers = await prisma.user.count({ where: { role: 'CUSTOMER' } });
+        // Repeat customers: users with > 1 completed order
+        const repeatCustomers = await prisma.$queryRaw`
+            SELECT COUNT(*) as count FROM (
+                SELECT "userId" FROM "Order"
+                WHERE status = 'COMPLETED' AND "userId" IS NOT NULL
+                GROUP BY "userId" HAVING COUNT(*) > 1
+            ) sub
+        `;
+
+        // 6. Sipariş durumu dağılımı
+        const orderStatusDistribution = await prisma.order.groupBy({
+            by: ['status'],
+            _count: true,
+            where: { createdAt: { gte: startDate } }
+        });
+
+        // Serialize BigInt for JSON
+        const serialize = (data) => JSON.parse(JSON.stringify(data, (key, value) =>
+            typeof value === 'bigint' ? value.toString() : value
+        ));
+
+        res.json(serialize({
+            topProducts: topProductsWithNames,
+            dailySales,
+            categorySales,
+            avgOrderAmount: avgOrder._avg.totalAmount || 0,
+            totalCustomers,
+            repeatCustomers: Number(repeatCustomers[0]?.count || 0),
+            orderStatusDistribution
+        }));
+
+    } catch (error) {
+        console.error('Detailed Stats Error:', error);
+        res.status(500).json({ error: 'İstatistikler alınamadı' });
+    }
+};
+
+module.exports = { getDashboardStats, getDetailedStats };
 

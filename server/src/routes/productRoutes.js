@@ -12,6 +12,9 @@ router.post('/categories', authenticateToken, isAdmin, require('../controllers/c
 router.put('/categories/:id', authenticateToken, isAdmin, require('../controllers/categoryController').updateCategory);
 router.delete('/categories/:id', authenticateToken, isAdmin, require('../controllers/categoryController').deleteCategory);
 
+// Search Suggestions (Must be before dynamic :id routes)
+router.get('/products/search/suggestions', productController.searchSuggestions);
+
 // Admin Product Routes
 router.post('/products', authenticateToken, isAdmin, upload.array('images', 5), productController.createProduct);
 router.put('/products/:id', authenticateToken, isAdmin, upload.array('images', 5), productController.updateProduct);

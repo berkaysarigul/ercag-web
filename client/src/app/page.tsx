@@ -8,6 +8,7 @@ import { ArrowRight, ShoppingBag, Star, TrendingUp, Rocket } from "lucide-react"
 import HeroSlider from "@/components/home/HeroSlider";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
 import Skeleton from "@/components/ui/Skeleton";
+import CampaignBanner from "@/components/ui/CampaignBanner";
 
 interface Category {
   id: number;
@@ -35,6 +36,9 @@ export default function Home() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <HeroSlider />
+
+      {/* Campaign Banner */}
+      <CampaignBanner />
 
       {/* Featured Products */}
       <FeaturedProducts />

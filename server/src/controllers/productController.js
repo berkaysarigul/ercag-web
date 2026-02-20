@@ -23,11 +23,19 @@ const getAllProducts = async (req, res) => {
 
         if (search) {
             where.OR = [
-                { name: { contains: search } }, // Case insensitive usually requires mode: 'insensitive' in Postgres, but if not enabled in schema, it might be case sensitive. 
-                // But let's keep it simple for now or adding mode: 'insensitive' if using Postgres.
-                // Prisma default for Postgres is case sensitive unless mode: 'insensitive' is specified.
-                { description: { contains: search } }
-            ];
+                { name: { contains: search, mode: 'insensitive' } },
+                { description: { contains: search, mode: 'insensitive' } },
+                { category: { name: { contains: search, mode: 'insensitive' } } },
+                // Only search SKU if length > 3 to avoid noise
+                (search.length > 3 ? { sku: { contains: search, mode: 'insensitive' } } : undefined),
+                // Exact match for barcode if length > 5
+                (search.length > 5 ? { barcode: { equals: search } } : undefined)
+            ].filter(Boolean);
+
+            // Log search query (non-blocking)
+            prisma.searchLog.create({
+                data: { query: search, resultCount: 0 } // We'll update result count later if needed or just log the query
+            }).catch(err => console.error('Search Log Error:', err));
         }
 
         if (isFeatured) {

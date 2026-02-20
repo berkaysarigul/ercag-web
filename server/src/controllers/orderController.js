@@ -92,6 +92,18 @@ const createOrder = async (req, res) => {
             include: { items: true }
         });
 
+        // Socket Notification
+        const io = req.app.get('io');
+        if (io) {
+            io.to('admin-room').emit('new-order', {
+                id: order.id,
+                fullName,
+                totalAmount: finalAmount,
+                itemCount: items.length,
+                createdAt: new Date()
+            });
+        }
+
         res.status(201).json(order);
     } catch (error) {
         console.error('Create Order Error:', error);
@@ -258,6 +270,27 @@ const updateOrderStatus = async (req, res) => {
         }
 
         const updatedOrder = await prisma.order.findUnique({ where: { id: parseInt(id) } });
+
+        // Socket Notification
+        const io = req.app.get('io');
+        if (io) {
+            // To User
+            if (order.userId) {
+                io.to(`user-${order.userId}`).emit('order-status-update', {
+                    orderId: order.id,
+                    status,
+                    pickupCode: order.pickupCode
+                });
+            }
+
+            // To Admin
+            io.to('admin-room').emit('order-updated', {
+                orderId: parseInt(id),
+                status,
+                updatedBy: adminId
+            });
+        }
+
         res.json(updatedOrder);
 
     } catch (error) {

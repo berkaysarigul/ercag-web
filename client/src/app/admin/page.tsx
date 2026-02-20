@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import { DollarSign, ShoppingBag, Package, Users, TrendingUp, ArrowUpRight, Clock } from 'lucide-react';
 import Link from 'next/link';
+import { useSocket } from '@/context/SocketContext';
+import { toast } from 'sonner';
 
 export default function AdminDashboard() {
     const [stats, setStats] = useState({
@@ -11,28 +13,60 @@ export default function AdminDashboard() {
         pendingOrders: 0,
         totalProducts: 0,
         totalRevenue: 0,
-        chartData: [] // Add chartData to state
+        chartData: []
     });
     const [recentOrders, setRecentOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const { socket } = useSocket();
+
+    const fetchData = async () => {
+        try {
+            const [statsRes, ordersRes] = await Promise.all([
+                api.get('/orders/stats'),
+                api.get('/orders/all')
+            ]);
+            setStats(statsRes.data);
+            setRecentOrders(ordersRes.data.slice(0, 5));
+        } catch (error) {
+            console.error('Failed to fetch dashboard data', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [statsRes, ordersRes] = await Promise.all([
-                    api.get('/orders/stats'),
-                    api.get('/orders/all')
-                ]);
-                setStats(statsRes.data);
-                setRecentOrders(ordersRes.data.slice(0, 5)); // Get last 5 orders
-            } catch (error) {
-                console.error('Failed to fetch dashboard data', error);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchData();
     }, []);
+
+    useEffect(() => {
+        if (!socket) return;
+
+        socket.on('new-order', (data: any) => {
+            // Update stats optimistically or refetch
+            // For simplicity and accuracy, refetching is safer, but let's do optimistic for pending count
+            setStats(prev => ({
+                ...prev,
+                totalOrders: prev.totalOrders + 1,
+                pendingOrders: prev.pendingOrders + 1,
+                totalRevenue: Number(prev.totalRevenue) + Number(data.totalAmount)
+            }));
+
+            // Add to recent orders
+            setRecentOrders(prev => [data, ...prev].slice(0, 5));
+        });
+
+        socket.on('order-updated', (data: any) => {
+            // If status changed to something else from PENDING, decrement pending
+            // This is tricky without knowing previous status. 
+            // Simplest is to refetch all data to be consistent.
+            fetchData();
+        });
+
+        return () => {
+            socket.off('new-order');
+            socket.off('order-updated');
+        };
+    }, [socket]);
 
     if (loading) {
         return <div className="p-8 text-center text-gray-500">Yükleniyor...</div>;

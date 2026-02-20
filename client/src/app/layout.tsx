@@ -14,6 +14,7 @@ const inter = Inter({
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { SettingsProvider } from "@/context/SettingsContext";
+import { SocketProvider } from "@/context/SocketContext";
 import ClientLayout from "@/components/layout/ClientLayout";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -53,9 +54,11 @@ export default function RootLayout({
             <CartProvider>
               <Toaster richColors position="top-right" />
               <CookieConsent />
-              <ClientLayout>
-                {children}
-              </ClientLayout>
+              <SocketProvider>
+                <ClientLayout>
+                  {children}
+                </ClientLayout>
+              </SocketProvider>
             </CartProvider>
           </SettingsProvider>
         </AuthProvider>

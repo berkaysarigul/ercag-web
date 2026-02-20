@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 
 import { useSettings } from "@/context/SettingsContext";
+import SearchAutocomplete from "@/components/search/SearchAutocomplete";
 
 export default function Header() {
     const { settings } = useSettings();
@@ -60,35 +61,9 @@ export default function Header() {
                         <Link href="/products" className="font-medium hover:text-[var(--primary)] transition-colors">Ürünler</Link>
 
                         {/* Search Bar */}
-                        <form
-                            onSubmit={handleSearch}
-                            className="hidden md:flex items-center relative w-96 max-w-lg"
-                        >
-                            <div className="relative w-full">
-                                <input
-                                    name="search"
-                                    type="text"
-                                    placeholder="Ürün, kategori ara..."
-                                    className="
-                                        w-full pl-12 pr-12 py-2.5
-                                        bg-white
-                                        border border-gray-200
-                                        focus:border-brand-500
-                                        focus:ring-2 focus:ring-brand-100
-                                        rounded-full
-                                        text-gray-900 text-sm
-                                        placeholder:text-gray-400
-                                        shadow-sm
-                                        focus:outline-none
-                                        transition-all duration-200
-                                    "
-                                />
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-brand-100 text-brand-600 rounded-full hover:bg-brand-200 transition-colors">
-                                    <ArrowRight size={14} />
-                                </button>
-                            </div>
-                        </form>
+                        <div className="hidden md:block w-96 max-w-lg">
+                            <SearchAutocomplete />
+                        </div>
 
                         <div className="flex items-center gap-2">
                             <Link href="/wishlist" className="p-2 hover:bg-gray-100 rounded-full relative" title="Favorilerim">
