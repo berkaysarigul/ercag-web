@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useAdmin } from '@/context/AdminContext';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Package, ShoppingBag, Users, Star, FolderTree, Ticket, MessageSquare, Menu, X, LogOut, Settings, ScanBarcode, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingBag, Users, Star, FolderTree, Ticket, MessageSquare, Menu, X, LogOut, Settings, ScanBarcode, BarChart3, TrendingUp, Shield } from 'lucide-react';
 
 export default function AdminSidebar() {
     const pathname = usePathname();
@@ -15,8 +15,8 @@ export default function AdminSidebar() {
     const allMenuItems = [ // ... no changes to items
 
         { name: 'Dashboard', href: '/admin', icon: LayoutDashboard, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] },
-        { name: 'Teslimat Doğrula', href: '/admin/verify-pickup', icon: ScanBarcode, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] }, // New
-        { name: 'Siparişler', href: '/admin/orders', icon: ShoppingBag, badge: 3, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] }, // Mock badge
+        { name: 'Teslimat Doğrula', href: '/admin/verify-pickup', icon: ScanBarcode, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] },
+        { name: 'Siparişler', href: '/admin/orders', icon: ShoppingBag, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] }, // FIX-24: removed hardcoded badge
         { name: 'Ürünler', href: '/admin/products', icon: Package, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Stok Yönetimi', href: '/admin/stock', icon: BarChart3, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Kategoriler', href: '/admin/categories', icon: Package, roles: ['SUPER_ADMIN', 'ADMIN'] },
@@ -24,6 +24,10 @@ export default function AdminSidebar() {
         { name: 'Değerlendirmeler', href: '/admin/reviews', icon: MessageSquare, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] },
         { name: 'Müşteriler', href: '/admin/customers', icon: Users, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Vitrin / Slider', href: '/admin/sliders', icon: LayoutDashboard, roles: ['SUPER_ADMIN', 'ADMIN'] },
+        // FIX-07: Added 3 missing menu items
+        { name: 'Kampanyalar', href: '/admin/campaigns', icon: TrendingUp, roles: ['SUPER_ADMIN', 'ADMIN'] },
+        { name: 'Analitik & Rapor', href: '/admin/analytics', icon: BarChart3, roles: ['SUPER_ADMIN', 'ADMIN'] },
+        { name: 'Denetim Günlüğü', href: '/admin/audit-log', icon: Shield, roles: ['SUPER_ADMIN'] },
         { name: 'Ayarlar', href: '/admin/settings', icon: Settings, roles: ['SUPER_ADMIN', 'ADMIN'] },
     ];
 
@@ -64,11 +68,6 @@ export default function AdminSidebar() {
                                 <Icon size={20} className={isActive ? 'text-secondary' : 'text-gray-400 group-hover:text-white'} />
                                 <span className="font-medium">{item.name}</span>
                             </div>
-                            {item.badge && (
-                                <span className="bg-danger text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                                    {item.badge}
-                                </span>
-                            )}
                         </Link>
                     );
                 })}

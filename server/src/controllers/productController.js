@@ -10,7 +10,7 @@ const getAllProducts = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const where = {
-            // isDeleted: false // Default filter for soft deleted products
+            isDeleted: false // FIX-08: Enable soft delete filter
         };
 
         if (categoryId) where.categoryId = parseInt(categoryId);
@@ -48,14 +48,14 @@ const getAllProducts = async (req, res) => {
         else if (sort === 'newest') orderBy = { createdAt: 'desc' };
         else orderBy = { id: 'asc' };
 
+        // FIX-09: Use denormalized rating/numReviews fields instead of runtime calculation
         const [total, products] = await Promise.all([
             prisma.product.count({ where }),
             prisma.product.findMany({
                 where,
                 include: {
                     category: true,
-                    images: true,
-                    reviews: { select: { rating: true } }
+                    images: true
                 },
                 orderBy,
                 skip,
@@ -63,20 +63,8 @@ const getAllProducts = async (req, res) => {
             })
         ]);
 
-        // Calculate average rating for each product
-        const productsWithRating = products.map(product => {
-            const totalRating = product.reviews.reduce((sum, review) => sum + review.rating, 0);
-            const averageRating = product.reviews.length > 0 ? (totalRating / product.reviews.length) : 0;
-
-            return {
-                ...product,
-                rating: parseFloat(averageRating.toFixed(1)),
-                reviewCount: product.reviews.length
-            };
-        });
-
         res.json({
-            products: productsWithRating,
+            products,
             total,
             page,
             totalPages: Math.ceil(total / limit),
@@ -157,7 +145,7 @@ const updateProduct = async (req, res) => {
 
     try {
         const { id } = req.params;
-        console.log('Update Product Request:', { id, body: req.body, files: req.files }); // DEBUG LOG
+        // Debug log removed
 
         const { name, description, price, categoryId, isFeatured } = req.body;
         const files = req.files || [];
@@ -300,29 +288,36 @@ const bulkDeleteProducts = async (req, res) => {
     }
 };
 
+// FIX-02: Fixed searchSuggestions — was using isActive (not in schema) and slug (not in schema)
 const searchSuggestions = async (req, res) => {
     try {
-        const { query } = req.query;
-        if (!query || query.length < 2) {
-            return res.json([]);
+        const q = req.query.q || req.query.query;
+        if (!q || q.length < 2) {
+            return res.json({ products: [], categories: [] });
         }
 
-        const suggestions = await prisma.product.findMany({
+        const products = await prisma.product.findMany({
             where: {
                 OR: [
-                    { name: { contains: query, mode: 'insensitive' } },
-                    { description: { contains: query, mode: 'insensitive' } }
+                    { name: { contains: q, mode: 'insensitive' } },
+                    { description: { contains: q, mode: 'insensitive' } }
                 ],
-                isActive: true
+                isDeleted: false
             },
-            select: { id: true, name: true, slug: true, images: true, price: true },
-            take: 5
+            select: { id: true, name: true, price: true, image: true, images: { take: 1, select: { url: true } } },
+            take: 6
         });
 
-        res.json(suggestions);
+        const categories = await prisma.category.findMany({
+            where: { name: { contains: q, mode: 'insensitive' } },
+            select: { id: true, name: true },
+            take: 3
+        });
+
+        res.json({ products, categories });
     } catch (error) {
         console.error('Search Suggestions Error:', error);
-        res.status(500).json({ message: 'Search failed' });
+        res.status(500).json({ error: 'Search failed' });
     }
 };
 

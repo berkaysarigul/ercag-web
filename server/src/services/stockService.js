@@ -1,4 +1,5 @@
-const globalPrisma = require('../lib/prisma');
+// FIX-05: Renamed globalPrisma to prisma
+const prisma = require('../lib/prisma');
 
 const recordStockMovement = async (productId, type, quantity, reason, createdBy = null, prismaClient = null) => {
     const performOperations = async (client) => {
@@ -24,7 +25,8 @@ const recordStockMovement = async (productId, type, quantity, reason, createdBy 
     if (prismaClient) {
         result = await performOperations(prismaClient);
     } else {
-        result = await globalPrisma.$transaction(async (tx) => {
+        // FIX-05: was globalPrisma.$transaction
+        result = await prisma.$transaction(async (tx) => {
             return await performOperations(tx);
         });
     }
@@ -49,6 +51,7 @@ const checkLowStockAlert = async (product, currentStock) => {
 const triggerStockAlerts = async (productId, productName) => {
     try {
         const { sendStockAlertNotification } = require('./notificationService');
+        // FIX-05: was using undefined 'prisma', now correct
         const alerts = await prisma.stockAlert.findMany({
             where: { productId },
             include: { user: { select: { email: true } } }
@@ -56,8 +59,6 @@ const triggerStockAlerts = async (productId, productName) => {
 
         for (const alert of alerts) {
             if (alert.user.email) {
-                // notificationService implementasyonuna bağlı olarak değişebilir
-                // Şimdilik sadece logluyoruz veya varsa fonksiyonu çağırıyoruz
                 if (typeof sendStockAlertNotification === 'function') {
                     await sendStockAlertNotification(productName, alert.user.email);
                 } else {

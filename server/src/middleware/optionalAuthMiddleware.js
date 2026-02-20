@@ -11,9 +11,8 @@ const optionalAuth = (req, res, next) => {
 
     jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
         if (err) {
-            // If token is invalid, we can either return 403 or treat as guest. 
-            // Better to return 403 to avoid confusion if client intended to be logged in.
-            return res.status(403).json({ message: 'Invalid or expired token' });
+            // FIX-10: Token geçersiz/süresi dolmuş — guest olarak devam et
+            return next();
         }
         try {
             const user = await prisma.user.findUnique({ where: { id: decoded.userId || decoded.id } }); // Fix: decoded.id handled in authController but middleware was using userId? Checking authController token payload: { id: user.id }

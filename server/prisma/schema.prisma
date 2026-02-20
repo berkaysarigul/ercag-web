@@ -270,3 +270,13 @@ model LoyaltyHistory {
   reason    String // "Order #123", "Point usage", "Referral bonus"
   createdAt DateTime      @default(now())
 }
+
+model SearchLog {
+  id          Int      @id @default(autoincrement())
+  query       String
+  resultCount Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([query])
+  @@index([createdAt])
+}

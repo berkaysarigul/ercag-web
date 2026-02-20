@@ -1,5 +1,6 @@
 const prisma = require('../lib/prisma');
 
+// FIX-15: Removed N+1 query — cart items already include product via Prisma include
 const getCart = async (req, res) => {
     try {
         const userId = req.user.id;
@@ -15,20 +16,16 @@ const getCart = async (req, res) => {
             });
         }
 
-        // Apply Campaigns (New Logic)
         const { applyActiveCampaigns } = require('./campaignController');
 
-        // Improve items structure for campaign logic if needed
-        // applyActiveCampaigns expects items with product: { categoryId }
-        // We might need to fetch full product details if not present in cart items or fetch freshly
-        const cartItemsWithProduct = await Promise.all(cart.items.map(async (item) => {
-            const product = await prisma.product.findUnique({ where: { id: item.productId } });
-            return { ...item, product, price: product.price };
+        const cartItemsForCampaign = cart.items.map(item => ({
+            ...item,
+            price: item.product.price
         }));
 
-        const { totalDiscount, appliedCampaigns } = await applyActiveCampaigns(cartItemsWithProduct);
+        const { totalDiscount, appliedCampaigns } = await applyActiveCampaigns(cartItemsForCampaign);
 
-        const totalAmount = cartItemsWithProduct.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
+        const totalAmount = cart.items.reduce((sum, item) => sum + (Number(item.product.price) * item.quantity), 0);
         const finalAmount = Math.max(0, totalAmount - totalDiscount);
 
         res.json({

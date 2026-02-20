@@ -23,6 +23,7 @@ export default function Header() {
     const router = useRouter();
 
     const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+    const [mobileSearchOpen, setMobileSearchOpen] = useState(false); // FIX-20
 
     useEffect(() => {
         // Scroll handler only
@@ -47,10 +48,13 @@ export default function Header() {
                 <div className="container h-20 flex items-center justify-between">
                     <Link href="/" className="flex items-center">
                         <div className="relative h-16 w-52">
-                            <img
+                            {/* FIX-33: next/image instead of raw img */}
+                            <Image
                                 src={settings.site_logo ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${settings.site_logo}` : "/logo.png"}
                                 alt={settings.site_title || "Erçağ Kırtasiye"}
-                                className="h-full w-full object-contain object-left"
+                                fill
+                                className="object-contain object-left"
+                                priority
                             />
                         </div>
                     </Link>
@@ -88,13 +92,37 @@ export default function Header() {
                         </div>
                     </nav>
 
-                    {/* Mobile Menu Button - OPTIONAL: We can keep this for extra links or hide since we have bottom nav */}
-                    {/* For now, just show Logo centered or keep simpler. Let's hide these since Bottom Nav has everything. */}
-                    <div className="flex md:hidden w-8"></div> {/* Spacer to balance logo if needed */}
+                    {/* FIX-20: Mobile Icons — previously empty div */}
+                    <div className="flex md:hidden items-center gap-2">
+                        <button
+                            onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+                            className="p-2 hover:bg-gray-100 rounded-full"
+                        >
+                            <Search size={22} />
+                        </button>
+                        <button
+                            onClick={() => setIsCartOpen(true)}
+                            className="relative p-2 hover:bg-gray-100 rounded-full"
+                        >
+                            <ShoppingCart size={22} />
+                            {cartItemCount > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-[var(--primary)] text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                                    {cartItemCount}
+                                </span>
+                            )}
+                        </button>
+                    </div>
                 </div>
 
 
             </header>
+
+            {/* FIX-20: Mobile Search Bar */}
+            {mobileSearchOpen && (
+                <div className="md:hidden px-4 py-3 bg-white border-b border-gray-200">
+                    <SearchAutocomplete />
+                </div>
+            )}
 
             <MiniCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
         </>

@@ -120,6 +120,7 @@ const login = async (req, res) => {
     }
 };
 
+// FIX-19: Expiry check before code comparison, clear code on expired
 const verify2FA = async (req, res) => {
     try {
         const { userId, code } = req.body;
@@ -127,11 +128,20 @@ const verify2FA = async (req, res) => {
         const user = await prisma.user.findUnique({ where: { id: parseInt(userId) } });
         if (!user) return res.status(404).json({ message: 'Kullanıcı bulunamadı' });
 
-        if (user.twoFactorCode !== code || !user.twoFactorCodeExpires || new Date() > user.twoFactorCodeExpires) {
-            return res.status(400).json({ message: 'Geçersiz veya süresi dolmuş kod.' });
+        // Check expiry first
+        if (!user.twoFactorCode || !user.twoFactorCodeExpires || new Date() > user.twoFactorCodeExpires) {
+            await prisma.user.update({
+                where: { id: user.id },
+                data: { twoFactorCode: null, twoFactorCodeExpires: null }
+            });
+            return res.status(400).json({ message: 'Kodun süresi dolmuş. Tekrar giriş yapın.' });
         }
 
-        // Clear code
+        if (user.twoFactorCode !== code) {
+            return res.status(400).json({ message: 'Geçersiz kod.' });
+        }
+
+        // Clear code on success
         await prisma.user.update({
             where: { id: user.id },
             data: { twoFactorCode: null, twoFactorCodeExpires: null }
@@ -141,7 +151,6 @@ const verify2FA = async (req, res) => {
             expiresIn: '7d',
         });
 
-        // Audit Log
         const { logAudit } = require('../services/auditService');
         await logAudit(user.id, 'auth.login_2fa', 'User', user.id, '2FA ile başarılı giriş', req.ip);
 

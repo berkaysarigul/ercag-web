@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import AdminHeader from '@/components/admin/AdminHeader';
@@ -29,7 +28,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     }
 
     if (!user || !['SUPER_ADMIN', 'STAFF', 'ADMIN'].includes(user.role)) {
-        return null; // Or redirect handled by useEffect
+        return null;
     }
 
     return (
@@ -50,10 +49,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                 {/* Header */}
                 <AdminHeader />
 
-                {/* New Links */}
-                <Link href="/admin/campaigns" className="block px-4 py-2 hover:bg-gray-800 rounded">Kampanyalar</Link>
-                <Link href="/admin/analytics" className="block px-4 py-2 hover:bg-gray-800 rounded">Analitik & Rapor</Link>
-                <Link href="/admin/audit-log" className="block px-4 py-2 hover:bg-gray-800 rounded">Denetim Günlüğü</Link>
+                {/* FIX-07: Removed stray Link tags that were here */}
 
                 {/* Page Content */}
                 <main className="flex-1 p-4 md:p-8 overflow-y-auto w-full">

@@ -28,14 +28,13 @@ app.use(express.json());
 const uploadPath = path.join(__dirname, 'uploads');
 console.log('Serving static files from:', uploadPath);
 app.use('/uploads', (req, res, next) => {
-    // console.log('Static file request:', req.url); // Reduce log noise
     next();
 }, express.static(uploadPath));
 
 // Global Rate Limit
 app.use('/api', apiLimiter);
 
-// Routes
+// FIX-06: All routes registered exactly ONCE, no duplicates
 const authRoutes = require('./src/routes/authRoutes');
 const cartRoutes = require('./src/routes/cartRoutes');
 const productRoutes = require('./src/routes/productRoutes');
@@ -47,32 +46,25 @@ const stockAlertRoutes = require('./src/routes/stockAlertRoutes');
 const userRoutes = require('./src/routes/userRoutes');
 const settingsRoutes = require('./src/routes/settingsRoutes');
 const heroSlideRoutes = require('./src/routes/heroSlideRoutes');
-const categoryRoutes = require('./src/routes/categoryRoutes'); // Added
-const stockRoutes = require('./src/routes/stockRoutes'); // Added
-const auditRoutes = require('./src/routes/auditRoutes'); // Added
+const categoryRoutes = require('./src/routes/categoryRoutes');
+const stockRoutes = require('./src/routes/stockRoutes');
+const auditRoutes = require('./src/routes/auditRoutes');
+const campaignRoutes = require('./src/routes/campaignRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
-app.use('/api', productRoutes); // Changed back to /api to match internal routes
+app.use('/api', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/coupons', couponRoutes);
+app.use('/api/stock-alerts', stockAlertRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/hero-slides', heroSlideRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/stock', stockRoutes);
 app.use('/api/audit', auditRoutes);
-app.use('/api/stock-alerts', stockAlertRoutes);
-// Duplicate stockAlertRoutes removed from line 47
-app.use('/api/users', userRoutes);
-app.use('/api/settings', settingsRoutes);
-app.use('/api/hero-slides', heroSlideRoutes);
-app.use('/api/categories', categoryRoutes); // Added
-app.use('/api/stock', stockRoutes);
-app.use('/api/audit', auditRoutes);
-const campaignRoutes = require('./src/routes/campaignRoutes');
 app.use('/api/campaigns', campaignRoutes);
 
 app.get('/', (req, res) => {
@@ -116,8 +108,6 @@ io.use((socket, next) => {
 });
 
 io.on('connection', (socket) => {
-    // console.log('Socket connected:', socket.id); // Reduce log noise
-
     // Admin room
     if (['SUPER_ADMIN', 'STAFF', 'ADMIN'].includes(socket.userRole)) {
         socket.join('admin-room');

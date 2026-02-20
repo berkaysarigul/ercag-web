@@ -129,33 +129,53 @@ const getUserOrders = async (req, res) => {
     }
 };
 
+// FIX-14: Added pagination + status filter
 const getAllOrders = async (req, res) => {
     try {
-        // Build filter based on search query
-        const { search } = req.query;
+        const { search, status } = req.query;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        const skip = (page - 1) * limit;
+
         let where = {};
 
-        if (search) {
-            where = {
-                OR: [
-                    { id: !isNaN(search) ? parseInt(search) : undefined },
-                    { fullName: { contains: search } },
-                    { phoneNumber: { contains: search } },
-                    { pickupCode: { contains: search } },
-                    { user: { name: { contains: search } } } // Fallback to user account name
-                ]
-            };
+        if (status && status !== 'ALL') {
+            where.status = status;
         }
 
-        const orders = await prisma.order.findMany({
-            where,
-            include: {
-                items: { include: { product: true } },
-                user: { select: { name: true, email: true, phone: true } }
-            },
-            orderBy: { createdAt: 'desc' }
+        if (search) {
+            where.OR = [
+                { fullName: { contains: search, mode: 'insensitive' } },
+                { phoneNumber: { contains: search } },
+                { pickupCode: { contains: search, mode: 'insensitive' } },
+                { user: { name: { contains: search, mode: 'insensitive' } } }
+            ];
+            if (!isNaN(search)) {
+                where.OR.push({ id: parseInt(search) });
+            }
+        }
+
+        const [total, orders] = await Promise.all([
+            prisma.order.count({ where }),
+            prisma.order.findMany({
+                where,
+                include: {
+                    items: { include: { product: { select: { name: true, image: true } } } },
+                    user: { select: { name: true, email: true, phone: true } }
+                },
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take: limit
+            })
+        ]);
+
+        res.json({
+            orders,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
+            limit
         });
-        res.json(orders);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to fetch orders' });

@@ -245,45 +245,19 @@ const getStockMovements = async (req, res) => {
     }
 };
 
-// Düşük stoklu ürünler
+// FIX-16: Replaced invalid prisma field comparison with raw SQL
 const getLowStockProducts = async (req, res) => {
     try {
-        const products = await prisma.product.findMany({
-            where: {
-                stock: { lte: prisma.product.fields.lowStockThreshold },
-                // lowStockThreshold field referansı prisma'da tam böyle çalışmayabilir, aşağıda raw query veya JS filter gerekebilir.
-                // Prisma'da field comparison (stock <= lowStockThreshold) doğrudan where içinde desteklenmiyor olabilir (versiyona bağlı).
-                // Garantilemek için iki aşamalı veya raw query.
-            },
-            select: { id: true, name: true, sku: true, stock: true, lowStockThreshold: true },
-            orderBy: { stock: 'asc' }
-        });
-
-        // Prisma'da column comparison kısıtlıdır. Eğer yukarıdaki çalışmazsa, raw query kullanabiliriz.
-        // Ancak şimdilik JS filtering de yapılabilir ama performans için Raw Query daha iyi.
-        // Kontrol edelim. Eğer hata verirse düzeltiriz. 
-        // Prisma Client 5+ field ref destekliyor mu? En sağlamı RawQuery.
-
-        // ... Raw query implementation moved below to catch block for safety if standard fails ...
-
-        // Filter JS side just in case Prisma query returns everything (if where clause was ignored or invalid)
-        const filtered = products.filter(p => p.stock <= p.lowStockThreshold);
-        res.json(filtered);
-
-    } catch (error) {
-        // Raw query fallback
-        try {
-            const products = await prisma.$queryRaw`
-          SELECT id, name, sku, stock, "lowStockThreshold"
-          FROM "Product"
-          WHERE stock <= "lowStockThreshold" AND stock >= 0
-          ORDER BY stock ASC
+        const products = await prisma.$queryRaw`
+            SELECT id, name, sku, stock, "lowStockThreshold"
+            FROM "Product"
+            WHERE stock <= "lowStockThreshold" AND "isDeleted" = false
+            ORDER BY stock ASC
         `;
-            res.json(products);
-        } catch (err) {
-            console.error('Low Stock Error:', err);
-            res.status(500).json({ error: 'Düşük stok listesi alınamadı' });
-        }
+        res.json(products);
+    } catch (error) {
+        console.error('Low Stock Error:', error);
+        res.status(500).json({ error: 'Düşük stok listesi alınamadı' });
     }
 };
 

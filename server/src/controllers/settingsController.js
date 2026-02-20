@@ -28,19 +28,25 @@ const getPublicSettings = async (req, res) => {
 
 const updateSettings = async (req, res) => {
     try {
-        const updates = req.body; // Expecting { key: value, key2: value2 } or array
+        // FIX-13: Whitelist allowed settings keys
+        const ALLOWED_KEYS = [
+            'site_title', 'site_description', 'site_phone', 'site_email',
+            'site_address', 'site_logo', 'social_instagram', 'social_facebook',
+            'social_twitter', 'working_hours'
+        ];
 
-        // Handle array of updates or object
-        const updatePromises = Object.keys(updates).map(key => {
+        const updates = req.body;
+        const filteredKeys = Object.keys(updates).filter(key => ALLOWED_KEYS.includes(key));
+
+        if (filteredKeys.length === 0) {
+            return res.status(400).json({ error: 'Geçerli ayar anahtarı bulunamadı' });
+        }
+
+        const updatePromises = filteredKeys.map(key => {
             return prisma.systemSetting.upsert({
                 where: { key },
                 update: { value: String(updates[key]) },
-                create: {
-                    key,
-                    value: String(updates[key]),
-                    type: 'text', // Default, logic to refine type needed if critical
-                    group: 'general'
-                }
+                create: { key, value: String(updates[key]), type: 'text', group: 'general' }
             });
         });
 

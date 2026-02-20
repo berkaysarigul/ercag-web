@@ -1,10 +1,46 @@
 node_modules
-.env
-npm-debug.log
 .DS_Store
 .vscode
 .idea
+client/.next
+
+# Environment
+.env
+.env.local
+
+# Database
+*.db
 server/dev.db
+prisma/dev.db
+
+# Uploads (keep folder structure)
 server/uploads/*
 !server/uploads/.gitkeep
-client/.next
+
+# Logs
+*.log
+server/error*.txt
+server/output*.txt
+server/success.txt
+server/server.log
+server/test_output*.txt
+
+# Test artifacts
+server/test_image.*
+test_*.js
+
+# Debug/Migration scripts (keep in scripts/ if needed)
+server/check*.js
+server/clean*.js
+server/debug*.js
+server/fix_*.js
+server/inspect*.js
+server/migrate-*.js
+server/seed_*.js
+server/test*.js
+server/update*.js
+server/get_code.js
+
+# OS
+Thumbs.db
+npm-debug.log
