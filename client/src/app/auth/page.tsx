@@ -6,6 +6,8 @@ import api from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+// UI-10: Tüm inline style'lar Tailwind class'larına geçirildi
+
 export default function AuthPage() {
     const [isLogin, setIsLogin] = useState(true);
     const [formData, setFormData] = useState({
@@ -35,8 +37,6 @@ export default function AuthPage() {
             const res = await api.post(endpoint, formData);
 
             login(res.data.token, res.data.user);
-
-            // Redirect back to cart or home
             router.back();
         } catch (err: any) {
             setError(err.response?.data?.message || 'Bir hata oluştu.');
@@ -45,104 +45,107 @@ export default function AuthPage() {
     };
 
     return (
-        <div className="container" style={{ maxWidth: '400px', padding: '4rem 0' }}>
-            <div className="card">
-                <h1 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', textAlign: 'center' }}>
-                    {isLogin ? 'Giriş Yap' : 'Hızlı Üyelik'}
-                </h1>
+        <div className="min-h-[60vh] flex items-center justify-center py-12 px-4">
+            <div className="w-full max-w-md">
+                <div className="bg-white rounded-2xl shadow-card border border-gray-100 p-8">
+                    <h1 className="text-2xl font-bold text-center text-gray-900 mb-6">
+                        {isLogin ? 'Giriş Yap' : 'Hızlı Üyelik'}
+                    </h1>
 
-                {error && (
-                    <div style={{ backgroundColor: '#fee2e2', color: '#ef4444', padding: '0.75rem', borderRadius: 'var(--radius-md)', marginBottom: '1rem', fontSize: '0.875rem' }}>
-                        {error}
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {!isLogin && (
-                        <>
-                            <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Ad Soyad</label>
-                                <input
-                                    type="text"
-                                    required
-                                    style={{ width: '100%', padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                />
-                            </div>
-                            <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Telefon</label>
-                                <input
-                                    type="tel"
-                                    required
-                                    style={{ width: '100%', padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}
-                                    value={formData.phone}
-                                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                />
-                            </div>
-                        </>
-                    )}
-
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>E-posta</label>
-                        <input
-                            type="email"
-                            required
-                            style={{ width: '100%', padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        />
-                    </div>
-
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem' }}>Şifre</label>
-                        <input
-                            type="password"
-                            required
-                            style={{ width: '100%', padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}
-                            value={formData.password}
-                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                        />
-                        {isLogin && (
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
-                                <Link href="/auth/forgot-password" style={{ fontSize: '0.8rem', color: '#2563eb', textDecoration: 'none' }}>
-                                    Şifremi Unuttum?
-                                </Link>
-                            </div>
-                        )}
-                    </div>
-
-                    {!isLogin && (
-                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.875rem' }}>
-                            <input
-                                type="checkbox"
-                                id="consent"
-                                checked={formData.consent}
-                                onChange={(e) => setFormData({ ...formData, consent: e.target.checked })}
-                            />
-                            <label htmlFor="consent" style={{ color: 'var(--text-secondary)' }}>
-                                Kampanya ve bilgilendirmeler için iletişim bilgilerimin kullanılmasını ve üyelik sözleşmesini kabul ediyorum.
-                            </label>
+                    {error && (
+                        <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">
+                            {error}
                         </div>
                     )}
 
-                    <button
-                        type="submit"
-                        className="btn btn-primary"
-                        style={{ marginTop: '1rem' }}
-                        disabled={loading}
-                    >
-                        {loading ? 'İşleniyor...' : (isLogin ? 'Giriş Yap' : 'Üye Ol ve Devam Et')}
-                    </button>
-                </form>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        {!isLogin && (
+                            <>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Ad Soyad</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        className="input w-full"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Telefon</label>
+                                    <input
+                                        type="tel"
+                                        required
+                                        className="input w-full"
+                                        value={formData.phone}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                    />
+                                </div>
+                            </>
+                        )}
 
-                <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem' }}>
-                    <button
-                        onClick={() => setIsLogin(!isLogin)}
-                        style={{ background: 'none', border: 'none', color: 'var(--accent)', textDecoration: 'underline', cursor: 'pointer' }}
-                    >
-                        {isLogin ? 'Hesabın yok mu? Hemen üye ol' : 'Zaten üye misin? Giriş yap'}
-                    </button>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">E-posta</label>
+                            <input
+                                type="email"
+                                required
+                                className="input w-full"
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Şifre</label>
+                            <input
+                                type="password"
+                                required
+                                className="input w-full"
+                                value={formData.password}
+                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            />
+                            {isLogin && (
+                                <div className="flex justify-end mt-1">
+                                    <Link href="/auth/forgot-password" className="text-xs text-brand-600 hover:underline">
+                                        Şifremi Unuttum?
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
+
+                        {!isLogin && (
+                            <div className="flex items-start gap-2 text-sm">
+                                <input
+                                    type="checkbox"
+                                    id="consent"
+                                    className="mt-1"
+                                    checked={formData.consent}
+                                    onChange={(e) => setFormData({ ...formData, consent: e.target.checked })}
+                                />
+                                <label htmlFor="consent" className="text-gray-600">
+                                    Kampanya ve bilgilendirmeler için iletişim bilgilerimin kullanılmasını ve üyelik sözleşmesini kabul ediyorum.
+                                </label>
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            className="btn btn-primary w-full mt-2"
+                            disabled={loading}
+                        >
+                            {loading ? 'İşleniyor...' : (isLogin ? 'Giriş Yap' : 'Üye Ol ve Devam Et')}
+                        </button>
+                    </form>
+
+                    <div className="mt-6 text-center text-sm">
+                        {/* UI-01: var(--accent) → brand-600 */}
+                        <button
+                            onClick={() => setIsLogin(!isLogin)}
+                            className="text-brand-600 hover:underline bg-transparent border-none cursor-pointer"
+                        >
+                            {isLogin ? 'Hesabın yok mu? Hemen üye ol' : 'Zaten üye misin? Giriş yap'}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

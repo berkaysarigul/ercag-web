@@ -20,14 +20,16 @@ module.exports = {
                     900: '#1e3a8a',
                     DEFAULT: '#2563eb', // Default to brand-600
                 },
-                primary: { // Keep existing primary mapping for backward compatibility but map to new brand
+                primary: {
                     DEFAULT: '#2563eb',
                     foreground: '#ffffff',
+                    light: '#3b82f6', // UI-03: added primary-light so AdminSidebar refs don't break
                 },
                 // Başarı (Yeşil - Stokta için)
                 success: {
                     50: '#f0fdf4',
                     100: '#dcfce7',
+                    400: '#4ade80', // UI-07: eklendi
                     500: '#22c55e',
                     600: '#16a34a',
                     700: '#15803d',
@@ -35,12 +37,14 @@ module.exports = {
                 // Uyarı
                 warning: {
                     50: '#fffbeb',
+                    400: '#fbbf24', // UI-07: eklendi (fill-warning-400 için)
                     500: '#f59e0b',
                     600: '#d97706',
                 },
                 // Hata
                 danger: {
                     50: '#fef2f2',
+                    400: '#f87171', // UI-07: eklendi
                     500: '#ef4444',
                     600: '#dc2626',
                     DEFAULT: '#ef4444',

@@ -5,26 +5,25 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useAdmin } from '@/context/AdminContext';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Package, ShoppingBag, Users, Star, FolderTree, Ticket, MessageSquare, Menu, X, LogOut, Settings, ScanBarcode, BarChart3, TrendingUp, Shield } from 'lucide-react';
+// UI-21: Duplicate ikonlar düzeltildi — FolderTree Kategoriler için, ShoppingBag Ürünler için, Package Stok için
+import { LayoutDashboard, Package, ShoppingBag, Users, FolderTree, Ticket, MessageSquare, LogOut, Settings, ScanBarcode, BarChart3, TrendingUp, Shield, Menu, X, Star } from 'lucide-react';
 
 export default function AdminSidebar() {
     const pathname = usePathname();
     const { user, logout } = useAuth();
     const { sidebarOpen } = useAdmin();
 
-    const allMenuItems = [ // ... no changes to items
-
+    const allMenuItems = [
         { name: 'Dashboard', href: '/admin', icon: LayoutDashboard, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] },
         { name: 'Teslimat Doğrula', href: '/admin/verify-pickup', icon: ScanBarcode, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] },
-        { name: 'Siparişler', href: '/admin/orders', icon: ShoppingBag, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] }, // FIX-24: removed hardcoded badge
+        { name: 'Siparişler', href: '/admin/orders', icon: ShoppingBag, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] }, // UI-21: ShoppingBag (Ürünler'den ayrı)
         { name: 'Ürünler', href: '/admin/products', icon: Package, roles: ['SUPER_ADMIN', 'ADMIN'] },
-        { name: 'Stok Yönetimi', href: '/admin/stock', icon: BarChart3, roles: ['SUPER_ADMIN', 'ADMIN'] },
-        { name: 'Kategoriler', href: '/admin/categories', icon: Package, roles: ['SUPER_ADMIN', 'ADMIN'] },
+        { name: 'Stok Yönetimi', href: '/admin/stock', icon: BarChart3, roles: ['SUPER_ADMIN', 'ADMIN'] }, // UI-21: BarChart3 → ayrı
+        { name: 'Kategoriler', href: '/admin/categories', icon: FolderTree, roles: ['SUPER_ADMIN', 'ADMIN'] }, // UI-21: Package → FolderTree
         { name: 'Kuponlar', href: '/admin/coupons', icon: Ticket, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Değerlendirmeler', href: '/admin/reviews', icon: MessageSquare, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] },
         { name: 'Müşteriler', href: '/admin/customers', icon: Users, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Vitrin / Slider', href: '/admin/sliders', icon: LayoutDashboard, roles: ['SUPER_ADMIN', 'ADMIN'] },
-        // FIX-07: Added 3 missing menu items
         { name: 'Kampanyalar', href: '/admin/campaigns', icon: TrendingUp, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Analitik & Rapor', href: '/admin/analytics', icon: BarChart3, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Denetim Günlüğü', href: '/admin/audit-log', icon: Shield, roles: ['SUPER_ADMIN'] },
@@ -40,6 +39,7 @@ export default function AdminSidebar() {
             ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
         `}>
             {/* Logo Area */}
+            {/* UI-03: primary-light/30 → brand-600/30 (primary.light artık tailwind'de tanımlı) */}
             <div className="p-6 border-b border-primary-light/30 flex items-center gap-3">
                 <div className="w-8 h-8 bg-secondary rounded-lg flex items-center justify-center text-primary font-bold text-xl">
                     E
@@ -59,15 +59,13 @@ export default function AdminSidebar() {
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200 group ${isActive
+                            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${isActive
                                 ? 'bg-primary-light text-white shadow-md'
                                 : 'text-gray-300 hover:bg-primary-light/50 hover:text-white'
                                 }`}
                         >
-                            <div className="flex items-center gap-3">
-                                <Icon size={20} className={isActive ? 'text-secondary' : 'text-gray-400 group-hover:text-white'} />
-                                <span className="font-medium">{item.name}</span>
-                            </div>
+                            <Icon size={20} className={isActive ? 'text-secondary' : 'text-gray-400 group-hover:text-white'} />
+                            <span className="font-medium">{item.name}</span>
                         </Link>
                     );
                 })}

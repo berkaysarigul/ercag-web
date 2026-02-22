@@ -8,6 +8,8 @@
   --primary-light: #2563eb;
   --secondary: #fbbf24;
   --secondary-hover: #f59e0b;
+  --accent: #fbbf24;        /* UI-01: Tanımsız --accent eklendi */
+  --accent-hover: #f59e0b;  /* UI-01: --accent-hover da eklendi */
   --background: #f8fafc;
   --surface: #ffffff;
   --text-main: #0f172a;
@@ -64,12 +66,7 @@ button {
   font-family: inherit;
 }
 
-/* Utilities */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 var(--spacing-md);
-}
+/* UI-30: .container kaldırıldı — Tailwind'in container'ı kullanılıyor */
 
 .btn {
   display: inline-flex;
@@ -92,13 +89,75 @@ button {
   transform: translateY(-1px);
 }
 
+/* UI-01: btn-accent artık --accent tanımlı olduğu için çalışacak */
 .btn-accent {
   background-color: var(--accent);
-  color: white;
+  color: #1e293b;
 }
 
 .btn-accent:hover {
   background-color: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+/* UI-06: Eksik buton stilleri eklendi */
+.btn-secondary {
+  background-color: var(--secondary);
+  color: #1e293b;
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--border);
+}
+
+.btn-outline:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-success {
+  background-color: var(--success);
+  color: white;
+}
+
+.btn-success:hover {
+  background-color: #059669;
+  transform: translateY(-1px);
+}
+
+/* UI-08: .input class eklendi */
+.input {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-main);
+  background-color: var(--surface);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.input:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.input::placeholder {
+  color: #9ca3af;
 }
 
 .card {

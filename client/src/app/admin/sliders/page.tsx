@@ -128,7 +128,7 @@ export default function AdminSliders() {
                         <div key={slide.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col md:flex-row gap-6 items-center">
                             <div className="relative w-full md:w-64 h-32 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                                 <Image
-                                    src={`http://localhost:3001/uploads/${slide.imageUrl}`}
+                                    src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${slide.imageUrl}`}
                                     alt={slide.title}
                                     fill
                                     className="object-cover"

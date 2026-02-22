@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
+import { Trash2 } from 'lucide-react'; // UI-20: Emoji → Lucide
 
 interface WishlistItem {
     id: number;
@@ -68,13 +69,13 @@ export default function WishlistPage() {
                                 className="absolute top-2 right-2 bg-white p-2 rounded-full shadow-md z-10 text-red-500 hover:bg-red-50 transition-colors"
                                 title="Favorilerden Kaldır"
                             >
-                                🗑️
+                                <Trash2 size={16} />
                             </button>
                             <Link href={`/products/${item.product.id}`} className="flex-1 flex flex-col text-inherit no-underline">
                                 <div className="aspect-square bg-gray-100 rounded-lg mb-4 overflow-hidden relative">
                                     {item.product.image ? (
                                         <img
-                                            src={`http://localhost:3001/uploads/${item.product.image}`}
+                                            src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${item.product.image}`}
                                             alt={item.product.name}
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                         />

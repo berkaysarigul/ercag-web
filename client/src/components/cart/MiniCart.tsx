@@ -117,12 +117,12 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
                         {/* Items */}
                         <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-white">
                             {items.map((item) => (
-                                <div key={item.id} className="group flex gap-4 p-4 bg-gray-50 hover:bg-facebook-50 rounded-2xl transition-all duration-200 border border-transparent hover:border-brand-200 relative">
+                                <div key={item.id} className="group flex gap-4 p-4 bg-gray-50 hover:bg-brand-50 rounded-2xl transition-all duration-200 border border-transparent hover:border-brand-200 relative">
                                     {/* Image */}
                                     <div className="relative flex-shrink-0 w-24 h-24 bg-white rounded-xl overflow-hidden border border-gray-100">
                                         {item.image ? (
                                             <Image
-                                                src={`http://localhost:3001/uploads/${item.image}`}
+                                                src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${item.image}`}
                                                 alt={item.name}
                                                 fill
                                                 className="object-cover"

@@ -1,8 +1,9 @@
 'use client';
+// UI-19: Package import dosyanın sonundan başa taşındı
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Search, X, Loader2 } from 'lucide-react';
+import { Search, X, Loader2, Package } from 'lucide-react';
 import api from '@/lib/api';
 
 export default function SearchAutocomplete() {
@@ -60,13 +61,13 @@ export default function SearchAutocomplete() {
                 <input
                     type="text"
                     placeholder="Ürün, kategori veya marka ara..."
-                    className="w-full pl-10 pr-4 py-2.5 rounded-full border border-gray-200 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 bg-gray-50/50 transition-all text-sm"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-full border border-gray-200 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 bg-gray-50/50 transition-all text-sm"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onFocus={() => query.length >= 2 && setIsOpen(true)}
                 />
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                {loading && <Loader2 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-primary-500 w-4 h-4 animate-spin" />}
+                {loading && <Loader2 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-500 w-4 h-4 animate-spin" />}
             </form>
 
             {isOpen && (results.products.length > 0 || results.categories.length > 0) && (
@@ -109,7 +110,7 @@ export default function SearchAutocomplete() {
                                         )}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 truncate group-hover:text-primary-600">{product.name}</p>
+                                        <p className="text-sm font-medium text-gray-900 truncate group-hover:text-brand-600">{product.name}</p>
                                         <p className="text-xs text-gray-500 font-medium">{Number(product.price).toFixed(2)} ₺</p>
                                     </div>
                                 </Link>
@@ -120,7 +121,7 @@ export default function SearchAutocomplete() {
                     <div className="p-2 border-t border-gray-100 bg-gray-50 text-center">
                         <button
                             onClick={handleSubmit}
-                            className="text-xs font-medium text-primary-600 hover:text-primary-700 hover:underline"
+                            className="text-xs font-medium text-brand-600 hover:text-brand-700 hover:underline"
                         >
                             Tüm sonuçları gör ({query})
                         </button>
@@ -130,5 +131,3 @@ export default function SearchAutocomplete() {
         </div>
     );
 }
-
-import { Package } from 'lucide-react';

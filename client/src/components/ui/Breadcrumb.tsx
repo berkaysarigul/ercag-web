@@ -6,13 +6,17 @@ import { usePathname } from 'next/navigation';
 const routeNameMap: Record<string, string> = {
     'products': 'Ürünler',
     'cart': 'Sepetim',
-    'checkout': 'Ödeme',
-    'about': 'Hakkımızda',
-    'contact': 'İletişim',
+    'profile': 'Hesabım',
+    'wishlist': 'Favorilerim',
+    'auth': 'Giriş / Kayıt',
+    'privacy': 'Gizlilik Politikası',
+    'terms': 'Kullanım Koşulları',
+    'order-success': 'Sipariş Başarılı',
     'admin': 'Yönetim Paneli',
     'orders': 'Siparişler',
     'categories': 'Kategoriler',
     'new': 'Yeni Ekle',
+    // 'about' ve 'contact' kaldırıldı — bu sayfalar mevcut değil (UI-28)
 };
 
 export default function Breadcrumb({ productName }: { productName?: string }) {

@@ -3,11 +3,15 @@
 import { Bell, Search, User, Menu } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useAdmin } from '@/context/AdminContext';
+import { useAuth } from '@/context/AuthContext';
 
 export default function AdminHeader() {
     const pathname = usePathname();
     const { toggleSidebar } = useAdmin();
+    // UI-22: Gerçek kullanıcı bilgisi auth context'ten alınıyor
+    const { user } = useAuth();
 
+    // UI-23: Eksik sayfa başlıkları eklendi
     const getPageTitle = () => {
         if (pathname === '/admin') return 'Dashboard';
         if (pathname.includes('/orders')) return 'Sipariş Yönetimi';
@@ -15,7 +19,21 @@ export default function AdminHeader() {
         if (pathname.includes('/coupons')) return 'Kupon Yönetimi';
         if (pathname.includes('/customers')) return 'Müşteri Yönetimi';
         if (pathname.includes('/settings')) return 'Ayarlar';
+        if (pathname.includes('/analytics')) return 'Analitik & Raporlar';
+        if (pathname.includes('/campaigns')) return 'Kampanya Yönetimi';
+        if (pathname.includes('/audit-log')) return 'Denetim Günlüğü';
+        if (pathname.includes('/stock')) return 'Stok Yönetimi';
+        if (pathname.includes('/categories')) return 'Kategori Yönetimi';
+        if (pathname.includes('/sliders')) return 'Vitrin / Slider';
+        if (pathname.includes('/reviews')) return 'Değerlendirmeler';
+        if (pathname.includes('/verify-pickup')) return 'Teslimat Doğrulama';
         return 'Yönetim Paneli';
+    };
+
+    const getRoleLabel = () => {
+        if (user?.role === 'SUPER_ADMIN') return 'Süper Yönetici';
+        if (user?.role === 'ADMIN') return 'Yönetici';
+        return 'Personel';
     };
 
     return (
@@ -49,11 +67,11 @@ export default function AdminHeader() {
                     <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-danger rounded-full border-2 border-white"></span>
                 </button>
 
-                {/* Profile */}
+                {/* Profile — UI-22: Gerçek kullanıcı adı ve rolü */}
                 <div className="flex items-center gap-3 pl-6 border-l border-gray-200">
                     <div className="text-right hidden md:block">
-                        <p className="text-sm font-semibold text-gray-700">Admin User</p>
-                        <p className="text-xs text-gray-500">Süper Yönetici</p>
+                        <p className="text-sm font-semibold text-gray-700">{user?.name || 'Admin'}</p>
+                        <p className="text-xs text-gray-500">{getRoleLabel()}</p>
                     </div>
                     <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary border border-primary/20">
                         <User size={20} />

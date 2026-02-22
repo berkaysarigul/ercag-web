@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Instagram, Facebook, Twitter } from 'lucide-react';
+import { Instagram, Facebook, Twitter, MapPin, Phone, Mail, Clock } from 'lucide-react';
 
 import { useSettings } from "@/context/SettingsContext";
 
@@ -28,20 +28,20 @@ export default function Footer() {
                         <p className="text-gray-300 text-sm leading-relaxed">
                             {settings.site_description || "Okul, ofis ve sanatsal tüm ihtiyaçlarınız için güvenilir adresiniz. Kaliteli ürünler, uygun fiyatlar ve güler yüzlü hizmet."}
                         </p>
-                        {/* FIX-22: Emoji icons replaced with lucide-react */}
+                        {/* UI-01: var(--accent) artık tanımlı */}
                         <div className="flex gap-4">
                             {settings.social_instagram && (
-                                <a href={settings.social_instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-[var(--accent)] transition-colors">
+                                <a href={settings.social_instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-amber-400 transition-colors">
                                     <Instagram size={18} />
                                 </a>
                             )}
                             {settings.social_facebook && (
-                                <a href={settings.social_facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-[var(--accent)] transition-colors">
+                                <a href={settings.social_facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-amber-400 transition-colors">
                                     <Facebook size={18} />
                                 </a>
                             )}
                             {settings.social_twitter && (
-                                <a href={settings.social_twitter} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-[var(--accent)] transition-colors">
+                                <a href={settings.social_twitter} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-amber-400 transition-colors">
                                     <Twitter size={18} />
                                 </a>
                             )}
@@ -50,7 +50,7 @@ export default function Footer() {
 
                     {/* Quick Links */}
                     <div>
-                        <h3 className="text-lg font-bold mb-6 text-[var(--accent)]">Hızlı Erişim</h3>
+                        <h3 className="text-lg font-bold mb-6 text-amber-400">Hızlı Erişim</h3>
                         <ul className="space-y-3">
                             <li>
                                 <Link href="/" className="text-gray-300 hover:text-white transition-colors">Ana Sayfa</Link>
@@ -59,7 +59,6 @@ export default function Footer() {
                                 <Link href="/products" className="text-gray-300 hover:text-white transition-colors">Tüm Ürünler</Link>
                             </li>
                             <li>
-                                {/* FIX-21: /about → /privacy */}
                                 <Link href="/privacy" className="text-gray-300 hover:text-white transition-colors">Gizlilik Politikası</Link>
                             </li>
                             <li>
@@ -68,37 +67,38 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    {/* FIX-21: Replaced hardcoded category links with static pages */}
+                    {/* UI-12: "Sayfalar" → "Hesabım" olarak değiştirildi */}
                     <div>
-                        <h3 className="text-lg font-bold mb-6 text-[var(--accent)]">Sayfalar</h3>
+                        <h3 className="text-lg font-bold mb-6 text-amber-400">Hesabım</h3>
                         <ul className="space-y-3">
-                            <li><Link href="/products" className="text-gray-300 hover:text-white transition-colors">Tüm Ürünler</Link></li>
-                            <li><Link href="/privacy" className="text-gray-300 hover:text-white transition-colors">Gizlilik Politikası</Link></li>
-                            <li><Link href="/terms" className="text-gray-300 hover:text-white transition-colors">Kullanım Koşulları</Link></li>
+                            <li><Link href="/auth" className="text-gray-300 hover:text-white transition-colors">Giriş Yap</Link></li>
+                            <li><Link href="/profile" className="text-gray-300 hover:text-white transition-colors">Profilim</Link></li>
+                            <li><Link href="/wishlist" className="text-gray-300 hover:text-white transition-colors">Favorilerim</Link></li>
+                            <li><Link href="/cart" className="text-gray-300 hover:text-white transition-colors">Sepetim</Link></li>
                         </ul>
                     </div>
 
                     {/* Contact Info */}
                     <div>
-                        <h3 className="text-lg font-bold mb-6 text-[var(--accent)]">İletişim</h3>
+                        <h3 className="text-lg font-bold mb-6 text-amber-400">İletişim</h3>
+                        {/* UI-11: Emoji ikonlar → Lucide React */}
                         <ul className="space-y-4">
                             <li className="flex items-start gap-3">
-                                <span className="text-[var(--accent)] mt-1">📍</span>
+                                <MapPin size={16} className="text-amber-400 mt-0.5 flex-shrink-0" />
                                 <span className="text-gray-300 text-sm whitespace-pre-line">
                                     {settings.site_address || "Atatürk Caddesi No: 123\nMerkez, İstanbul"}
                                 </span>
                             </li>
                             <li className="flex items-center gap-3">
-                                <span className="text-[var(--accent)]">📞</span>
+                                <Phone size={16} className="text-amber-400 flex-shrink-0" />
                                 <span className="text-gray-300 text-sm">{settings.site_phone || "+90 (212) 123 45 67"}</span>
                             </li>
                             <li className="flex items-center gap-3">
-                                <span className="text-[var(--accent)]">✉️</span>
+                                <Mail size={16} className="text-amber-400 flex-shrink-0" />
                                 <span className="text-gray-300 text-sm">{settings.site_email || "info@ercagkirtasiye.com"}</span>
                             </li>
-                            {/* FIX-25: Working hours from settings */}
                             <li className="flex items-center gap-3">
-                                <span className="text-[var(--accent)]">⏰</span>
+                                <Clock size={16} className="text-amber-400 flex-shrink-0" />
                                 <span className="text-gray-300 text-sm">{settings.working_hours || "Pzt - Cmt: 09:00 - 19:00"}</span>
                             </li>
                         </ul>

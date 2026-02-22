@@ -88,8 +88,8 @@ export default function Home() {
               </div>
               <div>
                 <h4 className="font-bold text-gray-900 mb-2">Çalışma Saatleri</h4>
-                <p className="text-gray-600">Pazartesi - Cumartesi: 09:00 - 19:00</p>
-                <p className="text-gray-600">Pazar: Kapalı</p>
+                {/* UI-13: settings'ten dinamik çalışma saatleri */}
+                <p className="text-gray-600">{settings.working_hours || "Pazartesi - Cumartesi: 09:00 - 19:00"}</p>
               </div>
               <div>
                 <h4 className="font-bold text-gray-900 mb-2">İletişim</h4>

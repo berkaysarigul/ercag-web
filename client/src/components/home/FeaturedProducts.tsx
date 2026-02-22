@@ -15,6 +15,8 @@ interface Product {
     image: string;
     category: { name: string };
     stock: number;
+    rating?: number;  // UI-15: gerçek rating alanı eklendi
+    isFeatured?: boolean; // UI-16: badge için
 }
 
 export default function FeaturedProducts() {
@@ -78,10 +80,12 @@ export default function FeaturedProducts() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                     {products.map((product) => (
                         <div key={product.id} className="group relative bg-white rounded-2xl border border-gray-100 p-4 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-                            {/* Badge */}
-                            <div className="absolute top-4 left-4 z-10 bg-yellow-400 text-xs font-bold px-2 py-1 rounded-full text-gray-900 shadow-sm">
-                                Fırsat
-                            </div>
+                            {/* UI-16: Badge sadece gerçekten featured ürünlerde gösterilsin */}
+                            {product.isFeatured && (
+                                <div className="absolute top-4 left-4 z-10 bg-amber-400 text-xs font-bold px-2 py-1 rounded-full text-gray-900 shadow-sm">
+                                    Öne Çıkan
+                                </div>
+                            )}
 
                             {/* Image */}
                             <div className="relative aspect-square mb-4 overflow-hidden rounded-xl bg-gray-50 p-6 flex items-center justify-center">
@@ -95,7 +99,7 @@ export default function FeaturedProducts() {
                                 <div className="absolute inset-x-4 bottom-4 flex gap-2 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                                     <button
                                         onClick={(e) => handleAddToCart(e, product)}
-                                        className="flex-1 bg-primary text-white py-2 rounded-lg font-medium shadow-lg hover:bg-primary-hover flex items-center justify-center gap-2"
+                                        className="flex-1 bg-brand-600 text-white py-2 rounded-lg font-medium shadow-lg hover:bg-brand-700 flex items-center justify-center gap-2"
                                     >
                                         <ShoppingCart size={18} /> Sepete Ekle
                                     </button>
@@ -112,13 +116,17 @@ export default function FeaturedProducts() {
                                     <Link href={`/products/${product.id}`}>{product.name}</Link>
                                 </h3>
 
+                                {/* UI-15: Gerçek rating kullanılıyor */}
                                 <div className="flex items-center gap-1 mb-3">
-                                    <Star size={14} className="fill-yellow-400 text-yellow-400" />
-                                    <Star size={14} className="fill-yellow-400 text-yellow-400" />
-                                    <Star size={14} className="fill-yellow-400 text-yellow-400" />
-                                    <Star size={14} className="fill-yellow-400 text-yellow-400" />
-                                    <Star size={14} className="fill-gray-200 text-gray-200" />
-                                    <span className="text-xs text-gray-400 ml-1">(4.0)</span>
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <Star key={star} size={14}
+                                            className={star <= Math.round(product.rating || 0)
+                                                ? "fill-yellow-400 text-yellow-400"
+                                                : "fill-gray-200 text-gray-200"
+                                            }
+                                        />
+                                    ))}
+                                    <span className="text-xs text-gray-400 ml-1">({product.rating?.toFixed(1) || '0.0'})</span>
                                 </div>
 
                                 <div className="flex items-center justify-between">

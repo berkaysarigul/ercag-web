@@ -176,10 +176,11 @@ export default function AdminDashboard() {
                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm
                                         ${order.status === 'PENDING' ? 'bg-orange-500' :
                                             order.status === 'COMPLETED' ? 'bg-green-500' : 'bg-blue-500'}`}>
-                                        {order.user.name.charAt(0)}
+                                        {/* UI-24: Null-safe access — guest orders have no user */}
+                                        {(order.user?.name || order.fullName || 'M').charAt(0)}
                                     </div>
                                     <div>
-                                        <p className="font-medium text-gray-900">#{order.id} - {order.user.name}</p>
+                                        <p className="font-medium text-gray-900">#{order.id} - {order.user?.name || order.fullName || 'Misafir'}</p>
                                         <p className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString('tr-TR')}</p>
                                     </div>
                                 </div>
