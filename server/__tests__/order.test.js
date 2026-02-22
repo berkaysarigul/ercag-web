@@ -7,8 +7,10 @@ let productId;
 
 describe('Order Endpoints', () => {
     beforeAll(async () => {
-        // Create User
+        // Clean up stale test data
         await prisma.user.deleteMany({ where: { email: 'ordertest@example.com' } });
+
+        // Register user via API
         const userRes = await request(app).post('/api/auth/register').send({
             name: 'Order Test',
             email: 'ordertest@example.com',
@@ -17,37 +19,36 @@ describe('Order Endpoints', () => {
         });
         userToken = userRes.body.token;
 
-        // Create Product
+        // Create test product directly via Prisma
+        // images field must use Prisma's nested create syntax, NOT a plain array
         const product = await prisma.product.create({
             data: {
                 name: 'Test Product',
                 description: 'Desc',
                 price: 100,
                 stock: 10,
-                images: [],
-                categoryId: 1 // Assuming category 1 exists or using connect logic if needed. 
-                // Ideally we create a category too, but keeping it simple for now. 
-                // If category requirement is strict, this might fail.
+                categoryId: 1
+                // images omitted — Prisma default is empty relation
             }
         });
         productId = product.id;
     });
 
     afterAll(async () => {
-        // Cleanup
-        await prisma.orderItem.deleteMany({ where: { product: { name: 'Test Product' } } });
+        // Cleanup in correct dependency order
+        await prisma.cartItem.deleteMany({ where: { productId } });
+        await prisma.orderItem.deleteMany({ where: { productId } });
         await prisma.order.deleteMany({ where: { user: { email: 'ordertest@example.com' } } });
-        await prisma.product.delete({ where: { id: productId } });
+        // Only delete product if it was actually created (productId may be undefined if beforeAll failed)
+        if (productId) {
+            await prisma.product.delete({ where: { id: productId } });
+        }
         await prisma.user.deleteMany({ where: { email: 'ordertest@example.com' } });
         await prisma.$disconnect();
     });
 
     it('should create an order', async () => {
-        // Add to cart first (assuming cart logic is implicit or we can create order directly via endpoint if exposed)
-        // Since typical flow is Cart -> Order, let's try creating order from cart
-        // But if we test /api/orders, it might require a Cart.
-
-        // Let's seed a CartItem
+        // Seed a CartItem for the test user
         const user = await prisma.user.findUnique({ where: { email: 'ordertest@example.com' } });
         let cart = await prisma.cart.findUnique({ where: { userId: user.id } });
         if (!cart) cart = await prisma.cart.create({ data: { userId: user.id } });
@@ -63,14 +64,10 @@ describe('Order Endpoints', () => {
         const res = await request(app)
             .post('/api/orders')
             .set('Authorization', `Bearer ${userToken}`)
-            .send({
-                paymentMethod: 'CREDIT_CARD'
-            });
+            .send({ paymentMethod: 'CREDIT_CARD' });
 
         expect(res.statusCode).toEqual(201);
         expect(res.body).toHaveProperty('id');
         expect(res.body.status).toEqual('PENDING');
     });
-
-    // More tests (status transition) would go here
 });

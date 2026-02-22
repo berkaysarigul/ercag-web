@@ -21,7 +21,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" } // Allow serving static files
+    crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 app.use(express.json());
 
@@ -34,7 +34,7 @@ app.use('/uploads', (req, res, next) => {
 // Global Rate Limit
 app.use('/api', apiLimiter);
 
-// FIX-06: All routes registered exactly ONCE, no duplicates
+// Routes
 const authRoutes = require('./src/routes/authRoutes');
 const cartRoutes = require('./src/routes/cartRoutes');
 const productRoutes = require('./src/routes/productRoutes');
@@ -108,25 +108,26 @@ io.use((socket, next) => {
 });
 
 io.on('connection', (socket) => {
-    // Admin room
     if (['SUPER_ADMIN', 'STAFF', 'ADMIN'].includes(socket.userRole)) {
         socket.join('admin-room');
     }
-
-    // User-specific room
     if (socket.userId) {
         socket.join(`user-${socket.userId}`);
     }
-
-    socket.on('disconnect', () => {
-        // console.log('Socket disconnected:', socket.id);
-    });
+    socket.on('disconnect', () => { });
 });
 
 // Make io accessible globally
 app.set('io', io);
 
-// Start Server
-server.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+// Only start the HTTP server when NOT in test mode.
+// This prevents "EADDRINUSE" and "app.address is not a function" errors in Jest,
+// because each test file importing this module won't trigger a new server.listen().
+if (process.env.NODE_ENV !== 'test') {
+    server.listen(PORT, () => {
+        console.log(`Server is running on http://localhost:${PORT}`);
+    });
+}
+
+// Export the Express app (not the http.Server) so supertest can wrap it.
+module.exports = app;
