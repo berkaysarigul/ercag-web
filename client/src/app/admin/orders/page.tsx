@@ -105,6 +105,11 @@ export default function AdminOrdersPage() {
         setFilteredOrders(result);
     };
 
+    // FIX: filteredOrders'ı orders/activeTab/searchQuery değişince otomatik güncelle
+    useEffect(() => {
+        filterOrders();
+    }, [orders, activeTab, searchQuery]);
+
     const handleStatusChange = async (orderId: number, newStatus: string) => {
         try {
             await api.put(`/orders/${orderId}/status`, { status: newStatus });

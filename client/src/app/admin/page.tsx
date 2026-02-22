@@ -23,10 +23,12 @@ export default function AdminDashboard() {
         try {
             const [statsRes, ordersRes] = await Promise.all([
                 api.get('/orders/stats'),
-                api.get('/orders/all')
+                api.get('/orders/all?limit=5')
             ]);
             setStats(statsRes.data);
-            setRecentOrders(ordersRes.data.slice(0, 5));
+            // FIX: getAllOrders returns { orders, total } after FIX-14 pagination
+            const ordersArray = Array.isArray(ordersRes.data) ? ordersRes.data : (ordersRes.data.orders ?? []);
+            setRecentOrders(ordersArray.slice(0, 5));
         } catch (error) {
             console.error('Failed to fetch dashboard data', error);
         } finally {

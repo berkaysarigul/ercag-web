@@ -144,7 +144,7 @@ export default function CartPage() {
                                         <Link href={`/products/${item.id}`} className="font-semibold text-lg text-gray-900 hover:text-primary transition-colors">
                                             {item.name}
                                         </Link>
-                                        <p className="text-sm text-gray-500">{item.category?.name}</p>
+                                        <p className="text-sm text-gray-500">{(item as any).category?.name}</p>
                                         <div className="mt-2 font-bold text-primary text-lg">{Number(item.price).toFixed(2)} ₺</div>
                                     </div>
                                     <div className="flex flex-col items-end gap-3">
