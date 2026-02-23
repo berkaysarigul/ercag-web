@@ -2,111 +2,130 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Instagram, Facebook, Twitter, MapPin, Phone, Mail, Clock } from 'lucide-react';
-
-import { useSettings } from "@/context/SettingsContext";
+import { Instagram, Facebook, Twitter, MapPin, Phone, Mail, Clock, ArrowUpRight } from 'lucide-react';
+import { useSettings } from '@/context/SettingsContext';
 
 export default function Footer() {
     const { settings } = useSettings();
     const year = new Date().getFullYear();
 
+    const quickLinks = [
+        { href: '/', label: 'Ana Sayfa' },
+        { href: '/products', label: 'Tüm Ürünler' },
+        { href: '/privacy', label: 'Gizlilik Politikası' },
+        { href: '/terms', label: 'Kullanım Koşulları' },
+    ];
+
+    const accountLinks = [
+        { href: '/auth', label: 'Giriş Yap' },
+        { href: '/profile', label: 'Profilim' },
+        { href: '/wishlist', label: 'Favorilerim' },
+        { href: '/cart', label: 'Sepetim' },
+    ];
+
+    const socials = [
+        { href: settings.social_instagram, icon: Instagram, label: 'Instagram' },
+        { href: settings.social_facebook, icon: Facebook, label: 'Facebook' },
+        { href: settings.social_twitter, icon: Twitter, label: 'Twitter' },
+    ].filter(s => s.href);
+
     return (
-        <footer className="bg-[var(--primary)] text-white pt-16 pb-8 mt-auto">
-            <div className="container">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-                    {/* Brand Column */}
-                    <div className="space-y-6">
+        <footer className="bg-[var(--primary)] text-white mt-auto">
+            {/* Main footer */}
+            <div className="container py-10">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+
+                    {/* Brand — 4 cols */}
+                    <div className="md:col-span-4 space-y-4">
                         <div className="bg-white p-2 w-fit rounded-lg">
                             <Image
                                 src="/logo.png"
-                                alt={settings.site_title || "Erçağ Kırtasiye"}
-                                width={120}
-                                height={40}
+                                alt={settings.site_title || 'Erçağ Kırtasiye'}
+                                width={110}
+                                height={36}
                                 className="object-contain"
                             />
                         </div>
-                        <p className="text-gray-300 text-sm leading-relaxed">
-                            {settings.site_description || "Okul, ofis ve sanatsal tüm ihtiyaçlarınız için güvenilir adresiniz. Kaliteli ürünler, uygun fiyatlar ve güler yüzlü hizmet."}
+                        <p className="text-white/60 text-sm leading-relaxed max-w-xs">
+                            {settings.site_description || 'Okul, ofis ve sanatsal tüm ihtiyaçlarınız için güvenilir adresiniz.'}
                         </p>
-                        {/* UI-01: var(--accent) artık tanımlı */}
-                        <div className="flex gap-4">
-                            {settings.social_instagram && (
-                                <a href={settings.social_instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-amber-400 transition-colors">
-                                    <Instagram size={18} />
-                                </a>
-                            )}
-                            {settings.social_facebook && (
-                                <a href={settings.social_facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-amber-400 transition-colors">
-                                    <Facebook size={18} />
-                                </a>
-                            )}
-                            {settings.social_twitter && (
-                                <a href={settings.social_twitter} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-amber-400 transition-colors">
-                                    <Twitter size={18} />
-                                </a>
-                            )}
-                        </div>
+                        {socials.length > 0 && (
+                            <div className="flex gap-3 pt-1">
+                                {socials.map(({ href, icon: Icon, label }) => (
+                                    <a key={label} href={href} target="_blank" rel="noopener noreferrer"
+                                        className="w-9 h-9 bg-white/10 hover:bg-amber-400 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
+                                        aria-label={label}>
+                                        <Icon size={16} />
+                                    </a>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
-                    {/* Quick Links */}
-                    <div>
-                        <h3 className="text-lg font-bold mb-6 text-amber-400">Hızlı Erişim</h3>
-                        <ul className="space-y-3">
-                            <li>
-                                <Link href="/" className="text-gray-300 hover:text-white transition-colors">Ana Sayfa</Link>
-                            </li>
-                            <li>
-                                <Link href="/products" className="text-gray-300 hover:text-white transition-colors">Tüm Ürünler</Link>
-                            </li>
-                            <li>
-                                <Link href="/privacy" className="text-gray-300 hover:text-white transition-colors">Gizlilik Politikası</Link>
-                            </li>
-                            <li>
-                                <Link href="/terms" className="text-gray-300 hover:text-white transition-colors">Kullanım Koşulları</Link>
-                            </li>
+                    {/* Quick Links — 2 cols */}
+                    <div className="md:col-span-2">
+                        <h3 className="text-xs font-semibold uppercase tracking-widest text-amber-400 mb-4">Hızlı Erişim</h3>
+                        <ul className="space-y-2.5">
+                            {quickLinks.map(({ href, label }) => (
+                                <li key={href}>
+                                    <Link href={href} className="text-white/60 hover:text-white text-sm transition-colors flex items-center gap-1 group">
+                                        <span>{label}</span>
+                                        <ArrowUpRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
 
-                    {/* UI-12: "Sayfalar" → "Hesabım" olarak değiştirildi */}
-                    <div>
-                        <h3 className="text-lg font-bold mb-6 text-amber-400">Hesabım</h3>
-                        <ul className="space-y-3">
-                            <li><Link href="/auth" className="text-gray-300 hover:text-white transition-colors">Giriş Yap</Link></li>
-                            <li><Link href="/profile" className="text-gray-300 hover:text-white transition-colors">Profilim</Link></li>
-                            <li><Link href="/wishlist" className="text-gray-300 hover:text-white transition-colors">Favorilerim</Link></li>
-                            <li><Link href="/cart" className="text-gray-300 hover:text-white transition-colors">Sepetim</Link></li>
+                    {/* Account — 2 cols */}
+                    <div className="md:col-span-2">
+                        <h3 className="text-xs font-semibold uppercase tracking-widest text-amber-400 mb-4">Hesabım</h3>
+                        <ul className="space-y-2.5">
+                            {accountLinks.map(({ href, label }) => (
+                                <li key={href}>
+                                    <Link href={href} className="text-white/60 hover:text-white text-sm transition-colors flex items-center gap-1 group">
+                                        <span>{label}</span>
+                                        <ArrowUpRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
 
-                    {/* Contact Info */}
-                    <div>
-                        <h3 className="text-lg font-bold mb-6 text-amber-400">İletişim</h3>
-                        {/* UI-11: Emoji ikonlar → Lucide React */}
-                        <ul className="space-y-4">
-                            <li className="flex items-start gap-3">
-                                <MapPin size={16} className="text-amber-400 mt-0.5 flex-shrink-0" />
-                                <span className="text-gray-300 text-sm whitespace-pre-line">
-                                    {settings.site_address || "Atatürk Caddesi No: 123\nMerkez, İstanbul"}
+                    {/* Contact — 4 cols */}
+                    <div className="md:col-span-4">
+                        <h3 className="text-xs font-semibold uppercase tracking-widest text-amber-400 mb-4">İletişim</h3>
+                        <ul className="space-y-3">
+                            <li className="flex items-start gap-2.5">
+                                <MapPin size={14} className="text-amber-400 mt-0.5 shrink-0" />
+                                <span className="text-white/60 text-sm whitespace-pre-line">
+                                    {settings.site_address || 'Atatürk Caddesi No: 123\nMerkez, İstanbul'}
                                 </span>
                             </li>
-                            <li className="flex items-center gap-3">
-                                <Phone size={16} className="text-amber-400 flex-shrink-0" />
-                                <span className="text-gray-300 text-sm">{settings.site_phone || "+90 (212) 123 45 67"}</span>
+                            <li className="flex items-center gap-2.5">
+                                <Phone size={14} className="text-amber-400 shrink-0" />
+                                <span className="text-white/60 text-sm">{settings.site_phone || '+90 (212) 123 45 67'}</span>
                             </li>
-                            <li className="flex items-center gap-3">
-                                <Mail size={16} className="text-amber-400 flex-shrink-0" />
-                                <span className="text-gray-300 text-sm">{settings.site_email || "info@ercagkirtasiye.com"}</span>
-                            </li>
-                            <li className="flex items-center gap-3">
-                                <Clock size={16} className="text-amber-400 flex-shrink-0" />
-                                <span className="text-gray-300 text-sm">{settings.working_hours || "Pzt - Cmt: 09:00 - 19:00"}</span>
+                            {settings.site_email && (
+                                <li className="flex items-center gap-2.5">
+                                    <Mail size={14} className="text-amber-400 shrink-0" />
+                                    <span className="text-white/60 text-sm">{settings.site_email}</span>
+                                </li>
+                            )}
+                            <li className="flex items-center gap-2.5">
+                                <Clock size={14} className="text-amber-400 shrink-0" />
+                                <span className="text-white/60 text-sm">{settings.working_hours || 'Pzt – Cmt: 09:00 – 19:00'}</span>
                             </li>
                         </ul>
                     </div>
                 </div>
+            </div>
 
-                <div className="border-t border-white/10 pt-8 text-center text-sm text-gray-400">
-                    <p>&copy; {year} {settings.site_title || "Erçağ Kırtasiye"}. Tüm hakları saklıdır.</p>
+            {/* Bottom bar */}
+            <div className="border-t border-white/10">
+                <div className="container py-4 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-white/40">
+                    <p>© {year} {settings.site_title || 'Erçağ Kırtasiye'}. Tüm hakları saklıdır.</p>
+                    <p>Click & Collect ile hızlı alışveriş</p>
                 </div>
             </div>
         </footer>
