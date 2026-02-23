@@ -167,7 +167,7 @@ export default function EditProductPage() {
                                                 {existingImages.map((img, index) => (
                                                     <div key={index} className="relative aspect-square border rounded-lg overflow-hidden group">
                                                         <img
-                                                            src={img.url.startsWith('http') ? img.url : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${img.url}`}
+                                                            src={img.url.startsWith('http') ? img.url : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${img.url.startsWith('/') ? '' : '/uploads/'}${img.url}`}
                                                             alt={`Existing ${index}`}
                                                             className="w-full h-full object-cover"
                                                         />

@@ -13,6 +13,9 @@ const nextConfig = {
             { protocol: 'https', hostname: 'placehold.co' },
             { protocol: 'https', hostname: 'via.placeholder.com' },
         ],
+        // Allow unoptimized images in dev to bypass "resolved to private ip" error
+        // In production (Vercel/Railway), images come from a real domain so this doesn't apply
+        unoptimized: process.env.NODE_ENV === 'development',
     },
 };
 

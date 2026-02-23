@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Inter } from 'next/font/google';
 import { Toaster } from 'sonner';
@@ -17,6 +17,11 @@ import { SettingsProvider } from "@/context/SettingsContext";
 import { SocketProvider } from "@/context/SocketContext";
 import ClientLayout from "@/components/layout/ClientLayout";
 
+// Moved themeColor here — Next.js 15+ requires it in generateViewport, not metadata
+export const viewport: Viewport = {
+  themeColor: '#1e3a8a',
+};
+
 export async function generateMetadata(): Promise<Metadata> {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/settings/public`, { next: { revalidate: 3600 } });
@@ -30,7 +35,6 @@ export async function generateMetadata(): Promise<Metadata> {
       description: settings.site_description || "Erçağ Kırtasiye ile okul, ofis ve sanat malzemeleri ihtiyaçlarınızı hızlı ve güvenilir bir şekilde karşılayın.",
       keywords: ['kırtasiye', 'okul malzemeleri', 'ofis malzemeleri', 'sanat malzemeleri', 'defter', 'kalem'],
       manifest: '/manifest.json',
-      themeColor: '#1e3a8a',
       appleWebApp: {
         capable: true,
         title: 'Erçağ Kırtasiye',
@@ -44,7 +48,6 @@ export async function generateMetadata(): Promise<Metadata> {
       description: "Erçağ Kırtasiye ile okul, ofis ve sanat malzemeleri ihtiyaçlarınızı hızlı ve güvenilir bir şekilde karşılayın.",
       keywords: ['kırtasiye', 'kalem', 'defter', 'ofis', 'okul', 'sanat', 'boya', 'kağıt'],
       manifest: '/manifest.json',
-      themeColor: '#1e3a8a',
       appleWebApp: {
         capable: true,
         title: 'Erçağ Kırtasiye',
