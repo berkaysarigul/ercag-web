@@ -1,5 +1,6 @@
 const prisma = require('../lib/prisma');
 const crypto = require('crypto');
+const { logAudit } = require('../services/auditService');
 
 const generatePickupCode = async () => {
     let code;
@@ -316,6 +317,9 @@ const updateOrderStatus = async (req, res) => {
         }
 
         res.json(updatedOrder);
+
+        // Audit log — order status change
+        logAudit(adminId, 'order.status_update', 'Order', parseInt(id), { oldStatus: order.status, newStatus: status }, req.ip);
 
     } catch (error) {
         console.error(error);

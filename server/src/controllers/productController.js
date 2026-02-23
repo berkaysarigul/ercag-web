@@ -1,4 +1,5 @@
 const prisma = require('../lib/prisma');
+const { logAudit } = require('../services/auditService');
 
 const getAllProducts = async (req, res) => {
     try {
@@ -135,6 +136,9 @@ const createProduct = async (req, res) => {
             include: { images: true }
         });
         res.status(201).json(product);
+
+        // Audit log (non-blocking — after response sent)
+        logAudit(req.user?.id, 'product.create', 'Product', product.id, { name: product.name, price: product.price }, req.ip);
     } catch (error) {
         console.error('Create Product Error:', error);
         res.status(500).json({ error: 'Failed to create product', details: error.message });
@@ -242,6 +246,9 @@ const updateProduct = async (req, res) => {
             include: { images: true }
         });
         res.json(product);
+
+        // Audit log
+        logAudit(req.user?.id, 'product.update', 'Product', parseInt(id), { name: product.name }, req.ip);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to update product' });
@@ -256,6 +263,9 @@ const deleteProduct = async (req, res) => {
             data: { isDeleted: true }
         });
         res.json({ message: 'Product deleted successfully (soft delete)' });
+
+        // Audit log
+        logAudit(req.user?.id, 'product.delete', 'Product', parseInt(id), null, req.ip);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to delete product' });
@@ -282,6 +292,9 @@ const bulkDeleteProducts = async (req, res) => {
         });
 
         res.json({ message: `${ids.length} products deleted successfully (soft delete)` });
+
+        // Audit log
+        logAudit(req.user?.id, 'product.bulk_delete', 'Product', null, { ids, count: ids.length }, req.ip);
     } catch (error) {
         console.error('Bulk Delete Error:', error);
         res.status(500).json({ error: 'Failed to delete products' });

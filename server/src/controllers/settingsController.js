@@ -1,4 +1,5 @@
 const prisma = require('../lib/prisma');
+const { logAudit } = require('../services/auditService');
 
 const getAllSettings = async (req, res) => {
     try {
@@ -52,6 +53,9 @@ const updateSettings = async (req, res) => {
 
         await Promise.all(updatePromises);
         res.json({ message: 'Settings updated successfully' });
+
+        // Audit log
+        logAudit(req.user?.id, 'settings.update', 'Settings', null, { updatedKeys: filteredKeys }, req.ip);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to update settings' });
