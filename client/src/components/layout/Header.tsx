@@ -40,14 +40,14 @@ export default function Header() {
     return (
         <>
             <header className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled
-                    ? 'bg-white/80 backdrop-blur-xl shadow-sm border-b border-gray-100'
-                    : 'bg-white border-b border-gray-100'
+                ? 'bg-white/80 backdrop-blur-xl shadow-sm border-b border-gray-100'
+                : 'bg-white border-b border-gray-100'
                 }`}>
-                <div className="container h-16 flex items-center gap-4">
+                <div className="container h-16 flex items-center gap-4" style={{ paddingTop: 0, paddingBottom: 0 }}>
 
                     {/* Logo */}
                     <Link href="/" className="flex items-center shrink-0">
-                        <div className="relative h-10 w-36">
+                        <div className="relative h-12 w-44">
                             <Image
                                 src={settings.site_logo
                                     ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${settings.site_logo}`
