@@ -19,7 +19,11 @@ interface CartContextType {
     removeFromCart: (id: number) => void;
     clearCart: () => void;
     total: number;
+    discountAmount: number;
+    finalAmount: number;
+    appliedCampaigns: { id: number; name: string; discount: number }[];
     loaded: boolean;
+    refreshCart: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -30,7 +34,10 @@ import api from '@/lib/api';
 export function CartProvider({ children }: { children: React.ReactNode }) {
     const [items, setItems] = useState<CartItem[]>([]);
     const [loaded, setLoaded] = useState(false);
-    const { user, loading: authLoading, logout } = useAuth(); // Assuming AuthContext provides 'loading' and 'logout'
+    const [discountAmount, setDiscountAmount] = useState(0);
+    const [finalAmount, setFinalAmount] = useState(0);
+    const [appliedCampaigns, setAppliedCampaigns] = useState<{ id: number; name: string; discount: number }[]>([]);
+    const { user, loading: authLoading, logout } = useAuth();
 
     // Load cart from local storage on mount (Guest)
     // Or from API (User)
@@ -76,6 +83,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                         image: item.product.image
                     })) : [];
                     setItems(mappedItems);
+                    setDiscountAmount(Number(res.data.discountAmount) || 0);
+                    setFinalAmount(Number(res.data.finalAmount) || 0);
+                    setAppliedCampaigns(res.data.appliedCampaigns || []);
 
                 } catch (error: any) {
                     console.error("Failed to fetch cart", error);
@@ -197,8 +207,26 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
+    const refreshCart = async () => {
+        if (!user) return;
+        try {
+            const res = await api.get('/cart');
+            const mapped = res.data.items ? res.data.items.map((item: any) => ({
+                id: item.productId,
+                name: item.product.name,
+                price: Number(item.product.price),
+                quantity: item.quantity,
+                image: item.product.image
+            })) : [];
+            setItems(mapped);
+            setDiscountAmount(Number(res.data.discountAmount) || 0);
+            setFinalAmount(Number(res.data.finalAmount) || 0);
+            setAppliedCampaigns(res.data.appliedCampaigns || []);
+        } catch { }
+    };
+
     return (
-        <CartContext.Provider value={{ items, addToCart, updateQuantity, decreaseQuantity, removeFromCart, clearCart, total, loaded }}>
+        <CartContext.Provider value={{ items, addToCart, updateQuantity, decreaseQuantity, removeFromCart, clearCart, total, discountAmount, finalAmount, appliedCampaigns, loaded, refreshCart }}>
             {children}
         </CartContext.Provider>
     );

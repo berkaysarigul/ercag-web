@@ -12,7 +12,7 @@ import { Trash2, ArrowRight, ShoppingBag, Minus, Plus, User, Phone, Mail, Clock,
 import AuthModal from '@/components/auth/AuthModal';
 
 export default function CartPage() {
-    const { items, removeFromCart, updateQuantity, total, clearCart, loaded } = useCart();
+    const { items, removeFromCart, updateQuantity, total, discountAmount, finalAmount, appliedCampaigns, clearCart, loaded, refreshCart } = useCart();
     const { user } = useAuth();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -42,7 +42,16 @@ export default function CartPage() {
         }
     }, [user]);
 
-    const finalTotal = appliedCoupon ? total - appliedCoupon.discountAmount : total;
+    // Refresh cart from server on mount to get latest campaign discounts
+    useEffect(() => {
+        if (user) refreshCart();
+    }, [user]);
+
+    const couponDiscount = appliedCoupon ? appliedCoupon.discountAmount : 0;
+    const campaignDiscount = discountAmount;
+    const finalTotal = finalAmount > 0
+        ? Math.max(0, finalAmount - couponDiscount)
+        : Math.max(0, total - couponDiscount);
 
     const handleApplyCoupon = async () => {
         if (!couponCode) return;
@@ -286,9 +295,15 @@ export default function CartPage() {
                                 <span>Ara Toplam</span>
                                 <span>{total.toFixed(2)} ₺</span>
                             </div>
+                            {campaignDiscount > 0 && appliedCampaigns.map((c, i) => (
+                                <div key={i} className="flex justify-between text-orange-600 font-medium text-sm">
+                                    <span>🎯 {c.name}</span>
+                                    <span>-{c.discount.toFixed(2)} ₺</span>
+                                </div>
+                            ))}
                             {appliedCoupon && (
                                 <div className="flex justify-between text-green-600 font-medium">
-                                    <span>İndirim ({appliedCoupon.code})</span>
+                                    <span>🏷️ Kupon ({appliedCoupon.code})</span>
                                     <span>-{appliedCoupon.discountAmount.toFixed(2)} ₺</span>
                                 </div>
                             )}

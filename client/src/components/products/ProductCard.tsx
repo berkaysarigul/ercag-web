@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
-import { ShoppingCart, Heart, Check, Eye, Star, Plus } from 'lucide-react';
+import { ShoppingCart, Heart, Check, Eye, Star, Plus, Zap, Tag } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useCampaigns } from '@/context/CampaignContext';
 import { useState } from 'react';
 import api from '@/lib/api';
 import { toast } from 'sonner';
@@ -14,40 +14,44 @@ interface Product {
     price: string | number;
     image: string | null;
     images?: { url: string; isMain: boolean; }[];
-    category?: { name: string };
+    category?: { id?: number; name: string };
+    categoryId?: number;
     stock?: number;
     rating?: number;
     reviewCount?: number;
 }
 
 export default function ProductCard({ product }: { product: Product }) {
-    // ... existing hooks ...
     const { addToCart } = useCart();
+    const { getProductDiscount } = useCampaigns();
     const [isHovered, setIsHovered] = useState(false);
 
-    // Determine the image to show
     const displayImage = product.image || product.images?.[0]?.url;
+    const price = Number(product.price);
+    const categoryId = product.categoryId ?? product.category?.id;
 
-    // ... existing handlers ...
+    // Get campaign discount for this product
+    const discount = getProductDiscount(product.id, categoryId, price);
+    const displayPrice = discount ? discount.discountedPrice : price;
+
     const handleAddToCart = (e: React.MouseEvent) => {
-        // ...
         e.preventDefault();
         e.stopPropagation();
         if (product.stock === 0) {
             toast.error('Ürün stokta yok');
             return;
         }
-        addToCart(product);
+        // Add with potentially discounted price
+        addToCart({ ...product, price: displayPrice });
     };
 
     const handleWishlist = async (e: React.MouseEvent) => {
-        // ...
         e.preventDefault();
         e.stopPropagation();
         try {
             await api.post('/wishlist', { productId: product.id });
             toast.success('Favorilere eklendi');
-        } catch (error) {
+        } catch {
             toast.error('Giriş yapmalısınız');
         }
     };
@@ -55,23 +59,36 @@ export default function ProductCard({ product }: { product: Product }) {
     return (
         <Link
             href={`/products/${product.id}`}
-            // ... className ...
             className="group bg-white rounded-2xl border border-gray-100 shadow-soft hover:shadow-hover overflow-hidden transition-all duration-300 hover:-translate-y-2 animate-scale-in flex flex-col h-full"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            {/* ... Image Container ... */}
+            {/* Image Container */}
             <div className="relative aspect-square bg-gray-50 overflow-hidden">
-                {/* Stock Badge */}
-                <div className="absolute top-3 left-3 z-10">
+                {/* Top-left badges: stock + campaign */}
+                <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
                     {product.stock === 0 ? (
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-danger-500 text-white text-xs font-bold rounded-full shadow-lg animate-fade-in">
+                        <div className="flex items-center gap-1 px-2.5 py-1 bg-red-500 text-white text-xs font-bold rounded-full shadow-lg">
                             Tükendi
                         </div>
                     ) : (
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-success-500 text-white text-xs font-bold rounded-full shadow-lg animate-fade-in">
-                            <Check size={12} strokeWidth={3} />
+                        <div className="flex items-center gap-1 px-2.5 py-1 bg-green-500 text-white text-xs font-bold rounded-full shadow-lg">
+                            <Check size={10} strokeWidth={3} />
                             Stokta
+                        </div>
+                    )}
+
+                    {/* Campaign badge */}
+                    {discount && (
+                        <div className={`flex items-center gap-1 px-2.5 py-1 text-white text-xs font-bold rounded-full shadow-lg ${discount.campaignType === 'FLASH_SALE'
+                                ? 'bg-orange-500'
+                                : 'bg-blue-500'
+                            }`}>
+                            {discount.campaignType === 'FLASH_SALE'
+                                ? <Zap size={10} />
+                                : <Tag size={10} />
+                            }
+                            -%{discount.discountPercent}
                         </div>
                     )}
                 </div>
@@ -79,7 +96,7 @@ export default function ProductCard({ product }: { product: Product }) {
                 {/* Wishlist Button */}
                 <button
                     onClick={handleWishlist}
-                    className="absolute top-3 right-3 z-10 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:scale-110 text-gray-400 hover:text-danger-500"
+                    className="absolute top-3 right-3 z-10 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:scale-110 text-gray-400 hover:text-red-500"
                 >
                     <Heart size={16} />
                 </button>
@@ -95,7 +112,7 @@ export default function ProductCard({ product }: { product: Product }) {
                     </div>
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-100">
-                        <span className="text-4xl text-gray-300">📷</span>
+                        <span className="text-4xl">📷</span>
                     </div>
                 )}
 
@@ -116,7 +133,7 @@ export default function ProductCard({ product }: { product: Product }) {
                         {product.category?.name || 'Genel'}
                     </span>
                     <div className="flex items-center gap-1 text-xs text-gray-500">
-                        <Star size={12} className={`fill-warning-400 ${product.rating ? 'text-warning-400' : 'text-gray-300'}`} />
+                        <Star size={12} className={`fill-yellow-400 ${product.rating ? 'text-yellow-400' : 'text-gray-300'}`} />
                         <span className="font-semibold">{product.rating ? product.rating : '0.0'}</span>
                         {product.reviewCount !== undefined && <span className="text-gray-400">({product.reviewCount})</span>}
                     </div>
@@ -127,16 +144,30 @@ export default function ProductCard({ product }: { product: Product }) {
                     {product.name}
                 </h3>
 
+                {/* Campaign label */}
+                {discount && (
+                    <p className="text-xs text-orange-600 font-medium mb-1 truncate">
+                        🎯 {discount.campaignName}
+                    </p>
+                )}
+
                 {/* Price & Action */}
                 <div className="flex items-end justify-between mt-4 pt-4 border-t border-gray-50">
                     <div>
-                        <div className="text-2xl font-bold text-gray-900">
-                            {Number(product.price).toFixed(2)} ₺
-                        </div>
-                        {/* Mock Compare Price */}
-                        {/* <div className="text-sm text-gray-400 line-through">
-                            {(Number(product.price) * 1.2).toFixed(2)} ₺
-                        </div> */}
+                        {discount ? (
+                            <>
+                                <div className="text-sm text-gray-400 line-through leading-none mb-0.5">
+                                    {price.toFixed(2)} ₺
+                                </div>
+                                <div className="text-2xl font-bold text-red-600">
+                                    {displayPrice.toFixed(2)} ₺
+                                </div>
+                            </>
+                        ) : (
+                            <div className="text-2xl font-bold text-gray-900">
+                                {price.toFixed(2)} ₺
+                            </div>
+                        )}
                     </div>
 
                     <button
@@ -151,7 +182,7 @@ export default function ProductCard({ product }: { product: Product }) {
                             shadow-md hover:shadow-lg
                             transform hover:scale-110 active:scale-95
                             transition-all duration-200
-                            ${product.stock === 0 ? 'opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400' : ''}
+                            ${product.stock === 0 ? 'opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400 hover:scale-100' : ''}
                         `}
                     >
                         <Plus size={20} />

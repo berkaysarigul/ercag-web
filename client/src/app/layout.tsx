@@ -15,6 +15,7 @@ import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { SettingsProvider } from "@/context/SettingsContext";
 import { SocketProvider } from "@/context/SocketContext";
+import { CampaignProvider } from "@/context/CampaignContext";
 import ClientLayout from "@/components/layout/ClientLayout";
 
 // Moved themeColor here — Next.js 15+ requires it in generateViewport, not metadata
@@ -74,15 +75,17 @@ export default function RootLayout({
       <body className="font-sans antialiased text-gray-900 bg-gray-50">
         <AuthProvider>
           <SettingsProvider>
-            <CartProvider>
-              <Toaster richColors position="top-right" />
-              <CookieConsent />
-              <SocketProvider>
-                <ClientLayout>
-                  {children}
-                </ClientLayout>
-              </SocketProvider>
-            </CartProvider>
+            <CampaignProvider>
+              <CartProvider>
+                <Toaster richColors position="top-right" />
+                <CookieConsent />
+                <SocketProvider>
+                  <ClientLayout>
+                    {children}
+                  </ClientLayout>
+                </SocketProvider>
+              </CartProvider>
+            </CampaignProvider>
           </SettingsProvider>
         </AuthProvider>
       </body>
