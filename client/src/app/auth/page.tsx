@@ -11,7 +11,8 @@ import Link from 'next/link';
 export default function AuthPage() {
     const [isLogin, setIsLogin] = useState(true);
     const [formData, setFormData] = useState({
-        email: '',
+        identifier: '', // Login için (email veya telefon)
+        email: '',      // Register için
         password: '',
         name: '',
         phone: '',
@@ -34,7 +35,10 @@ export default function AuthPage() {
         setLoading(true);
         try {
             const endpoint = isLogin ? '/auth/login' : '/auth/register';
-            const res = await api.post(endpoint, formData);
+            const payload = isLogin
+                ? { identifier: formData.identifier, password: formData.password }
+                : formData;
+            const res = await api.post(endpoint, payload);
 
             login(res.data.token, res.data.user);
             router.back();
@@ -84,16 +88,30 @@ export default function AuthPage() {
                             </>
                         )}
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">E-posta</label>
-                            <input
-                                type="email"
-                                required
-                                className="input w-full"
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            />
-                        </div>
+                        {isLogin ? (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">E-posta veya Telefon</label>
+                                <input
+                                    type="text"
+                                    required
+                                    className="input w-full"
+                                    placeholder="ornek@mail.com veya 05xx xxx xx xx"
+                                    value={formData.identifier}
+                                    onChange={(e) => setFormData({ ...formData, identifier: e.target.value })}
+                                />
+                            </div>
+                        ) : (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">E-posta</label>
+                                <input
+                                    type="email"
+                                    required
+                                    className="input w-full"
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                />
+                            </div>
+                        )}
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Şifre</label>

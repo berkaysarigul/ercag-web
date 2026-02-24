@@ -50,6 +50,7 @@ const categoryRoutes = require('./src/routes/categoryRoutes');
 const stockRoutes = require('./src/routes/stockRoutes');
 const auditRoutes = require('./src/routes/auditRoutes');
 const campaignRoutes = require('./src/routes/campaignRoutes');
+const loyaltyRoutes = require('./src/routes/loyaltyRoutes'); // FIX-K06
 
 app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
@@ -58,6 +59,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/coupons', couponRoutes);
+app.use('/api/loyalty', loyaltyRoutes); // FIX-K06
 app.use('/api/stock-alerts', stockAlertRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/settings', settingsRoutes);

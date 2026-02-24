@@ -102,7 +102,7 @@ export default function SearchAutocomplete() {
                                 >
                                     <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
                                         {product.images?.[0]?.url ? (
-                                            <img src={`${process.env.NEXT_PUBLIC_API_URL}${product.images[0].url}`} alt={product.name} className="w-full h-full object-cover" />
+                                            <img src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${product.images[0].url.startsWith('/') ? '' : '/uploads/'}${product.images[0].url}`} alt={product.name} className="w-full h-full object-cover" />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-gray-400">
                                                 <Package className="w-5 h-5" />

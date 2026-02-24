@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useAdmin } from '@/context/AdminContext';
 import { cn } from '@/lib/utils';
 // UI-21: Duplicate ikonlar düzeltildi — FolderTree Kategoriler için, ShoppingBag Ürünler için, Package Stok için
-import { LayoutDashboard, Package, ShoppingBag, Users, FolderTree, Ticket, MessageSquare, LogOut, Settings, ScanBarcode, BarChart3, TrendingUp, Shield, Menu, X, Star } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingBag, Users, FolderTree, Ticket, MessageSquare, LogOut, Settings, ScanBarcode, BarChart3, TrendingUp, Shield, Menu, X, Star, GalleryHorizontal, PieChart } from 'lucide-react'; // FIX-Y04
 
 export default function AdminSidebar() {
     const pathname = usePathname();
@@ -23,9 +23,9 @@ export default function AdminSidebar() {
         { name: 'Kuponlar', href: '/admin/coupons', icon: Ticket, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Değerlendirmeler', href: '/admin/reviews', icon: MessageSquare, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] },
         { name: 'Müşteriler', href: '/admin/customers', icon: Users, roles: ['SUPER_ADMIN', 'ADMIN'] },
-        { name: 'Vitrin / Slider', href: '/admin/sliders', icon: LayoutDashboard, roles: ['SUPER_ADMIN', 'ADMIN'] },
+        { name: 'Vitrin / Slider', href: '/admin/sliders', icon: GalleryHorizontal, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Kampanyalar', href: '/admin/campaigns', icon: TrendingUp, roles: ['SUPER_ADMIN', 'ADMIN'] },
-        { name: 'Analitik & Rapor', href: '/admin/analytics', icon: BarChart3, roles: ['SUPER_ADMIN', 'ADMIN'] },
+        { name: 'Analitik & Rapor', href: '/admin/analytics', icon: PieChart, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Denetim Günlüğü', href: '/admin/audit-log', icon: Shield, roles: ['SUPER_ADMIN'] },
         { name: 'Ayarlar', href: '/admin/settings', icon: Settings, roles: ['SUPER_ADMIN', 'ADMIN'] },
     ];

@@ -19,11 +19,11 @@ export default function OfflinePage() {
                 <p className="text-gray-600 mb-8">İnternet bağlantınız yok gibi görünüyor. Lütfen bağlantınızı kontrol edip tekrar deneyin.</p>
                 <button
                     onClick={() => window.location.reload()}
-                    className="w-full py-3 px-4 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors shadow-sm"
+                    className="w-full py-3 px-4 bg-brand-600 text-white rounded-lg font-medium hover:bg-brand-700 transition-colors shadow-sm"
                 >
                     Tekrar Dene
                 </button>
             </div>
-        </div>
+        </div >
     );
 }

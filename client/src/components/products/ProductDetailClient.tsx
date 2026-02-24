@@ -292,23 +292,11 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                     {activeTab === 'description' && (
                         <div className="prose max-w-none">
                             <p>{product.description}</p>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
                         </div>
                     )}
                     {activeTab === 'specs' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
-                            <div className="flex justify-between border-b py-2">
-                                <span className="text-gray-500">Marka</span>
-                                <span className="font-medium">Faber-Castell</span>
-                            </div>
-                            <div className="flex justify-between border-b py-2">
-                                <span className="text-gray-500">Renk</span>
-                                <span className="font-medium">Mavi</span>
-                            </div>
-                            <div className="flex justify-between border-b py-2">
-                                <span className="text-gray-500">Materyal</span>
-                                <span className="font-medium">Plastik</span>
-                            </div>
+                        <div className="text-center py-12 text-gray-400">
+                            <p>Bu ürün için teknik bilgi henüz eklenmemiştir.</p>
                         </div>
                     )}
                     {activeTab === 'reviews' && (

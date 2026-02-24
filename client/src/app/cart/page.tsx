@@ -144,7 +144,7 @@ export default function CartPage() {
                                 <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex gap-4 items-center hover:shadow-md transition-shadow">
                                     <div className="w-24 h-24 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
                                         {item.image ? (
-                                            <img src={`http://localhost:3001/uploads/${item.image}`} alt={item.name} className="w-full h-full object-cover" />
+                                            <img src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${item.image}`} alt={item.name} className="w-full h-full object-cover" />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-gray-300">📷</div>
                                         )}

@@ -104,28 +104,24 @@ export default function AdminDashboard() {
                     value={`${Number(stats.totalRevenue).toFixed(2)} ₺`}
                     icon={DollarSign}
                     color="bg-green-100 text-green-600"
-                    trend="+12.5%"
                 />
                 <StatCard
                     title="Toplam Sipariş"
                     value={stats.totalOrders}
                     icon={ShoppingBag}
                     color="bg-blue-100 text-blue-600"
-                    trend="+8.2%"
                 />
                 <StatCard
                     title="Toplam Ürün"
                     value={stats.totalProducts}
                     icon={Package}
                     color="bg-purple-100 text-purple-600"
-                    trend="+2.4%"
                 />
                 <StatCard
                     title="Bekleyen Sipariş"
                     value={stats.pendingOrders}
                     icon={Clock}
                     color="bg-orange-100 text-orange-600"
-                    trend="-5.0%"
                 />
             </div>
 

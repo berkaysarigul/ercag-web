@@ -81,9 +81,15 @@ const spendPoints = async (userId, pointsToSpend, orderId) => {
     }
 };
 
+// Endpoint: Redeem points
+const redeemPoints = async (req, res) => {
+    res.status(501).json({ message: 'Not implemented yet' });
+};
+
 module.exports = {
     getLoyaltyStatus,
     awardPointsForOrder,
     spendPoints,
+    redeemPoints,
     POINT_VALUE
 };

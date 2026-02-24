@@ -185,7 +185,7 @@ export default function AnalyticsPage() {
                                     <td className="px-4 py-3 font-medium text-gray-900 flex items-center gap-3">
                                         <div className="w-10 h-10 rounded bg-gray-100 flex-shrink-0 overflow-hidden">
                                             {item.product?.image ? (
-                                                <img src={`${process.env.NEXT_PUBLIC_API_URL}${item.product.image}`} className="w-full h-full object-cover" />
+                                                <img src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${item.product.image}`} className="w-full h-full object-cover" />
                                             ) : (
                                                 <div className="flex items-center justify-center h-full text-xs">IMG</div>
                                             )}
