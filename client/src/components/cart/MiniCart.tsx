@@ -122,9 +122,10 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
                                     <div className="relative flex-shrink-0 w-24 h-24 bg-white rounded-xl overflow-hidden border border-gray-100">
                                         {item.image ? (
                                             <Image
-                                                src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${item.image}`}
+                                                src={item.image.startsWith('http') ? item.image : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${item.image}`}
                                                 alt={item.name}
                                                 fill
+                                                unoptimized
                                                 className="object-cover"
                                             />
                                         ) : (
@@ -142,10 +143,11 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
                                             <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">
                                                 {item.name}
                                             </h3>
-                                            <p className="text-xs text-gray-500 mb-2">
-                                                {/* Category would go here if available in item */}
-                                                Genel
-                                            </p>
+                                            {(item as any).category?.name && (
+                                                <p className="text-xs text-gray-500 mb-2">
+                                                    {(item as any).category.name}
+                                                </p>
+                                            )}
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <span className="text-lg font-bold text-brand-600">

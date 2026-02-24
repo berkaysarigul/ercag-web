@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { ShoppingCart, Heart, Check, Eye, Star, Plus, Zap, Tag } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useCampaigns } from '@/context/CampaignContext';
@@ -71,18 +72,17 @@ export default function ProductCard({ product }: { product: Product }) {
                         <div className="flex items-center gap-1 px-2.5 py-1 bg-red-500 text-white text-xs font-bold rounded-full shadow-lg">
                             Tükendi
                         </div>
-                    ) : (
-                        <div className="flex items-center gap-1 px-2.5 py-1 bg-green-500 text-white text-xs font-bold rounded-full shadow-lg">
-                            <Check size={10} strokeWidth={3} />
-                            Stokta
+                    ) : (product.stock && product.stock <= 5) ? (
+                        <div className="flex items-center gap-1 px-2.5 py-1 bg-amber-500 text-white text-xs font-bold rounded-full shadow-lg">
+                            Son {product.stock} Ürün
                         </div>
-                    )}
+                    ) : null}
 
                     {/* Campaign badge */}
                     {discount && (
                         <div className={`flex items-center gap-1 px-2.5 py-1 text-white text-xs font-bold rounded-full shadow-lg ${discount.campaignType === 'FLASH_SALE'
-                                ? 'bg-orange-500'
-                                : 'bg-blue-500'
+                            ? 'bg-orange-500'
+                            : 'bg-blue-500'
                             }`}>
                             {discount.campaignType === 'FLASH_SALE'
                                 ? <Zap size={10} />
@@ -104,10 +104,13 @@ export default function ProductCard({ product }: { product: Product }) {
                 {/* Image */}
                 {displayImage ? (
                     <div className="relative w-full h-full">
-                        <img
-                            src={displayImage?.startsWith('http') ? displayImage : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${displayImage}`}
+                        <Image
+                            src={displayImage.startsWith('http') ? displayImage : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${displayImage}`}
                             alt={product.name}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            fill
+                            unoptimized
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                            className="object-cover group-hover:scale-110 transition-transform duration-500"
                         />
                     </div>
                 ) : (
@@ -115,14 +118,6 @@ export default function ProductCard({ product }: { product: Product }) {
                         <span className="text-4xl">📷</span>
                     </div>
                 )}
-
-                {/* Quick View Overlay */}
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <button className="px-4 py-2 bg-white text-gray-900 font-semibold text-sm rounded-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 flex items-center gap-2 shadow-lg hover:bg-gray-50">
-                        <Eye size={16} />
-                        İncele
-                    </button>
-                </div>
             </div>
 
             {/* Content */}

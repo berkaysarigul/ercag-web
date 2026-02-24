@@ -48,7 +48,7 @@ const getAllUsers = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Server error' });
+        res.status().json({ error: 'Server error' });
     }
 };
 
@@ -65,7 +65,7 @@ const getUserOrders = async (req, res) => {
         res.json(orders);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Server error' });
+        res.status().json({ error: 'Server error' });
     }
 };
 const updateUserRole = async (req, res) => {
@@ -76,7 +76,7 @@ const updateUserRole = async (req, res) => {
         // Valid roles
         const validRoles = ['SUPER_ADMIN', 'STAFF', 'CUSTOMER'];
         if (!validRoles.includes(role)) {
-            return res.status(400).json({ message: 'Invalid role' });
+            return res.status().json({ error: 'Invalid role' });
         }
 
         const user = await prisma.user.update({
@@ -93,7 +93,7 @@ const updateUserRole = async (req, res) => {
         res.json(user);
     } catch (error) {
         console.error('Update Role Error:', error);
-        res.status(500).json({ message: 'Failed to update role' });
+        res.status().json({ error: 'Failed to update role' });
     }
 };
 
@@ -114,7 +114,7 @@ const deleteMyAccount = async (req, res) => {
         res.json({ message: 'Hesabınız silindi.' });
     } catch (error) {
         console.error('Delete Account Error:', error);
-        res.status(500).json({ message: 'Hesap silinemedi.' });
+        res.status().json({ error: 'Hesap silinemedi.' });
     }
 };
 
@@ -139,7 +139,7 @@ const exportMyData = async (req, res) => {
         res.json(user);
     } catch (error) {
         console.error('Export Data Error:', error);
-        res.status(500).json({ message: 'Veri dışa aktarılamadı.' });
+        res.status().json({ error: 'Veri dışa aktarılamadı.' });
     }
 };
 

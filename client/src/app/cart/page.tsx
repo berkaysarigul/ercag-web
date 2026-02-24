@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import { CartSkeleton } from '@/components/cart/CartSkeleton';
 import { toast } from 'sonner';
 import Image from 'next/image';
-import { Trash2, ArrowRight, ShoppingBag, Minus, Plus, User, Phone, Mail, Clock, FileText } from 'lucide-react';
+import { Trash2, Plus, Minus, ArrowRight, Store, ShoppingBag, User, Phone, Mail, Clock, FileText } from 'lucide-react';
 import AuthModal from '@/components/auth/AuthModal';
 
 export default function CartPage() {
@@ -164,9 +164,10 @@ export default function CartPage() {
                                         {item.image ? (
                                             <div className="relative w-full h-full">
                                                 <Image
-                                                    src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${item.image}`}
+                                                    src={item.image.startsWith('http') ? item.image : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${item.image}`}
                                                     alt={item.name}
                                                     fill
+                                                    unoptimized
                                                     sizes="96px"
                                                     className="object-cover"
                                                 />
@@ -365,19 +366,18 @@ export default function CartPage() {
                             </div>
                         )}
 
-                        <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
-                            <p className="font-bold flex items-center gap-2 mb-1">
-                                <span className="text-xl">💳</span> Ödeme Bilgisi
-                            </p>
-                            <p>
-                                Online ödeme sistemimiz bakım aşamasındadır. Siparişinizin ödemesini
-                                <strong> mağazada ürünleri teslim alırken</strong> nakit veya kredi kartı ile yapabilirsiniz.
+                        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-5 text-sm text-blue-900 shadow-sm">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="bg-white p-2 rounded-lg shadow-sm">
+                                    <Store size={20} className="text-blue-600" />
+                                </div>
+                                <h3 className="font-bold text-base">Tıkla & Gel Al</h3>
+                            </div>
+                            <p className="text-blue-800/80 leading-relaxed">
+                                Siparişinizi mağazamızdan teslim alabilirsiniz.
+                                Ödemenizi teslimat sırasında <strong className="font-semibold text-blue-900">Nakit</strong> veya <strong className="font-semibold text-blue-900">Kredi Kartı</strong> ile güvenle yapabilirsiniz.
                             </p>
                         </div>
-
-                        <p className="text-xs text-gray-400 mt-4 text-center">
-                            Ödemeniz mağazada ürünleri teslim alırken yapılacaktır.
-                        </p>
                     </div>
                 </div>
             </div>

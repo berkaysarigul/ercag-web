@@ -3,68 +3,76 @@ const cors = require('cors');
 const helmet = require('helmet');
 const dotenv = require('dotenv');
 const path = require('path');
+const cookieParser = require('cookie-parser');
+const morgan = require('morgan');
+const logger = require('./src/utils/logger');
+require('./src/queues/whatsappQueue'); // Initialize BullMQ Worker
+require('./src/queues/stockQueue'); // Initialize BullMQ Worker
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-const { apiLimiter } = require('./src/middleware/rateLimitMiddleware');
-
-// Middleware
+// Security Config
 const corsOptions = {
-    origin: [process.env.FRONTEND_URL || 'http://localhost:3000'],
+    origin: process.env.CLIENT_URL || 'http://localhost:3000',
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 };
 
 app.use(cors(corsOptions));
-app.use(helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" }
-}));
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+app.use(cookieParser());
 app.use(express.json());
 
-const uploadPath = path.join(__dirname, 'uploads');
-console.log('Serving static files from:', uploadPath);
-app.use('/uploads', (req, res, next) => {
-    next();
-}, express.static(uploadPath));
+// Setup Morgan to write to Winston
+app.use(morgan(
+    ':method :url :status :res[content-length] - :response-time ms',
+    { stream: { write: message => logger.info(message.trim()) } }
+));
 
-// Global Rate Limit
-app.use('/api', apiLimiter);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
+// Note: Dynamic imports are used here to avoid issues with ES module static imports breaking app startup.
+// Standard imports
 const authRoutes = require('./src/routes/authRoutes');
-const cartRoutes = require('./src/routes/cartRoutes');
 const productRoutes = require('./src/routes/productRoutes');
-const orderRoutes = require('./src/routes/orderRoutes');
-const reviewRoutes = require('./src/routes/reviewRoutes');
-const wishlistRoutes = require('./src/routes/wishlistRoutes');
-const couponRoutes = require('./src/routes/couponRoutes');
-const stockAlertRoutes = require('./src/routes/stockAlertRoutes');
-const userRoutes = require('./src/routes/userRoutes');
-const settingsRoutes = require('./src/routes/settingsRoutes');
-const heroSlideRoutes = require('./src/routes/heroSlideRoutes');
 const categoryRoutes = require('./src/routes/categoryRoutes');
+const cartRoutes = require('./src/routes/cartRoutes');
+const orderRoutes = require('./src/routes/orderRoutes');
+const wishlistRoutes = require('./src/routes/wishlistRoutes');
+const userRoutes = require('./src/routes/userRoutes');
+const reviewRoutes = require('./src/routes/reviewRoutes');
+const settingsRoutes = require('./src/routes/settingsRoutes');
 const stockRoutes = require('./src/routes/stockRoutes');
-const auditRoutes = require('./src/routes/auditRoutes');
 const campaignRoutes = require('./src/routes/campaignRoutes');
-const loyaltyRoutes = require('./src/routes/loyaltyRoutes'); // FIX-K06
+const couponRoutes = require('./src/routes/couponRoutes'); // Kept existing
+const stockAlertRoutes = require('./src/routes/stockAlertRoutes'); // Kept existing
+const heroSlideRoutes = require('./src/routes/heroSlideRoutes'); // Kept existing
+const auditRoutes = require('./src/routes/auditRoutes'); // Kept existing
+const loyaltyRoutes = require('./src/routes/loyaltyRoutes'); // FIX-K06 // Kept existing
 
-app.use('/api/auth', authRoutes);
+// Important: import the newly created rate limiters!
+const { apiLimiter, authLimiter } = require('./src/middleware/rateLimiter');
+
+// API Rate Limiting protection
+app.use('/api/', apiLimiter); // Apply standard API limit to all endpoints
+app.use('/api/auth', authLimiter, authRoutes); // Apply stricter Auth limiter to auth routes alone
+app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
 app.use('/api/cart', cartRoutes);
-app.use('/api', productRoutes);
 app.use('/api/orders', orderRoutes);
-app.use('/api/reviews', reviewRoutes);
+app.use('/api/reviews', reviewRoutes); // Moved reviewRoutes
 app.use('/api/wishlist', wishlistRoutes);
-app.use('/api/coupons', couponRoutes);
-app.use('/api/loyalty', loyaltyRoutes); // FIX-K06
+app.use('/api/coupons', couponRoutes); // Kept existing
+app.use('/api/loyalty', loyaltyRoutes); // FIX-K06 // Kept existing
 app.use('/api/stock-alerts', stockAlertRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/hero-slides', heroSlideRoutes);
-app.use('/api/categories', categoryRoutes);
 app.use('/api/stock', stockRoutes);
 app.use('/api/audit', auditRoutes);
 app.use('/api/campaigns', campaignRoutes);

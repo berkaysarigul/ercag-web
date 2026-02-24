@@ -1,9 +1,20 @@
 const prisma = require('../lib/prisma');
 const { logAudit } = require('../services/auditService');
+const { redisClient } = require('../config/redis.js');
 
 const getAllProducts = async (req, res) => {
     try {
         const { categoryId, minPrice, maxPrice, search, sort, isFeatured } = req.query;
+
+        // Redis Caching Key based on query params
+        const cacheKey = `products_all_${JSON.stringify(req.query)}`;
+        if (redisClient) {
+            const cachedData = await redisClient.get(cacheKey);
+            if (cachedData) {
+                console.log(`[Cache Hit] Serving ${cacheKey} from Redis`);
+                return res.json(JSON.parse(cachedData));
+            }
+        }
 
         // Pagination
         const page = parseInt(req.query.page) || 1;
@@ -23,10 +34,13 @@ const getAllProducts = async (req, res) => {
         }
 
         if (search) {
+            // Format for Prisma Full Text Search (split words with OR operator for broader matching)
+            const searchQuery = search.trim().split(/\s+/).join(' | ');
+
             where.OR = [
-                { name: { contains: search, mode: 'insensitive' } },
-                { description: { contains: search, mode: 'insensitive' } },
-                { category: { name: { contains: search, mode: 'insensitive' } } },
+                { name: { search: searchQuery } },
+                { description: { search: searchQuery } },
+                { category: { name: { search: searchQuery } } },
                 // Only search SKU if length > 3 to avoid noise
                 (search.length > 3 ? { sku: { contains: search, mode: 'insensitive' } } : undefined),
                 // Exact match for barcode if length > 5
@@ -64,15 +78,24 @@ const getAllProducts = async (req, res) => {
             })
         ]);
 
-        res.json({
+        const responsePayload = {
             products,
-            total,
-            page,
-            totalPages: Math.ceil(total / limit),
-            limit
-        });
+            pagination: {
+                total: total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
+            }
+        };
+
+        if (redisClient) {
+            // Cache for 5 minutes (300 seconds)
+            await redisClient.setex(cacheKey, 300, JSON.stringify(responsePayload));
+        }
+
+        res.json(responsePayload);
     } catch (error) {
-        console.error(error);
+        console.error('Error fetching products:', error);
         res.status(500).json({ error: 'Failed to fetch products' });
     }
 };
@@ -309,11 +332,13 @@ const searchSuggestions = async (req, res) => {
             return res.json({ products: [], categories: [] });
         }
 
+        const searchQuery = q.trim().split(/\s+/).join(' | ');
+
         const products = await prisma.product.findMany({
             where: {
                 OR: [
-                    { name: { contains: q, mode: 'insensitive' } },
-                    { description: { contains: q, mode: 'insensitive' } }
+                    { name: { search: searchQuery } },
+                    { description: { search: searchQuery } }
                 ],
                 isDeleted: false
             },

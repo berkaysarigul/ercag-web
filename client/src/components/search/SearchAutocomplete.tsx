@@ -80,7 +80,7 @@ export default function SearchAutocomplete() {
                             {results.categories.map((cat: { id: number; name: string }) => (
                                 <Link
                                     key={cat.id}
-                                    href={`/products?categoryId=${cat.id}`}
+                                    href={`/products?category=${cat.id}`}
                                     className="block px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
                                     onClick={() => setIsOpen(false)}
                                 >
@@ -105,9 +105,10 @@ export default function SearchAutocomplete() {
                                         {product.image ? (
                                             <div className="relative w-full h-full">
                                                 <Image
-                                                    src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${product.image.startsWith('/') ? '' : '/uploads/'}${product.image}`}
+                                                    src={product.image.startsWith('http') ? product.image : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${product.image}`}
                                                     alt={product.name}
                                                     fill
+                                                    unoptimized
                                                     sizes="40px"
                                                     className="object-cover"
                                                 />

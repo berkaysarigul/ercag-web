@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import api from '@/lib/api';
-import { ArrowRight, ShoppingBag, Clock, CheckCircle2, MapPin, Phone, Mail, ChevronDown, ChevronUp, Zap } from 'lucide-react';
+import { ArrowRight, ShoppingBag, Clock, CheckCircle2, MapPin, Phone, Mail, ChevronDown, ChevronUp, Zap, Lock, CreditCard, ShieldCheck } from 'lucide-react';
 import HeroSlider from '@/components/home/HeroSlider';
 import FeaturedProducts from '@/components/home/FeaturedProducts';
 import CampaignBanner from '@/components/ui/CampaignBanner';
@@ -263,13 +263,13 @@ export default function Home() {
             {/* Trust badges */}
             <div className="mt-6 grid grid-cols-2 gap-3">
               {[
-                { icon: '🔒', label: 'Güvenli Alışveriş' },
-                { icon: '⚡', label: 'Hızlı Hazırlık' },
-                { icon: '💳', label: 'Kasada Ödeme' },
-                { icon: '✅', label: 'Kaliteli Ürünler' },
-              ].map(({ icon, label }) => (
+                { Icon: Lock, label: 'Güvenli Alışveriş' },
+                { Icon: Zap, label: 'Hızlı Hazırlık' },
+                { Icon: CreditCard, label: 'Kasada Ödeme' },
+                { Icon: ShieldCheck, label: 'Kaliteli Ürünler' },
+              ].map(({ Icon, label }) => (
                 <div key={label} className="flex items-center gap-2.5 bg-gray-50 rounded-xl p-3 border border-gray-100">
-                  <span className="text-xl">{icon}</span>
+                  <Icon size={20} className="text-[var(--primary)]" />
                   <span className="text-sm font-medium text-gray-700">{label}</span>
                 </div>
               ))}

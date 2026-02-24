@@ -1,6 +1,8 @@
 const prisma = require('../lib/prisma');
 const crypto = require('crypto');
 const { logAudit } = require('../services/auditService');
+const { whatsappQueue } = require('../queues/whatsappQueue');
+const { stockQueue } = require('../queues/stockQueue');
 
 const generatePickupCode = async () => {
     let code;
@@ -14,7 +16,6 @@ const generatePickupCode = async () => {
 };
 
 const { createOrderSchema } = require('../utils/validationSchemas');
-const { sendOrderConfirmation, sendOrderReady, sendOrderCompleted } = require('../services/whatsappService');
 
 const createOrder = async (req, res) => {
     try {
@@ -106,9 +107,16 @@ const createOrder = async (req, res) => {
             });
         }
 
-        // WhatsApp Notification
-        await sendOrderConfirmation(phoneNumber, order.id, pickupCode);
-
+        // 5. Asenkron WhatsApp Onay Mesajı (Kuyruk üzerinden)
+        if (phoneNumber) {
+            whatsappQueue.add('send-msg', {
+                action: 'sendOrderConfirmation',
+                payload: { phone: phoneNumber, orderId: order.id, pickupCode }
+            }, {
+                attempts: 3,
+                backoff: { type: 'exponential', delay: 2000 }
+            });
+        }
         res.status(201).json(order);
     } catch (error) {
         console.error('Create Order Error:', error);
@@ -241,20 +249,13 @@ const updateOrderStatus = async (req, res) => {
             // Easier approach for this codebase: Call recordStockMovement individually.
 
             // To match request: "Use stockService.recordStockMovement"
+            // Update: We are now offloading this to BullMQ `stockQueue` to avoid transaction locks
+            // and API slowdowns during massive order processing streams.
             if ((status === 'PREPARING' || status === 'CONFIRMED') && order.status === 'PENDING') {
-                // Iterate items and call service. Service handles its own atomic update per item.
-                // This might not be fully atomic for the whole order but acceptable for this scale.
-                const { recordStockMovement } = require('../services/stockService');
-                for (const item of order.items) {
-                    await recordStockMovement(
-                        item.productId,
-                        'ORDER',
-                        -item.quantity,
-                        `Sipariş #${order.id}`,
-                        req.user.id,
-                        tx // Pass transaction
-                    );
-                }
+                stockQueue.add('update-stock', {
+                    action: 'reduceStockOnOrder',
+                    payload: { items: order.items, orderId: order.id, adminId: req.user.id }
+                });
             } else if (status === 'CANCELLED' && (order.status !== 'PENDING' && order.status !== 'CANCELLED')) {
                 // RESTOCK if cancelled after stock was reduced
                 const { recordStockMovement } = require('../services/stockService');

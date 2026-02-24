@@ -43,6 +43,7 @@ export default function Footer() {
                                 alt={settings.site_title || 'Erçağ Kırtasiye'}
                                 width={110}
                                 height={36}
+                                unoptimized
                                 className="object-contain"
                             />
                         </div>

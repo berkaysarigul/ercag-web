@@ -66,8 +66,8 @@ export default function CampaignBanner() {
                                     <Clock size={18} />
                                     <span>{timeLeft[campaign.id] || '...'}</span>
                                 </div>
-                                <Link href="/products?flash_sale=true"
-                                    className="bg-white text-red-600 px-6 py-2 rounded-full font-bold hover:bg-gray-100 transition-colors shadow-md whitespace-nowrap">
+                                <Link href={`/products?category=${config.categoryId}`}
+                                    className="bg-white text-blue-600 px-6 py-2 rounded-full font-bold hover:bg-blue-50 transition-colors shadow-sm whitespace-nowrap">
                                     İncele →
                                 </Link>
                             </div>

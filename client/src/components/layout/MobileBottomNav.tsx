@@ -28,9 +28,12 @@ export default function MobileBottomNav() {
                     <Link
                         key={item.href}
                         href={item.href}
-                        className={`flex flex-col items-center gap-1 p-2 transition-colors relative ${isActive ? 'text-primary' : 'text-gray-400 hover:text-gray-600'}`}
+                        className={`flex flex-col items-center gap-1 p-2 transition-all duration-300 relative ${isActive ? 'text-[var(--primary)] -translate-y-1' : 'text-gray-400 hover:text-gray-600'}`}
                     >
-                        <div className="relative">
+                        {isActive && (
+                            <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[var(--primary)] rounded-full shadow-[0_0_8px_var(--primary)] animate-pulse"></span>
+                        )}
+                        <div className={`relative transition-transform duration-300 ${isActive ? 'scale-110' : ''}`}>
                             <item.icon size={24} strokeWidth={isActive ? 2.5 : 2} />
                             {item.badge !== undefined && item.badge > 0 && (
                                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border border-white">

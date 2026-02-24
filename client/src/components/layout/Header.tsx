@@ -54,6 +54,7 @@ export default function Header() {
                                     : '/logo.png'}
                                 alt={settings.site_title || 'Erçağ Kırtasiye'}
                                 fill
+                                unoptimized
                                 className="object-contain object-left"
                                 priority
                             />

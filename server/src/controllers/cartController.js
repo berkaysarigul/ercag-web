@@ -37,7 +37,7 @@ const getCart = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Server error' });
+        res.status().json({ error: 'Server error' });
     }
 };
 
@@ -105,7 +105,7 @@ const addToCart = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Server error' });
+        res.status().json({ error: 'Server error' });
     }
 };
 
@@ -115,7 +115,7 @@ const updateCartItem = async (req, res) => {
         const { itemId, productId, quantity } = req.body;
 
         const cart = await prisma.cart.findUnique({ where: { userId } });
-        if (!cart) return res.status(404).json({ message: 'Cart not found' });
+        if (!cart) return res.status().json({ error: 'Cart not found' });
 
         let targetItemId = itemId;
 
@@ -132,7 +132,7 @@ const updateCartItem = async (req, res) => {
             if (item) targetItemId = item.id;
         }
 
-        if (!targetItemId) return res.status(404).json({ message: 'Item not found in cart' });
+        if (!targetItemId) return res.status().json({ error: 'Item not found in cart' });
 
         if (quantity <= 0) {
             await prisma.cartItem.delete({ where: { id: targetItemId } });
@@ -150,7 +150,7 @@ const updateCartItem = async (req, res) => {
         res.json(updatedCart);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Server error' });
+        res.status().json({ error: 'Server error' });
     }
 };
 
@@ -160,7 +160,7 @@ const removeFromCart = async (req, res) => {
         const { itemId } = req.params; // itemId here will be treated as productId
 
         const cart = await prisma.cart.findUnique({ where: { userId } });
-        if (!cart) return res.status(404).json({ message: 'Cart not found' });
+        if (!cart) return res.status().json({ error: 'Cart not found' });
 
         const productId = parseInt(itemId);
 
@@ -177,7 +177,7 @@ const removeFromCart = async (req, res) => {
             });
         } catch (e) {
             // Record not found
-            return res.status(404).json({ message: 'Item not found in your cart' });
+            return res.status().json({ error: 'Item not found in your cart' });
         }
 
         const updatedCart = await prisma.cart.findUnique({
@@ -187,7 +187,7 @@ const removeFromCart = async (req, res) => {
         res.json(updatedCart);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Server error' });
+        res.status().json({ error: 'Server error' });
     }
 };
 
@@ -246,7 +246,7 @@ const syncCart = async (req, res) => {
         res.json(updatedCart);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Server error' });
+        res.status().json({ error: 'Server error' });
     }
 };
 
@@ -257,7 +257,7 @@ const clearCart = async (req, res) => {
         const cart = await prisma.cart.findUnique({ where: { userId } });
 
         if (!cart) {
-            return res.status(404).json({ message: 'Cart not found' });
+            return res.status().json({ error: 'Cart not found' });
         }
 
         await prisma.cartItem.deleteMany({
@@ -272,7 +272,7 @@ const clearCart = async (req, res) => {
         res.json(updatedCart);
     } catch (error) {
         console.error('Clear Cart Error:', error);
-        res.status(500).json({ message: 'Server error' });
+        res.status().json({ error: 'Server error' });
     }
 };
 
