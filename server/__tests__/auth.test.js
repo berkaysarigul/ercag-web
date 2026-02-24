@@ -3,13 +3,38 @@ const app = require('../index');
 const prisma = require('../src/lib/prisma');
 
 describe('Auth Endpoints', () => {
+    const cleanupTestUsers = async () => {
+        const users = await prisma.user.findMany({
+            where: {
+                OR: [
+                    { email: 'test@example.com' },
+                    { email: 'test2@example.com' },
+                    { phone: '5551234567' }
+                ]
+            }
+        });
+        const userIds = users.map(u => u.id);
+        if (userIds.length > 0) {
+            await prisma.cartItem.deleteMany({ where: { cart: { userId: { in: userIds } } } });
+            await prisma.cart.deleteMany({ where: { userId: { in: userIds } } });
+            await prisma.loyaltyHistory.deleteMany({ where: { loyalty: { userId: { in: userIds } } } });
+            await prisma.loyaltyPoints.deleteMany({ where: { userId: { in: userIds } } });
+            await prisma.wishlist.deleteMany({ where: { userId: { in: userIds } } });
+            await prisma.review.deleteMany({ where: { userId: { in: userIds } } });
+            await prisma.stockAlert.deleteMany({ where: { userId: { in: userIds } } });
+            await prisma.orderItem.deleteMany({ where: { order: { userId: { in: userIds } } } });
+            await prisma.order.deleteMany({ where: { userId: { in: userIds } } });
+            await prisma.auditLog.deleteMany({ where: { userId: { in: userIds } } });
+            await prisma.user.deleteMany({ where: { id: { in: userIds } } });
+        }
+    };
+
     beforeAll(async () => {
-        // Clean up user
-        await prisma.user.deleteMany({ where: { email: 'test@example.com' } });
+        await cleanupTestUsers();
     });
 
     afterAll(async () => {
-        await prisma.user.deleteMany({ where: { email: 'test@example.com' } });
+        await cleanupTestUsers();
         await prisma.$disconnect();
     });
 

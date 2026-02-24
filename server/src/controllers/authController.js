@@ -7,18 +7,18 @@ const register = async (req, res) => {
         const { email, password, name, phone } = req.body;
 
         if (!phone || !password || !name) {
-            return res.status().json({ error: 'Lütfen Telefon, Ad Soyad ve Şifre giriniz.' });
+            return res.status(400).json({ error: 'Lütfen Telefon, Ad Soyad ve Şifre giriniz.' });
         }
 
         const existingUser = await prisma.user.findUnique({ where: { phone } });
         if (existingUser) {
-            return res.status().json({ error: 'Bu telefon numarası ile kayıtlı kullanıcı var.' });
+            return res.status(400).json({ error: 'Bu telefon numarası ile kayıtlı kullanıcı var.' });
         }
 
         if (email) {
             const existingEmail = await prisma.user.findUnique({ where: { email } });
             if (existingEmail) {
-                return res.status().json({ error: 'Bu email adresi ile kayıtlı kullanıcı var.' });
+                return res.status(400).json({ error: 'Bu email adresi ile kayıtlı kullanıcı var.' });
             }
         }
 
@@ -40,7 +40,7 @@ const register = async (req, res) => {
         res.status(201).json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role, phone: user.phone } });
     } catch (error) {
         console.error(error);
-        res.status().json({ error: 'Server error' });
+        res.status(500).json({ error: 'Server error' });
     }
 };
 
@@ -50,7 +50,7 @@ const login = async (req, res) => {
         identifier = identifier || email || phone;
 
         if (!identifier) {
-            return res.status().json({ error: 'Lütfen Email veya Telefon giriniz.' });
+            return res.status(400).json({ error: 'Lütfen Email veya Telefon giriniz.' });
         }
 
         // Try to find user by Email or Phone
@@ -64,12 +64,12 @@ const login = async (req, res) => {
         });
 
         if (!user) {
-            return res.status().json({ error: 'Kullanıcı bulunamadı (Telefon veya Email kontrol edin)' });
+            return res.status(404).json({ error: 'Kullanıcı bulunamadı (Telefon veya Email kontrol edin)' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status().json({ error: 'Geçersiz şifre' });
+            return res.status(400).json({ error: 'Geçersiz şifre' });
         }
 
         // 2FA Check
@@ -95,11 +95,11 @@ const login = async (req, res) => {
                 } else {
                     // If no email, maybe fallback to something else or just error?
                     // For now, let's assume admin has email.
-                    return res.status().json({ error: '2FA aktif ancak email adresi tanımlı değil. Yönetici ile iletişime geçin.' });
+                    return res.status(400).json({ error: '2FA aktif ancak email adresi tanımlı değil. Yönetici ile iletişime geçin.' });
                 }
             } catch (emailError) {
                 console.error('2FA Email Error:', emailError);
-                return res.status().json({ error: 'Doğrulama kodu gönderilemedi.' });
+                return res.status(500).json({ error: 'Doğrulama kodu gönderilemedi.' });
             }
 
             return res.json({ require2FA: true, userId: user.id, message: 'Doğrulama kodu email adresinize gönderildi.' });
@@ -116,7 +116,7 @@ const login = async (req, res) => {
         res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role, phone: user.phone } });
     } catch (error) {
         console.error(error);
-        res.status().json({ error: 'Server error' });
+        res.status(500).json({ error: 'Server error' });
     }
 };
 
@@ -126,7 +126,7 @@ const verify2FA = async (req, res) => {
         const { userId, code } = req.body;
 
         const user = await prisma.user.findUnique({ where: { id: parseInt(userId) } });
-        if (!user) return res.status().json({ error: 'Kullanıcı bulunamadı' });
+        if (!user) return res.status(404).json({ error: 'Kullanıcı bulunamadı' });
 
         // Check expiry first
         if (!user.twoFactorCode || !user.twoFactorCodeExpires || new Date() > user.twoFactorCodeExpires) {
@@ -134,11 +134,11 @@ const verify2FA = async (req, res) => {
                 where: { id: user.id },
                 data: { twoFactorCode: null, twoFactorCodeExpires: null }
             });
-            return res.status().json({ error: 'Kodun süresi dolmuş. Tekrar giriş yapın.' });
+            return res.status(400).json({ error: 'Kodun süresi dolmuş. Tekrar giriş yapın.' });
         }
 
         if (user.twoFactorCode !== code) {
-            return res.status().json({ error: 'Geçersiz kod.' });
+            return res.status(400).json({ error: 'Geçersiz kod.' });
         }
 
         // Clear code on success
@@ -157,7 +157,7 @@ const verify2FA = async (req, res) => {
         res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role, phone: user.phone } });
     } catch (error) {
         console.error(error);
-        res.status().json({ error: 'Server error' });
+        res.status(500).json({ error: 'Server error' });
     }
 };
 
@@ -188,7 +188,7 @@ const { sendEmail } = require('../services/notificationService');
 const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
-        if (!email) return res.status().json({ error: 'Email adresi gerekli.' });
+        if (!email) return res.status(400).json({ error: 'Email adresi gerekli.' });
 
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
@@ -218,7 +218,7 @@ const forgotPassword = async (req, res) => {
         res.json({ message: 'Eğer bu email kayıtlıysa, şifre sıfırlama kodu gönderildi.' });
     } catch (error) {
         console.error('Forgot Password Error:', error);
-        res.status().json({ error: 'Server error' });
+        res.status(500).json({ error: 'Server error' });
     }
 };
 
@@ -228,7 +228,7 @@ const forgotPassword = async (req, res) => {
 const verifyResetCode = async (req, res) => {
     try {
         const { email, code } = req.body;
-        if (!email || !code) return res.status().json({ error: 'Bilgiler eksik.' });
+        if (!email || !code) return res.status(400).json({ error: 'Bilgiler eksik.' });
 
         const user = await prisma.user.findFirst({
             where: {
@@ -239,20 +239,20 @@ const verifyResetCode = async (req, res) => {
         });
 
         if (!user) {
-            return res.status().json({ error: 'Geçersiz veya süresi dolmuş kod.' });
+            return res.status(400).json({ error: 'Geçersiz veya süresi dolmuş kod.' });
         }
 
         res.json({ message: 'Kod doğrulandı.', valid: true });
     } catch (error) {
         console.error(error);
-        res.status().json({ error: 'Doğrulama hatası.' });
+        res.status(500).json({ error: 'Doğrulama hatası.' });
     }
 };
 
 const resetPassword = async (req, res) => {
     try {
         const { email, code, newPassword } = req.body;
-        if (!email || !code || !newPassword) return res.status().json({ error: 'Tüm alanlar gerekli.' });
+        if (!email || !code || !newPassword) return res.status(400).json({ error: 'Tüm alanlar gerekli.' });
 
         const user = await prisma.user.findFirst({
             where: {
@@ -263,7 +263,7 @@ const resetPassword = async (req, res) => {
         });
 
         if (!user) {
-            return res.status().json({ error: 'Geçersiz işlem veya süresi dolmuş.' });
+            return res.status(400).json({ error: 'Geçersiz işlem veya süresi dolmuş.' });
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -281,7 +281,7 @@ const resetPassword = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        res.status().json({ error: 'Şifre sıfırlama hatası.' });
+        res.status(500).json({ error: 'Şifre sıfırlama hatası.' });
     }
 };
 
