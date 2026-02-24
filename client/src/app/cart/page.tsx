@@ -8,6 +8,7 @@ import api from '@/lib/api';
 import { useState, useEffect } from 'react';
 import { CartSkeleton } from '@/components/cart/CartSkeleton';
 import { toast } from 'sonner';
+import Image from 'next/image';
 import { Trash2, ArrowRight, ShoppingBag, Minus, Plus, User, Phone, Mail, Clock, FileText } from 'lucide-react';
 import AuthModal from '@/components/auth/AuthModal';
 
@@ -62,9 +63,10 @@ export default function CartPage() {
             setAppliedCoupon({ code: res.data.couponCode, discountAmount: res.data.discountAmount });
             setCouponMessage({ type: 'success', text: `Kupon uygulandı: ${res.data.discountAmount} ₺ indirim` });
             toast.success('Kupon uygulandı');
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const errResponse = (error as any)?.response;
             setAppliedCoupon(null);
-            setCouponMessage({ type: 'error', text: error.response?.data?.message || 'Geçersiz kupon' });
+            setCouponMessage({ type: 'error', text: errResponse?.data?.message || 'Geçersiz kupon' });
             toast.error('Geçersiz kupon');
         } finally {
             setLoading(false);
@@ -100,9 +102,10 @@ export default function CartPage() {
             toast.success('Siparişiniz başarıyla oluşturuldu!');
             // Redirect to success page with pickup code
             router.push(`/order-success?id=${res.data.id}&code=${res.data.pickupCode}&amount=${res.data.totalAmount}`);
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Order failed', error);
-            const msg = error.response?.data?.error || 'Sipariş oluşturulurken bir hata oluştu.';
+            const errResponse = (error as any)?.response;
+            const msg = errResponse?.data?.error || 'Sipariş oluşturulurken bir hata oluştu.';
             toast.error(msg);
         } finally {
             setLoading(false);
@@ -130,10 +133,25 @@ export default function CartPage() {
 
     return (
         <div className="container py-12">
-            <h1 className="text-3xl font-bold text-primary mb-8 flex items-center">
-                <ShoppingBag className="mr-3" />
-                {step === 'cart' ? `Sepetim (${items.length} Ürün)` : 'Siparişi Tamamla'}
-            </h1>
+            <div className="flex justify-between items-center mb-8">
+                <h1 className="text-3xl font-bold text-primary flex items-center">
+                    <ShoppingBag className="mr-3" />
+                    {step === 'cart' ? `Sepetim (${items.length} Ürün)` : 'Siparişi Tamamla'}
+                </h1>
+                {step === 'cart' && items.length > 0 && (
+                    <button
+                        onClick={() => {
+                            if (confirm('Sepetinizdeki tüm ürünleri silmek istediğinize emin misiniz?')) {
+                                clearCart();
+                            }
+                        }}
+                        className="text-red-500 hover:text-red-700 font-medium flex items-center gap-2 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors"
+                    >
+                        <Trash2 size={18} />
+                        Sepeti Temizle
+                    </button>
+                )}
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left Column: Cart Items or Form */}
@@ -144,7 +162,15 @@ export default function CartPage() {
                                 <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex gap-4 items-center hover:shadow-md transition-shadow">
                                     <div className="w-24 h-24 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
                                         {item.image ? (
-                                            <img src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${item.image}`} alt={item.name} className="w-full h-full object-cover" />
+                                            <div className="relative w-full h-full">
+                                                <Image
+                                                    src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${item.image}`}
+                                                    alt={item.name}
+                                                    fill
+                                                    sizes="96px"
+                                                    className="object-cover"
+                                                />
+                                            </div>
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-gray-300">📷</div>
                                         )}

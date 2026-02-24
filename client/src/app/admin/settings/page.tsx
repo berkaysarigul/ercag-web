@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { toast } from 'sonner';
 import { Save, Loader2, Globe, Phone, MapPin, Instagram, Facebook } from 'lucide-react';
+import Image from 'next/image';
 
 export default function AdminSettings() {
     const [settings, setSettings] = useState<any>({});
@@ -124,7 +125,15 @@ export default function AdminSettings() {
                     <div className="flex items-start gap-6">
                         <div className="w-40 h-40 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center bg-gray-50 overflow-hidden relative group">
                             {settings.site_logo ? (
-                                <img src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${settings.site_logo}`} alt="Site Logo" className="w-full h-full object-contain p-2" />
+                                <div className="relative w-full h-full p-2">
+                                    <Image
+                                        src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${settings.site_logo}`}
+                                        alt="Site Logo"
+                                        fill
+                                        sizes="160px"
+                                        className="object-contain p-2"
+                                    />
+                                </div>
                             ) : (
                                 <span className="text-gray-400 text-sm">Logo Yok</span>
                             )}

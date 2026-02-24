@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import Image from 'next/image';
 import RichTextEditor from '@/components/admin/RichTextEditor';
 import ImageUpload from '@/components/admin/ImageUpload';
 
@@ -102,7 +103,13 @@ export default function NewProductPage() {
                                     <div className="grid grid-cols-3 gap-2 mt-4">
                                         {imagePreviews.map((preview, index) => (
                                             <div key={index} className="relative aspect-square border rounded-lg overflow-hidden group">
-                                                <img src={preview} alt={`Preview ${index}`} className="w-full h-full object-cover" />
+                                                <Image
+                                                    src={preview}
+                                                    alt={`Preview ${index}`}
+                                                    fill
+                                                    sizes="96px"
+                                                    className="object-cover"
+                                                />
                                                 <button
                                                     type="button"
                                                     onClick={() => removeImage(index)}

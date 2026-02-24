@@ -79,8 +79,9 @@ function BulkStockUpload() {
             toast.success(res.data.message);
             setFile(null);
             if (fileInputRef.current) fileInputRef.current.value = '';
-        } catch (error: any) {
-            toast.error(error.response?.data?.error || 'Yükleme başarısız');
+        } catch (error: unknown) {
+            const errResponse = (error as any)?.response;
+            toast.error(errResponse?.data?.error || 'Yükleme başarısız');
         } finally {
             setLoading(false);
         }
@@ -147,14 +148,14 @@ function BulkStockUpload() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {results.errors.map((err: any, i: number) => (
+                                    {results.errors.map((err: { row: number; message: string }, i: number) => (
                                         <tr key={`err-${i}`} className="bg-red-50">
                                             <td className="px-4 py-2">{err.row}</td>
                                             <td className="px-4 py-2 text-red-600" colSpan={3}>{err.message}</td>
                                             <td className="px-4 py-2">❌</td>
                                         </tr>
                                     ))}
-                                    {results.success.map((item: any, i: number) => (
+                                    {results.success.map((item: { row: number; productName: string; change: number; newStock: number }, i: number) => (
                                         <tr key={`succ-${i}`} className="border-b last:border-0 hover:bg-gray-50">
                                             <td className="px-4 py-2">{item.row}</td>
                                             <td className="px-4 py-2 font-medium">{item.productName}</td>

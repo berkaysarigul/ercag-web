@@ -9,7 +9,7 @@ import autoTable from 'jspdf-autotable';
 interface OrderDetailsModalProps {
     isOpen: boolean;
     onClose: () => void;
-    order: any;
+    order: { id: number; createdAt: string; fullName?: string; phoneNumber?: string; email?: string; user?: { name?: string; phone?: string; email?: string }; items: { id: number; quantity: number; price: number | string; product: { name: string } }[]; totalAmount: number | string; discountAmount?: number | string; couponCode?: string; note?: string; status: string; statusHistory?: string | { status: string; date: string; user?: string; note?: string; timestamp?: string }[]; pickupCode?: string; completedAt?: string };
     onStatusChange: (orderId: number, status: string) => Promise<void>;
 }
 
@@ -47,9 +47,9 @@ export default function OrderDetailsModal({ isOpen, onClose, order, onStatusChan
 
         // Table
         const tableColumn = ["Ürün", "Adet", "Birim Fiyat", "Toplam"];
-        const tableRows: any[] = [];
+        const tableRows: (string | number)[][] = [];
 
-        order.items.forEach((item: any) => {
+        order.items.forEach((item: { quantity: number; price: number | string; product: { name: string } }) => {
             const itemData = [
                 item.product.name,
                 item.quantity,
@@ -74,7 +74,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order, onStatusChan
         const finalY = doc.lastAutoTable.finalY + 10;
 
         doc.text(`Ara Toplam: ${(Number(order.totalAmount) + (Number(order.discountAmount) || 0)).toFixed(2)} TL`, 140, finalY);
-        if (order.discountAmount > 0) {
+        if (order.discountAmount && Number(order.discountAmount) > 0) {
             doc.text(`İndirim: -${Number(order.discountAmount).toFixed(2)} TL`, 140, finalY + 5);
         }
         doc.setFontSize(12);
@@ -97,7 +97,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order, onStatusChan
     };
 
     // Parse History
-    let statusHistory: any[] = [];
+    let statusHistory: { status: string; date: string; user?: string; note?: string; timestamp?: string }[] = [];
     try {
         statusHistory = typeof order.statusHistory === 'string'
             ? JSON.parse(order.statusHistory)
@@ -207,7 +207,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order, onStatusChan
                                             <div>
                                                 <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4 border-b pb-2">Ürünler ({order.items.length})</h4>
                                                 <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                                                    {order.items.map((item: any) => (
+                                                    {order.items.map((item: { id: number; quantity: number; price: number | string; product: { name: string } }) => (
                                                         <div key={item.id} className="flex justify-between items-start border-b border-gray-200 pb-3 last:border-0 last:pb-0">
                                                             <div className="flex gap-3">
                                                                 <span className="font-mono bg-white px-2 rounded border border-gray-200 text-sm text-gray-600 h-fit shadow-sm">
@@ -223,7 +223,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order, onStatusChan
                                                 </div>
 
                                                 <div className="mt-4 space-y-2 flex flex-col items-end">
-                                                    {order.discountAmount > 0 && (
+                                                    {order.discountAmount && Number(order.discountAmount) > 0 && (
                                                         <div className="flex justify-between w-48 text-sm text-green-600">
                                                             <span>İndirim ({order.couponCode})</span>
                                                             <span>-₺{Number(order.discountAmount).toFixed(2)}</span>
@@ -244,7 +244,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order, onStatusChan
                                                     <History size={14} /> Sipariş Geçmişi
                                                 </h4>
                                                 <div className="space-y-6 relative before:absolute before:inset-0 before:ml-1.5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-gray-200 before:via-gray-100 before:to-transparent">
-                                                    {statusHistory.map((log: any, index: number) => (
+                                                    {statusHistory.map((log: { status: string; date?: string; timestamp?: string; user?: string; note?: string }, index: number) => (
                                                         <div key={index} className="relative pl-6">
                                                             <span className={`absolute left-0 top-1.5 w-3 h-3 rounded-full border-2 border-white shadow-sm
                                                                 ${log.status === 'COMPLETED' ? 'bg-green-500' :
@@ -259,7 +259,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order, onStatusChan
                                                                                     log.status === 'CANCELLED' ? 'İptal Edildi' : log.status}
                                                                 </span>
                                                                 <span className="text-xs text-gray-400">
-                                                                    {new Date(log.timestamp).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                                                    {new Date((log.timestamp || log.date) as string).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                                                                 </span>
                                                                 {log.note && <span className="text-xs text-gray-500 italic mt-0.5">"{log.note}"</span>}
                                                             </div>

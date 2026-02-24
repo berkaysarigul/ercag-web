@@ -5,10 +5,11 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Search, X, Loader2, Package } from 'lucide-react';
 import api from '@/lib/api';
+import Image from 'next/image';
 
 export default function SearchAutocomplete() {
     const [query, setQuery] = useState('');
-    const [results, setResults] = useState<{ products: any[], categories: any[] }>({ products: [], categories: [] });
+    const [results, setResults] = useState<{ products: { id: number; name: string; slug: string; price: number; image?: string | null; discountPercent?: number; category?: { name: string } }[], categories: { id: number; name: string }[] }>({ products: [], categories: [] });
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -76,7 +77,7 @@ export default function SearchAutocomplete() {
                     {results.categories.length > 0 && (
                         <div className="p-2 bg-gray-50/50">
                             <p className="text-xs font-semibold text-gray-500 px-2 py-1 uppercase tracking-wider">Kategoriler</p>
-                            {results.categories.map((cat: any) => (
+                            {results.categories.map((cat: { id: number; name: string }) => (
                                 <Link
                                     key={cat.id}
                                     href={`/products?categoryId=${cat.id}`}
@@ -93,7 +94,7 @@ export default function SearchAutocomplete() {
                     {results.products.length > 0 && (
                         <div className="p-2">
                             <p className="text-xs font-semibold text-gray-500 px-2 py-1 uppercase tracking-wider">Ürünler</p>
-                            {results.products.map((product: any) => (
+                            {results.products.map((product: { id: number; name: string; slug: string; price: number; image?: string | null; discountPercent?: number; category?: { name: string } }) => (
                                 <Link
                                     key={product.id}
                                     href={`/products/${product.id}`}
@@ -101,8 +102,16 @@ export default function SearchAutocomplete() {
                                     onClick={() => setIsOpen(false)}
                                 >
                                     <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
-                                        {product.images?.[0]?.url ? (
-                                            <img src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${product.images[0].url.startsWith('/') ? '' : '/uploads/'}${product.images[0].url}`} alt={product.name} className="w-full h-full object-cover" />
+                                        {product.image ? (
+                                            <div className="relative w-full h-full">
+                                                <Image
+                                                    src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${product.image.startsWith('/') ? '' : '/uploads/'}${product.image}`}
+                                                    alt={product.name}
+                                                    fill
+                                                    sizes="40px"
+                                                    className="object-cover"
+                                                />
+                                            </div>
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-gray-400">
                                                 <Package className="w-5 h-5" />

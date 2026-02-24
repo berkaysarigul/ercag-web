@@ -69,8 +69,9 @@ export default function ProfilePage() {
                 phone: formData.phone
             });
             toast.success('Profil bilgileri güncellendi');
-        } catch (error: any) {
-            toast.error(error.response?.data?.error || 'Güncelleme başarısız');
+        } catch (error: unknown) {
+            const errResponse = (error as any)?.response;
+            toast.error(errResponse?.data?.error || 'Güncelleme başarısız');
         } finally {
             setLoading(false);
         }
@@ -90,8 +91,9 @@ export default function ProfilePage() {
             });
             toast.success('Şifre başarıyla değiştirildi');
             setFormData(prev => ({ ...prev, currentPassword: '', newPassword: '', confirmPassword: '' }));
-        } catch (error: any) {
-            toast.error(error.response?.data?.error || 'Şifre değiştirilemedi');
+        } catch (error: unknown) {
+            const errResponse = (error as any)?.response;
+            toast.error(errResponse?.data?.error || 'Şifre değiştirilemedi');
         } finally {
             setLoading(false);
         }
@@ -256,7 +258,7 @@ export default function ProfilePage() {
                                     <p className="text-gray-500">Henüz siparişiniz bulunmuyor.</p>
                                 ) : (
                                     <div className="space-y-4">
-                                        {orders.map((order: any) => (
+                                        {orders.map((order: { id: number; status: string; createdAt: string; totalAmount: number; pickupCode: string | null; items: { id: number; quantity: number; price: number; product: { name: string } }[] }) => (
                                             <div key={order.id} className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
                                                 <div className="flex justify-between items-start mb-4">
                                                     <div>
@@ -275,8 +277,9 @@ export default function ProfilePage() {
                                                                             await api.put(`/orders/${order.id}/cancel`);
                                                                             toast.success('Sipariş iptal edildi');
                                                                             fetchOrders(); // Refresh list
-                                                                        } catch (err: any) {
-                                                                            toast.error(err.response?.data?.error || 'İptal edilemedi');
+                                                                        } catch (err: unknown) {
+                                                                            const errResponse = (err as any)?.response;
+                                                                            toast.error(errResponse?.data?.error || 'İptal edilemedi');
                                                                         }
                                                                     }
                                                                 }}
@@ -297,7 +300,7 @@ export default function ProfilePage() {
                                                 </div>
                                                 <div className="bg-gray-50 rounded-lg p-4">
                                                     <div className="space-y-2">
-                                                        {order.items.map((item: any) => (
+                                                        {order.items.map((item: { id: number; quantity: number; price: number; product: { name: string } }) => (
                                                             <div key={item.id} className="flex justify-between text-sm">
                                                                 <span>{item.quantity}x {item.product.name}</span>
                                                                 <span className="font-medium">{Number(item.price).toFixed(2)} ₺</span>

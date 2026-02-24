@@ -36,8 +36,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     try {
         const res = await fetch(`${apiUrl}/api/products`, { next: { revalidate: 3600 } });
         if (res.ok) {
-            const products = await res.json();
-            const productRoutes = products.map((product: any) => ({
+            const products: { id: number; updatedAt: string }[] = await res.json();
+            const productRoutes = products.map((product) => ({
                 url: `${baseUrl}/products/${product.id}`,
                 lastModified: new Date(product.updatedAt || new Date()),
                 changeFrequency: 'weekly' as const,

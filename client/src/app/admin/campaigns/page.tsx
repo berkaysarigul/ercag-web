@@ -66,9 +66,9 @@ export default function AdminCampaignsPage() {
         setIsModalOpen(true);
     };
 
-    const openEdit = (c: any) => {
+    const openEdit = (c: { id: number; config: string | object; name: string; type: string; startDate?: string; endDate?: string; isActive: boolean }) => {
         setEditingId(c.id);
-        let cfg: any = {};
+        let cfg: { discountPercent?: string | number, categoryId?: string | number, productIds?: string[] | string, buyQuantity?: number | string, payQuantity?: number | string } = {};
         try { cfg = typeof c.config === 'string' ? JSON.parse(c.config) : c.config; } catch { }
         setForm({
             name: c.name,
@@ -78,18 +78,18 @@ export default function AdminCampaignsPage() {
             isActive: c.isActive,
         });
         setConfig({
-            discountPercent: cfg.discountPercent || '',
-            categoryId: cfg.categoryId || '',
-            productIds: Array.isArray(cfg.productIds) ? cfg.productIds.join(', ') : cfg.productIds || '',
-            buyQuantity: cfg.buyQuantity || '',
-            payQuantity: cfg.payQuantity || '',
+            discountPercent: String(cfg.discountPercent || ''),
+            categoryId: String(cfg.categoryId || ''),
+            productIds: Array.isArray(cfg.productIds) ? cfg.productIds.join(', ') : String(cfg.productIds || ''),
+            buyQuantity: String(cfg.buyQuantity || ''),
+            payQuantity: String(cfg.payQuantity || ''),
         });
         setIsModalOpen(true);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        let finalConfig: any = {};
+        let finalConfig: Record<string, unknown> = {};
         if (form.type === 'CATEGORY_DISCOUNT') {
             finalConfig = { categoryId: parseInt(config.categoryId), discountPercent: parseFloat(config.discountPercent) };
         } else if (form.type === 'FLASH_SALE') {
@@ -112,8 +112,9 @@ export default function AdminCampaignsPage() {
             }
             setIsModalOpen(false);
             fetchAll();
-        } catch (err: any) {
-            toast.error(err.response?.data?.error || 'İşlem başarısız');
+        } catch (err: unknown) {
+            const errResponse = (err as any)?.response;
+            toast.error(errResponse?.data?.error || 'İşlem başarısız');
         }
     };
 
@@ -128,7 +129,7 @@ export default function AdminCampaignsPage() {
         }
     };
 
-    const handleToggle = async (c: any) => {
+    const handleToggle = async (c: { id: number; isActive: boolean;[key: string]: unknown }) => {
         try {
             await api.put(`/campaigns/${c.id}`, { ...c, isActive: !c.isActive });
             toast.success(`Kampanya ${!c.isActive ? 'aktif' : 'pasif'} edildi`);
@@ -141,12 +142,12 @@ export default function AdminCampaignsPage() {
     const formatDate = (d: string) => d ? new Date(d).toLocaleDateString('tr-TR') : '—';
     const getCategoryName = (id: number) => categories.find(c => c.id === id)?.name || `#${id}`;
 
-    const getConfigSummary = (c: any) => {
-        let cfg: any = {};
+    const getConfigSummary = (c: { type: string; config: string | object }) => {
+        let cfg: { discountPercent?: number; categoryId?: number; productIds?: number[]; buyQuantity?: number; payQuantity?: number } = {};
         try { cfg = typeof c.config === 'string' ? JSON.parse(c.config) : c.config; } catch { }
-        if (c.type === 'CATEGORY_DISCOUNT') return `%${cfg.discountPercent} indirim • ${getCategoryName(cfg.categoryId)}`;
-        if (c.type === 'FLASH_SALE') return `%${cfg.discountPercent} indirim • ${Array.isArray(cfg.productIds) ? cfg.productIds.length : '?'} ürün`;
-        if (c.type === 'BUY_X_GET_Y') return `${cfg.buyQuantity} al ${cfg.payQuantity} öde`;
+        if (c.type === 'CATEGORY_DISCOUNT') return `%${cfg.discountPercent || 0} indirim • ${getCategoryName(cfg.categoryId || 0)}`;
+        if (c.type === 'FLASH_SALE') return `%${cfg.discountPercent || 0} indirim • ${Array.isArray(cfg.productIds) ? cfg.productIds.length : '?'} ürün`;
+        if (c.type === 'BUY_X_GET_Y') return `${cfg.buyQuantity || 0} al ${cfg.payQuantity || 0} öde`;
         return '';
     };
 
@@ -195,7 +196,7 @@ export default function AdminCampaignsPage() {
                 </div>
             ) : (
                 <div className="grid gap-3">
-                    {campaigns.map((c: any) => (
+                    {campaigns.map((c: { id: number; name: string; type: string; isActive: boolean; startDate?: string; endDate?: string; viewCount?: number; useCount?: number; config: string | object }) => (
                         <div key={c.id}
                             className={`bg-white rounded-xl border p-5 flex items-center gap-5 transition-all ${c.isActive ? 'border-gray-100 shadow-sm' : 'border-gray-100 opacity-60'}`}>
                             {/* Icon */}
@@ -219,7 +220,7 @@ export default function AdminCampaignsPage() {
                                 <p className="text-sm text-gray-500 mt-0.5">{getConfigSummary(c)}</p>
                                 <div className="flex items-center gap-1.5 mt-1.5 text-xs text-gray-400">
                                     <Calendar size={12} />
-                                    {formatDate(c.startDate)} — {formatDate(c.endDate)}
+                                    {formatDate(c.startDate as string)} — {formatDate(c.endDate as string)}
                                 </div>
                             </div>
 

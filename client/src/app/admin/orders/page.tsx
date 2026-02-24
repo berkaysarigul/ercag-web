@@ -278,12 +278,14 @@ export default function AdminOrdersPage() {
                 </div>
             )}
 
-            <OrderDetailsModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                order={selectedOrder}
-                onStatusChange={handleStatusChange}
-            />
+            {selectedOrder && (
+                <OrderDetailsModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    order={selectedOrder}
+                    onStatusChange={handleStatusChange}
+                />
+            )}
         </div>
     );
 }

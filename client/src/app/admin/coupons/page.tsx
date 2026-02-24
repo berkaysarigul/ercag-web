@@ -42,9 +42,10 @@ export default function AdminCouponsPage() {
                 expirationDate: ''
             });
             fetchCoupons();
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Create coupon error', error);
-            toast.error(error.response?.data?.error || 'Kupon oluşturulamadı');
+            const errResponse = (error as any)?.response;
+            toast.error(errResponse?.data?.error || 'Kupon oluşturulamadı');
         } finally {
             setLoading(false);
         }

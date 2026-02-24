@@ -82,7 +82,7 @@ export default function AdminSliders() {
         }
     };
 
-    const handleEdit = (slide: any) => {
+    const handleEdit = (slide: { id: number; title: string; subtitle: string; description: string; link: string; order: number; isActive: boolean }) => {
         setEditingId(slide.id);
         setFormData({
             title: slide.title,

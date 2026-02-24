@@ -9,6 +9,7 @@ import { Download, TrendingUp, Users, ShoppingCart, DollarSign, AlertCircle } fr
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
@@ -59,10 +60,10 @@ export default function AnalyticsPage() {
         autoTable(doc, {
             startY: (doc as any).lastAutoTable.finalY + 10,
             head: [['Ürün Adı', 'Adet', 'Fiyat']],
-            body: stats.topProducts.map((p: any) => [
+            body: stats.topProducts.map((p: { product?: { name?: string; price?: number }; _sum: { quantity: number } }) => [
                 p.product?.name || 'Bilinmeyen Ürün',
                 p._sum.quantity,
-                `${Number(p.product?.price).toFixed(2)} ₺`
+                `${Number(p.product?.price || 0).toFixed(2)} ₺`
             ]),
             theme: 'striped'
         });
@@ -155,7 +156,7 @@ export default function AnalyticsPage() {
                                     paddingAngle={5}
                                     dataKey="totalRevenue"
                                 >
-                                    {stats.categorySales.map((entry: any, index: number) => (
+                                    {stats.categorySales.map((entry: { category?: { name?: string }; totalRevenue: number }, index: number) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
@@ -180,12 +181,20 @@ export default function AnalyticsPage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {stats.topProducts.map((item: any, idx: number) => (
+                            {stats.topProducts.map((item: { product?: { image?: string; name?: string; price?: number }; _sum: { quantity: number } }, idx: number) => (
                                 <tr key={idx} className="hover:bg-gray-50">
                                     <td className="px-4 py-3 font-medium text-gray-900 flex items-center gap-3">
                                         <div className="w-10 h-10 rounded bg-gray-100 flex-shrink-0 overflow-hidden">
                                             {item.product?.image ? (
-                                                <img src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${item.product.image}`} className="w-full h-full object-cover" />
+                                                <div className="relative w-full h-full">
+                                                    <Image
+                                                        src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${item.product.image}`}
+                                                        alt={item.product?.name || 'Ürün görseli'}
+                                                        fill
+                                                        sizes="40px"
+                                                        className="object-cover"
+                                                    />
+                                                </div>
                                             ) : (
                                                 <div className="flex items-center justify-center h-full text-xs">IMG</div>
                                             )}

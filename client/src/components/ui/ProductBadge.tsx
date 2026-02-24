@@ -1,6 +1,6 @@
 import { Percent, Gift, Truck, DollarSign } from 'lucide-react';
 
-export default function ProductBadge({ campaign }: { campaign: any }) {
+export default function ProductBadge({ campaign }: { campaign: { type: string; value?: number } | null | undefined }) {
     if (!campaign) return null;
 
     let icon = <Percent size={12} />;

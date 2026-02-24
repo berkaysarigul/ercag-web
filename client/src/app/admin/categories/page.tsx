@@ -56,8 +56,9 @@ export default function AdminCategoriesPage() {
             await api.delete(`/categories/${id}`);
             toast.success('Kategori silindi');
             setCategories(prev => prev.filter(c => c.id !== id));
-        } catch (error: any) {
-            toast.error(error.response?.data?.error || 'Silme işlemi başarısız');
+        } catch (error: unknown) {
+            const errResponse = (error as any)?.response;
+            toast.error(errResponse?.data?.error || 'Silme işlemi başarısız');
         }
     };
 
@@ -79,7 +80,7 @@ export default function AdminCategoriesPage() {
             toast.success('Kategori güncellendi');
             setEditingId(null);
             fetchCategories();
-        } catch (error: any) {
+        } catch (error: unknown) {
             toast.error('Güncelleme başarısız');
         }
     };

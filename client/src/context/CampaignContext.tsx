@@ -44,10 +44,10 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
         api.get('/campaigns/public')
             .then(res => {
                 // Parse config JSON strings
-                const parsed = res.data.map((c: any) => ({
+                const parsed = res.data.map((c: { config: string | CampaignConfig;[key: string]: unknown }) => ({
                     ...c,
                     config: typeof c.config === 'string' ? JSON.parse(c.config) : c.config,
-                }));
+                })) as Campaign[];
                 setCampaigns(parsed);
             })
             .catch(() => { });

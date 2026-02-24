@@ -24,9 +24,9 @@ export default function Footer() {
     ];
 
     const socials = [
-        { href: settings.social_instagram, icon: Instagram, label: 'Instagram' },
-        { href: settings.social_facebook, icon: Facebook, label: 'Facebook' },
-        { href: settings.social_twitter, icon: Twitter, label: 'Twitter' },
+        { href: settings.social_instagram ? String(settings.social_instagram) : '', icon: Instagram, label: 'Instagram' },
+        { href: settings.social_facebook ? String(settings.social_facebook) : '', icon: Facebook, label: 'Facebook' },
+        { href: settings.social_twitter ? String(settings.social_twitter) : '', icon: Twitter, label: 'Twitter' },
     ].filter(s => s.href);
 
     return (

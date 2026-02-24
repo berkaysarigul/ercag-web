@@ -93,7 +93,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
             // Update stats from fresh reviews (client-side sync)
             if (data.length > 0) {
-                const total = data.reduce((acc: number, review: any) => acc + review.rating, 0);
+                const total = data.reduce((acc: number, review: { rating: number }) => acc + review.rating, 0);
                 setStats({
                     average: total / data.length,
                     count: data.length
@@ -127,8 +127,9 @@ export default function ProductDetailClient({ product }: { product: Product }) {
             await api.post('/stock-alerts', { productId: product.id });
             setAlertSubscribed(true);
             toast.success('Stok gelince size haber vereceğiz!');
-        } catch (error: any) {
-            toast.error(error.response?.data?.error || 'Bir hata oluştu');
+        } catch (error: unknown) {
+            const errResponse = (error as any)?.response;
+            toast.error(errResponse?.data?.error || 'Bir hata oluştu');
         }
     };
 
@@ -227,7 +228,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                                     </div>
                                     <button
                                         onClick={() => {
-                                            addToCart({ ...product, quantity });
+                                            addToCart({ ...product, price: Number(product.price), quantity });
                                             toast.success('Ürün sepete eklendi');
                                         }}
                                         className="btn btn-primary flex-1 text-lg"

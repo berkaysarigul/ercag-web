@@ -108,7 +108,7 @@ export default function AuditLogPage() {
                                 <tr><td colSpan={6} className="p-8 text-center">Yükleniyor...</td></tr>
                             ) : logs.length === 0 ? (
                                 <tr><td colSpan={6} className="p-8 text-center text-gray-500">Kayıt bulunamadı.</td></tr>
-                            ) : logs.map((log: any) => (
+                            ) : logs.map((log: { id: number; createdAt: string; user?: { name?: string; email?: string }; userId?: number; action: string; targetResource: string; ipAddress: string; details: string; entityType?: string; entityId?: number }) => (
                                 <tr key={log.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-3 text-gray-500 whitespace-nowrap">
                                         {new Date(log.createdAt).toLocaleString('tr-TR')}

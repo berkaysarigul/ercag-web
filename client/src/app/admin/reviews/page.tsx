@@ -48,8 +48,9 @@ export default function AdminReviewsPage() {
             await api.delete(`/reviews/${id}`);
             toast.success('Yorum silindi');
             setReviews(prev => prev.filter(r => r.id !== id));
-        } catch (error: any) {
-            toast.error(error.response?.data?.error || 'Silme işlemi başarısız');
+        } catch (error: unknown) {
+            const errResponse = (error as any)?.response;
+            toast.error(errResponse?.data?.error || 'Silme işlemi başarısız');
         }
     };
 

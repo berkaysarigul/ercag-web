@@ -46,7 +46,7 @@ export default function CampaignBanner() {
     return (
         <div className="container py-4 space-y-3">
             {activeCampaigns.map((campaign) => {
-                let config: any = {};
+                let config: { categoryId?: number | string; discountPercent?: number; productIds?: number[] | string; buyQuantity?: number; payQuantity?: number; target?: string } = {};
                 try { config = typeof campaign.config === 'string' ? JSON.parse(campaign.config) : campaign.config; } catch { }
 
                 if (campaign.type === 'FLASH_SALE') {

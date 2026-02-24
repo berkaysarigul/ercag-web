@@ -9,6 +9,7 @@ router.get('/', cartController.getCart);
 router.post('/add', cartController.addToCart);
 router.put('/update', cartController.updateCartItem); // Expects { itemId, quantity }
 router.delete('/remove/:itemId', cartController.removeFromCart);
+router.delete('/clear', cartController.clearCart);
 router.post('/sync', cartController.syncCart);
 
 module.exports = router;

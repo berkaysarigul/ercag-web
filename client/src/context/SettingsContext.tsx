@@ -12,7 +12,7 @@ interface Settings {
     site_address?: string;
     social_instagram?: string;
     social_facebook?: string;
-    [key: string]: any;
+    [key: string]: string | number | boolean | null | undefined;
 }
 
 interface SettingsContextType {

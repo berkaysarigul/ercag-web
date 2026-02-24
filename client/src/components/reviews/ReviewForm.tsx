@@ -35,8 +35,9 @@ export default function ReviewForm({ productId, onReviewAdded }: ReviewFormProps
             setRating(0);
             setComment('');
             onReviewAdded();
-        } catch (err: any) {
-            setError(err.response?.data?.error || 'Yorum gönderilirken bir hata oluştu.');
+        } catch (err: unknown) {
+            const errResponse = (err as any)?.response;
+            setError(errResponse?.data?.error || 'Yorum gönderilirken bir hata oluştu.');
         } finally {
             setIsSubmitting(false);
         }

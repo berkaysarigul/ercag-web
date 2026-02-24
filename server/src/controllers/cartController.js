@@ -250,10 +250,37 @@ const syncCart = async (req, res) => {
     }
 };
 
+// Endpoint: Clear whole cart
+const clearCart = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const cart = await prisma.cart.findUnique({ where: { userId } });
+
+        if (!cart) {
+            return res.status(404).json({ message: 'Cart not found' });
+        }
+
+        await prisma.cartItem.deleteMany({
+            where: { cartId: cart.id }
+        });
+
+        const updatedCart = await prisma.cart.findUnique({
+            where: { id: cart.id },
+            include: { items: { include: { product: true } } }
+        });
+
+        res.json(updatedCart);
+    } catch (error) {
+        console.error('Clear Cart Error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 module.exports = {
     getCart,
     addToCart,
     updateCartItem,
     removeFromCart,
-    syncCart
+    syncCart,
+    clearCart
 };

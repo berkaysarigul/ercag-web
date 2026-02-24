@@ -43,7 +43,7 @@ export default function AdminDashboard() {
     useEffect(() => {
         if (!socket) return;
 
-        socket.on('new-order', (data: any) => {
+        socket.on('new-order', (data: { totalAmount: number;[key: string]: unknown }) => {
             // Update stats optimistically or refetch
             // For simplicity and accuracy, refetching is safer, but let's do optimistic for pending count
             setStats(prev => ({
@@ -57,7 +57,7 @@ export default function AdminDashboard() {
             setRecentOrders(prev => [data, ...prev].slice(0, 5));
         });
 
-        socket.on('order-updated', (data: any) => {
+        socket.on('order-updated', () => {
             // If status changed to something else from PENDING, decrement pending
             // This is tricky without knowing previous status. 
             // Simplest is to refetch all data to be consistent.
@@ -74,7 +74,7 @@ export default function AdminDashboard() {
         return <div className="p-8 text-center text-gray-500">Yükleniyor...</div>;
     }
 
-    const StatCard = ({ title, value, icon: Icon, color, trend }: any) => (
+    const StatCard = ({ title, value, icon: Icon, color, trend }: { title: string; value: string | number; icon: any; color: string; trend?: string }) => (
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start">
                 <div>

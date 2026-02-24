@@ -13,11 +13,11 @@ interface CartItem {
 
 interface CartContextType {
     items: CartItem[];
-    addToCart: (product: any) => void;
+    addToCart: (product: { id: number; name: string; price: number; image?: string | null; quantity?: number; category?: any }) => void;
     updateQuantity: (id: number, quantity: number) => void;
     decreaseQuantity: (id: number) => void;
     removeFromCart: (id: number) => void;
-    clearCart: () => void;
+    clearCart: () => Promise<void>;
     total: number;
     discountAmount: number;
     finalAmount: number;
@@ -60,7 +60,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                             // Map backend response to frontend format
                             // Backend: items: [{ productId: 1, quantity: 2, product: { ... } }]
                             // Frontend: [{ id: 1, name: ..., price: ..., quantity: 2, image: ... }]
-                            const mappedItems = res.data.items.map((item: any) => ({
+                            const mappedItems = res.data.items.map((item: { productId: number; product: { name: string; price: number; image?: string | null }; quantity: number }) => ({
                                 id: item.productId,
                                 name: item.product.name,
                                 price: Number(item.product.price),
@@ -75,7 +75,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
                     // Just fetch if no sync needed
                     const res = await api.get('/cart');
-                    const mappedItems = res.data.items ? res.data.items.map((item: any) => ({
+                    const mappedItems = res.data.items ? res.data.items.map((item: { productId: number; product: { name: string; price: number; image?: string | null }; quantity: number }) => ({
                         id: item.productId,
                         name: item.product.name,
                         price: Number(item.product.price),
@@ -87,9 +87,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                     setFinalAmount(Number(res.data.finalAmount) || 0);
                     setAppliedCampaigns(res.data.appliedCampaigns || []);
 
-                } catch (error: any) {
+                } catch (error: unknown) {
                     console.error("Failed to fetch cart", error);
-                    if (error.response && (error.response.status === 403 || error.response.status === 401)) {
+                    const errResponse = (error as any)?.response;
+                    if (errResponse && (errResponse.status === 403 || errResponse.status === 401)) {
                         // Invalid token or user not found, logout
                         logout();
                     }
@@ -114,7 +115,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
     }, [items, loaded, user]);
 
-    const addToCart = async (product: any) => {
+    const addToCart = async (product: { id: number; name: string; price: number; image?: string | null; quantity?: number; category?: any }) => {
         // Optimistic update for UI speed
         const existing = items.find((item) => item.id === product.id);
         const quantityToAdd = product.quantity || 1;
@@ -196,12 +197,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    const clearCart = () => {
+    const clearCart = async () => {
         setItems([]);
         if (!user) {
             localStorage.removeItem('cart');
         } else {
-            // Optional: Call clear cart API if we make one
+            try {
+                await api.delete('/cart/clear');
+                toast.success('Sepetiniz temizlendi');
+            } catch (error) {
+                console.error("Failed to clear cart API", error);
+            }
         }
     };
 
@@ -211,7 +217,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         if (!user) return;
         try {
             const res = await api.get('/cart');
-            const mapped = res.data.items ? res.data.items.map((item: any) => ({
+            const mapped = res.data.items ? res.data.items.map((item: { productId: number; product: { name: string; price: number; image?: string | null }; quantity: number }) => ({
                 id: item.productId,
                 name: item.product.name,
                 price: Number(item.product.price),

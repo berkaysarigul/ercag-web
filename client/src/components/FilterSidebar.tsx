@@ -8,7 +8,7 @@ interface Category {
 }
 
 interface FilterProps {
-    onFilterChange: (filters: any) => void;
+    onFilterChange: (filters: { inStock?: boolean; categoryId?: number | null; sort?: string; minPrice?: string; maxPrice?: string }) => void;
     initialCategory: number | null;
 }
 

@@ -85,7 +85,7 @@ function ProductList() {
         fetchProducts();
     }, [fetchProducts]);
 
-    const handleFilterChange = (newFilters: any) => {
+    const handleFilterChange = (newFilters: { search?: string; category?: string; sort?: string; inStock?: boolean }) => {
         setFilters(prev => ({ ...prev, ...newFilters }));
         setPagination(prev => ({ ...prev, page: 1 }));
     };
