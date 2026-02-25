@@ -45,13 +45,13 @@ export default function FilterSidebar({ onFilterChange, initialCategory }: Filte
     };
 
     return (
-        <aside className="bg-white rounded-2xl border border-gray-100 shadow-soft p-6 sticky top-24">
+        <aside className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 sticky top-24">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-gray-900">
                     Kategoriler
                 </h2>
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <button className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
                     <SlidersHorizontal className="w-5 h-5 text-gray-600" />
                 </button>
             </div>
@@ -61,22 +61,22 @@ export default function FilterSidebar({ onFilterChange, initialCategory }: Filte
                 <button
                     onClick={() => handleCategoryChange(null)}
                     className={`
-                        group w-full flex items-center justify-between px-4 py-3 text-left rounded-xl transition-all duration-200 hover:bg-brand-50
-                        ${selectedCategory === null ? 'bg-brand-50 border-2 border-brand-200' : ''}
+                        group w-full flex items-center justify-between px-4 py-3 text-left rounded-xl transition-all duration-200 hover:bg-[#e8e8e0]
+                        ${selectedCategory === null ? 'bg-[#e8e8e0] border-2 border-[#d1d1c4]' : 'border-2 border-transparent'}
                     `}
                 >
                     <div className="flex items-center gap-3">
                         <div className={`
-                            w-10 h-10 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110
-                            ${selectedCategory === null ? 'bg-brand-500 text-white' : 'bg-gradient-to-br from-brand-100 to-brand-200 text-brand-700'}
+                            w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110
+                            ${selectedCategory === null ? 'bg-primary text-white shadow-sm' : 'bg-gray-50 text-gray-500'}
                         `}>
                             <SlidersHorizontal size={20} />
                         </div>
-                        <span className={`font-medium group-hover:text-brand-700 ${selectedCategory === null ? 'text-brand-900' : 'text-gray-700'}`}>
+                        <span className={`font-medium group-hover:text-primary ${selectedCategory === null ? 'text-primary font-bold' : 'text-gray-700'}`}>
                             Tümü
                         </span>
                     </div>
-                    {selectedCategory === null && <ChevronRight className="w-5 h-5 text-brand-600" />}
+                    {selectedCategory === null && <ChevronRight className="w-5 h-5 text-primary" />}
                 </button>
 
                 {categories.map(cat => (
@@ -84,22 +84,22 @@ export default function FilterSidebar({ onFilterChange, initialCategory }: Filte
                         key={cat.id}
                         onClick={() => handleCategoryChange(cat.id)}
                         className={`
-                            group w-full flex items-center justify-between px-4 py-3 text-left rounded-xl transition-all duration-200 hover:bg-brand-50
-                            ${selectedCategory === cat.id ? 'bg-brand-50 border-2 border-brand-200' : ''}
+                            group w-full flex items-center justify-between px-4 py-3 text-left rounded-xl transition-all duration-200 hover:bg-[#e8e8e0]
+                            ${selectedCategory === cat.id ? 'bg-[#e8e8e0] border-2 border-[#d1d1c4]' : 'border-2 border-transparent'}
                         `}
                     >
                         <div className="flex items-center gap-3">
                             <div className={`
-                                w-10 h-10 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110
-                                ${selectedCategory === cat.id ? 'bg-brand-500 text-white' : 'bg-gradient-to-br from-brand-100 to-brand-200 text-brand-700'}
+                                w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110
+                                ${selectedCategory === cat.id ? 'bg-primary text-white shadow-sm' : 'bg-gray-50 text-gray-500'}
                             `}>
                                 {getCategoryIcon(cat.name)}
                             </div>
-                            <span className={`font-medium group-hover:text-brand-700 ${selectedCategory === cat.id ? 'text-brand-900' : 'text-gray-700'}`}>
+                            <span className={`font-medium group-hover:text-primary ${selectedCategory === cat.id ? 'text-primary font-bold' : 'text-gray-700'}`}>
                                 {cat.name}
                             </span>
                         </div>
-                        {selectedCategory === cat.id && <ChevronRight className="w-5 h-5 text-brand-600" />}
+                        {selectedCategory === cat.id && <ChevronRight className="w-5 h-5 text-primary" />}
                     </button>
                 ))}
             </div>
@@ -114,19 +114,19 @@ export default function FilterSidebar({ onFilterChange, initialCategory }: Filte
                             placeholder="Min"
                             value={priceRange.minPrice}
                             onChange={(e) => setPriceRange({ ...priceRange, minPrice: e.target.value })}
-                            className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                            className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-medium"
                         />
                         <input
                             type="number"
                             placeholder="Max"
                             value={priceRange.maxPrice}
                             onChange={(e) => setPriceRange({ ...priceRange, maxPrice: e.target.value })}
-                            className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                            className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-medium"
                         />
                     </div>
                     <button
                         onClick={handlePriceApply}
-                        className="w-full px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm rounded-lg transition-colors"
+                        className="w-full px-4 py-2.5 bg-primary hover:bg-[#1a332a] text-white font-bold text-sm rounded-xl transition-colors shadow-sm"
                     >
                         Uygula
                     </button>

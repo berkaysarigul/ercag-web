@@ -161,7 +161,7 @@ export default function AdminCustomersPage() {
                                 <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                                            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
                                                 {user.name.charAt(0).toUpperCase()}
                                             </div>
                                             <span className="font-medium text-gray-900">{user.name}</span>
@@ -200,7 +200,7 @@ export default function AdminCustomersPage() {
                                         </button>
                                         <button
                                             onClick={() => handleViewOrders(user)}
-                                            className="text-gray-400 hover:text-primary transition-colors"
+                                            className="text-gray-400 hover:text-blue-600 transition-colors"
                                             title="Sipariş Geçmişi"
                                         >
                                             <Eye size={20} />
@@ -250,7 +250,7 @@ export default function AdminCustomersPage() {
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden animate-in zoom-in-95 flex flex-col">
                         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                             <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                                <ShoppingBag className="text-primary" />
+                                <ShoppingBag className="text-blue-600" />
                                 {selectedUser.name} - Sipariş Geçmişi
                             </h2>
                             <button onClick={() => setSelectedUser(null)} className="text-gray-400 hover:text-gray-600">
@@ -259,10 +259,10 @@ export default function AdminCustomersPage() {
                         </div>
                         <div className="flex-1 overflow-y-auto p-6 space-y-4">
                             {ordersLoading ? (
-                                <div className="flex justify-center py-8"><div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div></div>
+                                <div className="flex justify-center py-8"><div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div></div>
                             ) : userOrders.length > 0 ? (
                                 userOrders.map(order => (
-                                    <div key={order.id} className="border border-gray-200 rounded-xl p-4 hover:border-primary/30 transition-colors">
+                                    <div key={order.id} className="border border-gray-200 rounded-xl p-4 hover:border-blue-300 transition-colors">
                                         <div className="flex justify-between items-start mb-3">
                                             <div>
                                                 <div className="font-bold text-gray-900">Sipariş #{order.id}</div>
@@ -288,7 +288,7 @@ export default function AdminCustomersPage() {
                                                 </div>
                                             ))}
                                         </div>
-                                        <div className="text-right font-bold text-primary">
+                                        <div className="text-right font-bold text-blue-600">
                                             Toplam: {Number(order.totalAmount).toFixed(2)} ₺
                                         </div>
                                     </div>

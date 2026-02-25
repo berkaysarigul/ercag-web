@@ -101,7 +101,7 @@ function ProductList() {
     };
 
     return (
-        <div className="container py-8">
+        <div className="container pt-36 pb-12">
             <Breadcrumb />
             <div className="flex flex-col md:flex-row gap-8 py-8">
                 {/* Sidebar */}
@@ -130,17 +130,17 @@ function ProductList() {
                     <div className="flex justify-between items-center mb-8">
                         <div className="flex items-center gap-4">
                             <div>
-                                <h1 className="text-3xl font-bold text-gray-900">
-                                    {filters.search ? `"${filters.search}" için sonuçlar` : 'Tüm Ürünler'}
+                                <h1 className="text-3xl font-serif text-gray-900 tracking-tight">
+                                    {filters.search ? `"${filters.search}" için sonuçlar` : 'Koleksiyonumuzu Keşfedin'}
                                 </h1>
                                 {pagination.total > 0 && (
-                                    <p className="text-sm text-gray-500 mt-1">{pagination.total} ürün bulundu</p>
+                                    <p className="text-sm font-medium text-gray-500 mt-1">{pagination.total} ürün bulundu</p>
                                 )}
                             </div>
                             {filters.search && (
                                 <Link
                                     href="/products"
-                                    className="text-sm bg-red-100 text-red-600 px-3 py-1 rounded-full hover:bg-red-200 transition-colors flex items-center gap-1"
+                                    className="text-sm bg-red-50 text-red-600 px-4 py-2 rounded-full font-medium hover:bg-red-100 transition-colors border border-red-100 shadow-sm flex items-center gap-1.5"
                                 >
                                     Aramayı Temizle
                                 </Link>
@@ -154,7 +154,7 @@ function ProductList() {
                                     setFilters(prev => ({ ...prev, sort: e.target.value }));
                                     setPagination(prev => ({ ...prev, page: 1 }));
                                 }}
-                                className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent bg-white"
+                                className="px-4 py-2.5 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white text-sm text-gray-700 font-medium shadow-sm transition-all cursor-pointer"
                             >
                                 <option value="newest">En Yeni</option>
                                 <option value="price_asc">Fiyat (Artan)</option>
@@ -164,30 +164,30 @@ function ProductList() {
                     </div>
 
                     {loading ? (
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                             {[...Array(8)].map((_, i) => (
                                 <ProductCardSkeleton key={i} />
                             ))}
                         </div>
                     ) : (
                         <>
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
                                 {products.map((product) => (
                                     <ProductCard key={product.id} product={product} />
                                 ))}
                                 {products.length === 0 && (
-                                    <div className="col-span-full text-center py-16">
-                                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <Search size={32} className="text-gray-300" />
+                                    <div className="col-span-full text-center py-20 bg-gray-50 rounded-3xl border border-gray-100">
+                                        <div className="w-24 h-24 bg-white shadow-sm rounded-full flex items-center justify-center mx-auto mb-6">
+                                            <Search size={36} className="text-gray-300" />
                                         </div>
-                                        <h3 className="text-lg font-semibold text-gray-700 mb-2">Ürün Bulunamadı</h3>
-                                        <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+                                        <h3 className="text-xl font-bold text-gray-800 mb-2">Ürün Bulunamadı</h3>
+                                        <p className="text-gray-500 mb-6 max-w-md mx-auto leading-relaxed">
                                             {filters.search
                                                 ? `"${filters.search}" ile eşleşen ürün yok. Farklı bir arama deneyin.`
-                                                : 'Seçtiğiniz filtrelere uygun ürün bulunamadı.'
+                                                : 'Sürdürülebilir ürünlerimiz arasında aradığınız kriterlere uygun sonuç bulunamadı.'
                                             }
                                         </p>
-                                        <Link href="/products" className="btn btn-outline px-6">
+                                        <Link href="/products" className="inline-flex items-center justify-center px-6 py-3 bg-white text-primary font-bold rounded-full border border-gray-200 shadow-sm hover:shadow-md transition-all">
                                             Filtreleri Temizle
                                         </Link>
                                     </div>
@@ -196,13 +196,13 @@ function ProductList() {
 
                             {/* Pagination */}
                             {pagination.totalPages > 1 && (
-                                <div className="flex justify-center items-center gap-1 mt-10">
+                                <div className="flex justify-center items-center gap-1.5 mt-12 bg-white p-2 rounded-2xl w-fit mx-auto border border-gray-100 shadow-sm">
                                     <button
                                         onClick={() => handlePageChange(pagination.page - 1)}
                                         disabled={pagination.page === 1}
-                                        className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                        className="h-10 px-4 text-sm font-semibold rounded-xl hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors text-gray-700 flex items-center"
                                     >
-                                        ← Önceki
+                                        Önceki
                                     </button>
 
                                     {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
@@ -214,14 +214,14 @@ function ProductList() {
                                         }, [])
                                         .map((p, idx) =>
                                             typeof p === 'string' ? (
-                                                <span key={`dots-${idx}`} className="px-2 text-gray-400">…</span>
+                                                <span key={`dots-${idx}`} className="px-3 text-gray-400 font-medium">…</span>
                                             ) : (
                                                 <button
                                                     key={p}
                                                     onClick={() => handlePageChange(p as number)}
-                                                    className={`w-10 h-10 text-sm rounded-lg font-medium transition-colors ${pagination.page === p
-                                                        ? 'bg-brand-600 text-white shadow-md'
-                                                        : 'border border-gray-200 hover:bg-gray-50 text-gray-700'
+                                                    className={`w-10 h-10 text-sm rounded-full font-bold transition-all ${pagination.page === p
+                                                        ? 'bg-primary text-white shadow-md'
+                                                        : 'hover:bg-gray-50 text-gray-700'
                                                         }`}
                                                 >
                                                     {p}
@@ -232,9 +232,9 @@ function ProductList() {
                                     <button
                                         onClick={() => handlePageChange(pagination.page + 1)}
                                         disabled={pagination.page === pagination.totalPages}
-                                        className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                        className="h-10 px-4 text-sm font-semibold rounded-xl hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-colors text-gray-700 flex items-center"
                                     >
-                                        Sonraki →
+                                        Sonraki
                                     </button>
                                 </div>
                             )}

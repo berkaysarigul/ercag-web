@@ -31,7 +31,7 @@ export default function HeroSlider() {
     }, []);
 
     if (loading) return (
-        <div className="h-[380px] md:h-[460px] bg-gradient-to-br from-blue-900 to-blue-700 animate-pulse" />
+        <div className="min-h-[85vh] md:min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 animate-pulse" />
     );
 
     if (slides.length === 0) return null;
@@ -49,39 +49,38 @@ export default function HeroSlider() {
                         return (
                             <div
                                 key={slide.id || index}
-                                className="embla__slide flex-[0_0_100%] min-w-0 relative h-[380px] md:h-[460px]"
+                                className="embla__slide flex-[0_0_100%] min-w-0 relative min-h-[85vh] md:min-h-screen group flex items-center"
                             >
                                 {/* Background */}
                                 <div
                                     className="absolute inset-0 bg-cover bg-center scale-105 transition-transform duration-[8000ms]"
                                     style={{ backgroundImage: `url(${imgSrc})` }}
                                 />
-                                {/* Gradient overlay — bottom-heavy so text pops */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                                {/* Gradient overlay - Balanced for both text and image visibility */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/10" />
 
                                 {/* Content */}
-                                <div className="container relative z-10 h-full flex items-center">
-                                    <div className="max-w-xl text-white">
+                                <div className="container relative z-10 w-full px-6 md:px-12 mt-16 md:mt-24">
+                                    <div className="max-w-3xl text-white">
                                         {slide.subtitle && (
-                                            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest bg-white/15 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full mb-4 block w-fit">
+                                            <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 backdrop-blur-sm text-white/90 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-4 w-fit">
                                                 {slide.subtitle}
                                             </span>
                                         )}
-                                        <h1 className="text-3xl md:text-5xl font-extrabold leading-tight mb-3 drop-shadow-lg">
+                                        <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-white font-medium leading-[1.05] mb-6 drop-shadow-md">
                                             {slide.title}
                                         </h1>
                                         {slide.description && (
-                                            <p className="text-base md:text-lg text-white/80 mb-6 leading-relaxed max-w-md">
+                                            <p className="text-lg md:text-2xl text-white/90 mb-10 leading-relaxed max-w-2xl font-light drop-shadow">
                                                 {slide.description}
                                             </p>
                                         )}
                                         {slide.link && (
                                             <Link
                                                 href={slide.link}
-                                                className="inline-flex items-center gap-2 bg-white text-gray-900 font-bold px-6 py-3 rounded-xl hover:bg-gray-100 active:scale-95 transition-all shadow-xl"
+                                                className="px-10 py-4 bg-white text-primary font-bold rounded-full hover:bg-gray-50 hover:scale-105 hover:shadow-xl shadow-lg inline-flex items-center gap-3 transition-all w-fit text-lg"
                                             >
-                                                İncele <ArrowRight size={18} />
+                                                Koleksiyonu Keşfet <ArrowRight size={20} />
                                             </Link>
                                         )}
                                     </div>
@@ -97,14 +96,14 @@ export default function HeroSlider() {
                 <>
                     <button
                         onClick={scrollPrev}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/15 hover:bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/20 transition-all"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white border border-white/20 transition-all opacity-0 md:opacity-100 group-hover:opacity-100"
                         aria-label="Önceki"
                     >
                         <ArrowLeft size={20} />
                     </button>
                     <button
                         onClick={scrollNext}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/15 hover:bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/20 transition-all"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white border border-white/20 transition-all opacity-0 md:opacity-100 group-hover:opacity-100"
                         aria-label="Sonraki"
                     >
                         <ArrowRight size={20} />
@@ -114,14 +113,14 @@ export default function HeroSlider() {
 
             {/* Dot indicators */}
             {slides.length > 1 && (
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-3">
                     {slides.map((_, i) => (
                         <button
                             key={i}
                             onClick={() => emblaApi?.scrollTo(i)}
                             className={`transition-all duration-300 rounded-full ${i === selectedIndex
-                                    ? 'w-6 h-2 bg-white'
-                                    : 'w-2 h-2 bg-white/40 hover:bg-white/70'
+                                ? 'w-8 h-2 bg-white'
+                                : 'w-2 h-2 bg-white/40 hover:bg-white/70'
                                 }`}
                             aria-label={`Slayt ${i + 1}`}
                         />

@@ -124,7 +124,7 @@ export default function AdminCouponsPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="btn btn-primary w-full"
+                        className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-sm"
                     >
                         {loading ? 'Oluşturuluyor...' : 'Kupon Oluştur'}
                     </button>

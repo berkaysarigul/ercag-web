@@ -3,15 +3,21 @@ const RedisStore = require('rate-limit-redis').default;
 const { redisClient } = require('../config/redis.js');
 
 // Determine store based on environment
-const store = process.env.NODE_ENV === 'test' ? undefined : new RedisStore({
-    sendCommand: (...args) => redisClient.call(...args),
-});
+const getStore = (prefix) => {
+    if (process.env.NODE_ENV === 'test' || !redisClient) {
+        return undefined;
+    }
+    return new RedisStore({
+        sendCommand: (...args) => redisClient.call(...args),
+        prefix: prefix
+    });
+};
 
 // General API Rate Limiter
 const apiLimiter = rateLimit({
-    store,
+    store: getStore('rl:api:'),
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 200, // Limit each IP to 200 requests per `windowMs`
+    max: 1500, // Local development + test ortamında 429 almamak için 200 -> 1500 yapıldı.
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
     handler: (req, res) => {
@@ -21,9 +27,9 @@ const apiLimiter = rateLimit({
 
 // Stricter Auth Rate Limiter (Login, Register etc.)
 const authLimiter = rateLimit({
-    store,
+    store: getStore('rl:auth:'),
     windowMs: 60 * 60 * 1000, // 1 hour
-    max: 10, // Limit each IP to 10 login/register requests per hour
+    max: 50, // BU SINIRI DEBUG VE TEST İÇİN GEÇİCİ OLARAK ARTTIRIYORUZ (10 -> 50)
     standardHeaders: true,
     legacyHeaders: false,
     handler: (req, res) => {

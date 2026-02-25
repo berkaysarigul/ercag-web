@@ -196,7 +196,7 @@ export default function NewProductPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="btn btn-primary px-8 py-3 flex items-center gap-2 text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+                            className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl flex items-center gap-2 text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
                         >
                             {loading ? 'Kaydediliyor...' : (
                                 <>

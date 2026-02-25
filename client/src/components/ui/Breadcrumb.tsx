@@ -27,7 +27,7 @@ export default function Breadcrumb({ productName }: { productName?: string }) {
         <nav className="flex text-sm text-gray-500 mb-6" aria-label="Breadcrumb">
             <ol className="inline-flex items-center space-x-1 md:space-x-3">
                 <li className="inline-flex items-center">
-                    <Link href="/" className="hover:text-[var(--primary)] transition-colors">
+                    <Link href="/" className="hover:text-blue-600 transition-colors">
                         Ana Sayfa
                     </Link>
                 </li>
@@ -48,7 +48,7 @@ export default function Breadcrumb({ productName }: { productName?: string }) {
                                         {displayName}
                                     </span>
                                 ) : (
-                                    <Link href={href} className="hover:text-[var(--primary)] transition-colors capitalize">
+                                    <Link href={href} className="hover:text-blue-600 transition-colors capitalize">
                                         {displayName}
                                     </Link>
                                 )}

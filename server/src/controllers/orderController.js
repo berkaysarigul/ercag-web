@@ -291,8 +291,8 @@ const updateOrderStatus = async (req, res) => {
         const email = order.email || order.user?.email;
         const phone = order.phoneNumber || order.user?.phone;
 
-        if (email) {
-            await sendOrderStatusNotification(order.id, status, email, phone);
+        if (email || phone) {
+            await sendOrderStatusNotification(order.id, status, email, phone, order.pickupCode);
         }
 
         const updatedOrder = await prisma.order.findUnique({ where: { id: parseInt(id) } });

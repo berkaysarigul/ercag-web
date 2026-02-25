@@ -3,25 +3,29 @@
 @tailwind utilities;
 
 :root {
-  /* Colors - Erçağ Branding */
-  --primary: #1e3a8a;
-  --primary-light: #2563eb;
-  --secondary: #fbbf24;
-  --secondary-hover: #f59e0b;
-  --accent: #fbbf24;        /* UI-01: Tanımsız --accent eklendi */
-  --accent-hover: #f59e0b;  /* UI-01: --accent-hover da eklendi */
-  --background: #f8fafc;
+  /* Colors - Eco Branding */
+  --primary: #264a3d;
+  /* Eco Green */
+  --primary-light: #478f73;
+  --primary-dark: #1b3529;
+  --secondary: #e5b54e;
+  /* Warm Accent / Gold */
+  --accent: #d4af37;
+  --accent-hover: #b8972e;
+  --background: #f4f4f0;
+  /* Off-white / Beige */
   --surface: #ffffff;
-  --text-main: #0f172a;
-  --text-secondary: #64748b;
-  --border: #e2e8f0;
+  --text-main: #2D3748;
+  --text-secondary: #4A5568;
+  --border: #E2E8F0;
   --error: #ef4444;
   --success: #10b981;
   --warning: #f59e0b;
-  --info: #3b82f6;
+  --info: #478f73;
 
   /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
 
   /* Spacing */
   --spacing-xs: 0.25rem;
@@ -66,15 +70,20 @@ button {
   font-family: inherit;
 }
 
-/* UI-30: .container kaldırıldı — Tailwind'in container'ı kullanılıyor */
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-md);
-  font-weight: 600;
+  border-radius: var(--radius-full);
+  /* Yuvarlak hatlar */
+  font-weight: 500;
   transition: all 0.2s ease;
   border: none;
 }
@@ -82,17 +91,23 @@ button {
 .btn-primary {
   background-color: var(--primary);
   color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-full);
+  transition: all 0.2s;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-light);
+  background-color: var(--primary-dark);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
   transform: translateY(-1px);
 }
 
 /* UI-01: btn-accent artık --accent tanımlı olduğu için çalışacak */
 .btn-accent {
   background-color: var(--accent);
-  color: #1e293b;
+  color: white;
+  border-radius: var(--radius-full);
 }
 
 .btn-accent:hover {
@@ -103,11 +118,12 @@ button {
 /* UI-06: Eksik buton stilleri eklendi */
 .btn-secondary {
   background-color: var(--secondary);
-  color: #1e293b;
+  color: white;
+  border-radius: var(--radius-full);
 }
 
 .btn-secondary:hover {
-  background-color: var(--secondary-hover);
+  background-color: var(--accent-hover);
   transform: translateY(-1px);
 }
 
@@ -115,6 +131,7 @@ button {
   background-color: transparent;
   color: var(--text-main);
   border: 1px solid var(--border);
+  border-radius: var(--radius-full);
 }
 
 .btn-outline:hover {
@@ -125,6 +142,7 @@ button {
 .btn-success {
   background-color: var(--success);
   color: white;
+  border-radius: var(--radius-full);
 }
 
 .btn-success:hover {

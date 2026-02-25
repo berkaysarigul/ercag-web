@@ -1,36 +1,39 @@
 const Redis = require('ioredis');
 
-// Create a single Redis instance to be used across the app
-let redisClient;
+let redisClient = null;
 
-if (process.env.NODE_ENV === 'test') {
-    // Mock Redis for Jest tests to prevent ECONNREFUSED
-    redisClient = {
-        call: async () => { },
-        on: () => { },
-        keys: async () => [],
-        del: async () => { }
-    };
-} else {
-    try {
-        redisClient = new Redis(process.env.REDIS_URL || 'redis://127.0.0.1:6379', {
-            maxRetriesPerRequest: null,
-            enableReadyCheck: false,
-            retryStrategy(times) {
-                if (times > 10) {
-                    console.error('⚠️ Redis connection failed: Max retries reached.');
-                    return null;
+if (process.env.USE_REDIS === 'true') {
+    if (process.env.NODE_ENV === 'test') {
+        // Mock Redis for Jest tests to prevent ECONNREFUSED
+        redisClient = {
+            call: async () => { },
+            on: () => { },
+            keys: async () => [],
+            del: async () => { }
+        };
+    } else {
+        try {
+            redisClient = new Redis(process.env.REDIS_URL || 'redis://127.0.0.1:6379', {
+                maxRetriesPerRequest: null,
+                enableReadyCheck: false,
+                retryStrategy(times) {
+                    if (times > 10) {
+                        console.error('⚠️ Redis connection failed: Max retries reached.');
+                        return null;
+                    }
+                    return Math.min(times * 50, 2000);
                 }
-                return Math.min(times * 50, 2000);
-            }
-        });
+            });
 
-        redisClient.on('connect', () => console.log('✅ Redis connected successfully.'));
-        redisClient.on('error', (err) => console.error('❌ Redis Client Error:', err.message));
+            redisClient.on('connect', () => console.log('✅ Redis connected successfully.'));
+            redisClient.on('error', (err) => console.error('❌ Redis Client Error:', err.message));
 
-    } catch (error) {
-        console.error('❌ Failed to initialize Redis:', error);
+        } catch (error) {
+            console.error('❌ Failed to initialize Redis:', error);
+        }
     }
+} else {
+    console.log('ℹ️ Redis is disabled (USE_REDIS=false). Using Memory fallback.');
 }
 
 // Helper to invalidate cache keys by pattern

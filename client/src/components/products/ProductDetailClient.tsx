@@ -156,14 +156,14 @@ export default function ProductDetailClient({ product }: { product: Product }) {
     const displayPrice = discount ? discount.discountedPrice : price;
 
     return (
-        <div className="container py-8">
+        <div className="container pt-28 pb-8">
             <nav className="flex text-sm text-gray-500 mb-6" aria-label="Breadcrumb">
                 <ol className="inline-flex items-center space-x-1">
-                    <li><Link href="/" className="hover:text-brand-600 transition-colors">Ana Sayfa</Link></li>
+                    <li><Link href="/" className="hover:text-blue-600 transition-colors">Ana Sayfa</Link></li>
                     <span className="mx-2 text-gray-300">/</span>
-                    <li><Link href="/products" className="hover:text-brand-600 transition-colors">Ürünler</Link></li>
+                    <li><Link href="/products" className="hover:text-blue-600 transition-colors">Ürünler</Link></li>
                     <span className="mx-2 text-gray-300">/</span>
-                    <li><Link href={`/products?category=${product.category?.id || ''}`} className="hover:text-brand-600 transition-colors">{product.category?.name}</Link></li>
+                    <li><Link href={`/products?category=${product.category?.id || ''}`} className="hover:text-blue-600 transition-colors">{product.category?.name}</Link></li>
                     <span className="mx-2 text-gray-300">/</span>
                     <li className="text-gray-900 font-medium truncate max-w-[200px]">{product.name}</li>
                 </ol>
@@ -200,7 +200,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                                     onClick={() => setSelectedImage(img)}
                                     className={cn(
                                         "aspect-square rounded-lg bg-gray-50 border cursor-pointer overflow-hidden relative transition-all",
-                                        selectedImage === img ? "border-[var(--primary)] ring-2 ring-[var(--primary)] ring-offset-1" : "hover:border-[var(--primary)]"
+                                        selectedImage === img ? "border-blue-600 ring-2 ring-blue-600 ring-offset-1" : "hover:border-blue-600"
                                     )}
                                 >
                                     <Image
@@ -236,7 +236,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                                     <div className="text-3xl font-bold text-red-600">{displayPrice.toFixed(2)} ₺</div>
                                 </>
                             ) : (
-                                <div className="text-3xl font-bold text-[var(--primary)]">{price.toFixed(2)} ₺</div>
+                                <div className="text-3xl font-bold text-blue-600">{price.toFixed(2)} ₺</div>
                             )}
                         </div>
                         {discount && (
@@ -290,7 +290,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                                             addToCart({ ...product, price: displayPrice, quantity });
                                             toast.success('Ürün sepete eklendi');
                                         }}
-                                        className="btn btn-primary flex-1 text-lg"
+                                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-md hover:shadow-lg flex-1 text-lg py-3 flex items-center justify-center gap-2"
                                     >
                                         Sepete Ekle
                                     </button>
@@ -299,7 +299,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                                 <button
                                     onClick={handleStockAlert}
                                     disabled={alertSubscribed}
-                                    className={`btn w-full text-lg ${alertSubscribed ? 'btn-success text-white' : 'btn-outline'}`}
+                                    className={`py-3 px-6 rounded-xl font-bold w-full text-lg transition-all ${alertSubscribed ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-md' : 'border-2 border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'}`}
                                 >
                                     {alertSubscribed ? <span className="flex items-center justify-center gap-2"><CheckCircle size={18} /> Haber Verilecek</span> : <span className="flex items-center justify-center gap-2"><Bell size={18} /> Gelince Haber Ver</span>}
                                 </button>
@@ -307,11 +307,11 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                             <button
                                 onClick={toggleWishlist}
                                 className={cn(
-                                    "btn btn-outline px-6 text-2xl transition-colors flex items-center justify-center",
-                                    inWishlist ? "text-red-500 border-red-500 bg-red-50" : "text-gray-400 hover:text-red-500"
+                                    "border-2 rounded-xl px-6 text-2xl transition-all flex items-center justify-center hover:shadow-md",
+                                    inWishlist ? "border-red-500 bg-red-50 text-red-500" : "border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200"
                                 )}
                             >
-                                {inWishlist ? <Heart size={20} className="fill-red-500 text-red-500" /> : <Heart size={20} />}
+                                {inWishlist ? <Heart size={24} className="fill-red-500 text-red-500" /> : <Heart size={24} />}
                             </button>
                         </div>
 
@@ -349,19 +349,19 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                 <div className="flex border-b">
                     <button
                         onClick={() => setActiveTab('description')}
-                        className={cn("px-8 py-4 font-medium border-b-2 transition-colors", activeTab === 'description' ? "border-[var(--primary)] text-[var(--primary)]" : "border-transparent text-gray-500 hover:text-gray-700")}
+                        className={cn("px-8 py-4 font-medium border-b-2 transition-colors", activeTab === 'description' ? "border-blue-600 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700")}
                     >
                         Açıklama
                     </button>
                     <button
                         onClick={() => setActiveTab('specs')}
-                        className={cn("px-8 py-4 font-medium border-b-2 transition-colors", activeTab === 'specs' ? "border-[var(--primary)] text-[var(--primary)]" : "border-transparent text-gray-500 hover:text-gray-700")}
+                        className={cn("px-8 py-4 font-medium border-b-2 transition-colors", activeTab === 'specs' ? "border-blue-600 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700")}
                     >
                         Özellikler
                     </button>
                     <button
                         onClick={() => setActiveTab('reviews')}
-                        className={cn("px-8 py-4 font-medium border-b-2 transition-colors", activeTab === 'reviews' ? "border-[var(--primary)] text-[var(--primary)]" : "border-transparent text-gray-500 hover:text-gray-700")}
+                        className={cn("px-8 py-4 font-medium border-b-2 transition-colors", activeTab === 'reviews' ? "border-blue-600 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700")}
                     >
                         Yorumlar ({stats.count})
                     </button>
@@ -417,9 +417,9 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                             {user ? (
                                 <ReviewForm productId={product.id} onReviewAdded={fetchReviews} />
                             ) : (
-                                <div className="bg-gray-50 p-6 rounded-xl border mb-8 text-center">
-                                    <p className="text-gray-600 mb-4">Yorum yapmak için giriş yapmalısınız.</p>
-                                    <Link href="/auth" className="btn btn-primary inline-block">
+                                <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 mb-8 text-center">
+                                    <p className="text-gray-600 mb-4 font-medium">Yorum yapmak için giriş yapmalısınız.</p>
+                                    <Link href="/auth" className="inline-flex py-2.5 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-sm">
                                         Giriş Yap
                                     </Link>
                                 </div>
@@ -441,7 +441,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                             <h2 className="text-2xl font-bold text-gray-900">Benzer Ürünler</h2>
                             <p className="text-gray-500 text-sm mt-1">{product.category?.name} kategorisinden</p>
                         </div>
-                        <Link href={`/products?category=${(product as any).categoryId || product.category?.id || ''}`} className="text-sm font-semibold text-brand-600 hover:underline">
+                        <Link href={`/products?category=${(product as any).categoryId || product.category?.id || ''}`} className="text-sm font-semibold text-blue-600 hover:underline">
                             Tümünü Gör →
                         </Link>
                     </div>

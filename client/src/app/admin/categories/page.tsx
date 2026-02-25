@@ -92,7 +92,7 @@ export default function AdminCategoriesPage() {
             {/* Add Category */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
                 <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <Plus size={20} className="text-primary" />
+                    <Plus size={20} className="text-blue-600" />
                     Yeni Kategori Ekle
                 </h3>
                 <form onSubmit={handleAddCategory} className="flex gap-4">
@@ -104,7 +104,7 @@ export default function AdminCategoriesPage() {
                         onChange={(e) => setNewCategoryName(e.target.value)}
                         disabled={loading}
                     />
-                    <button type="submit" className="btn btn-primary px-8" disabled={loading}>
+                    <button type="submit" className="px-8 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-sm" disabled={loading}>
                         {loading ? 'Ekleniyor...' : 'Ekle'}
                     </button>
                 </form>

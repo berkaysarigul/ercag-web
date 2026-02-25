@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 import api from '@/lib/api';
 import ProductCard from '@/components/products/ProductCard';
 
@@ -50,14 +51,15 @@ export default function FeaturedProducts() {
     return (
         <section className="py-20 bg-white">
             <div className="container">
-                <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
-                    <div>
-                        <h2 className="text-3xl font-bold text-gray-900 mb-2">Çok Satan Ürünler</h2>
-                        <p className="text-gray-500">Müşterilerimizin en çok tercih ettiği ürünleri keşfedin.</p>
+                <div className="flex flex-col mb-10 gap-2">
+                    <h2 className="text-3xl font-serif text-gray-900 tracking-tight">
+                        Gezegen Dostu Özenle Seçilmiş<br />En Çok Satan <span className="italic font-normal opacity-80">Ürünler</span>
+                    </h2>
+                    <div className="flex justify-end w-full">
+                        <Link href="/products" className="text-sm font-semibold text-gray-900 hover:text-primary transition-colors flex items-center gap-1">
+                            Tümünü Gör <ArrowRight size={16} />
+                        </Link>
                     </div>
-                    <Link href="/products" className="btn btn-outline border-gray-200 hover:border-primary hover:text-primary transition-all">
-                        Tüm Ürünleri Gör
-                    </Link>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">

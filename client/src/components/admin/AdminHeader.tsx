@@ -57,14 +57,14 @@ export default function AdminHeader() {
                     <input
                         type="text"
                         placeholder="Ara..."
-                        className="pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary w-64 transition-all"
+                        className="pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 w-64 transition-all"
                     />
                 </div>
 
                 {/* Notifications */}
                 <button className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors">
                     <Bell size={20} />
-                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-danger rounded-full border-2 border-white"></span>
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
                 </button>
 
                 {/* Profile — UI-22: Gerçek kullanıcı adı ve rolü */}
@@ -73,7 +73,7 @@ export default function AdminHeader() {
                         <p className="text-sm font-semibold text-gray-700">{user?.name || 'Admin'}</p>
                         <p className="text-xs text-gray-500">{getRoleLabel()}</p>
                     </div>
-                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary border border-primary/20">
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 border border-blue-200">
                         <User size={20} />
                     </div>
                 </div>

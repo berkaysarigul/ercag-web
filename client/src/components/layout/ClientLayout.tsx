@@ -13,7 +13,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     return (
         <>
             {!isAdmin && <Header />}
-            <main className={!isAdmin ? "flex-grow py-8 min-h-[calc(100vh-160px)] pb-24 md:pb-8" : ""}>
+            <main className={!isAdmin ? "flex-grow min-h-[calc(100vh-160px)] pb-24 md:pb-0" : ""}>
                 {children}
             </main>
             {!isAdmin && <Footer />}

@@ -22,7 +22,7 @@ export default function Error({
             </p>
             <button
                 onClick={() => reset()}
-                className="btn btn-primary"
+                className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-md hover:shadow-lg inline-flex items-center justify-center"
             >
                 Tekrar Dene
             </button>

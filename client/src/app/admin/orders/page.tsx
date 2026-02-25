@@ -163,7 +163,7 @@ export default function AdminOrdersPage() {
                             key={tab}
                             onClick={() => setActiveTab(tab)}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${activeTab === tab
-                                ? 'bg-primary-600 text-white shadow-sm'
+                                ? 'bg-blue-600 text-white shadow-sm'
                                 : 'text-gray-500 hover:bg-gray-100'
                                 }`}
                         >
@@ -183,7 +183,7 @@ export default function AdminOrdersPage() {
                 <input
                     type="text"
                     placeholder="Sipariş No, Müşteri Adı, Telefon veya Teslimat Kodu ile ara..."
-                    className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all shadow-sm outline-none"
+                    className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm outline-none"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -215,7 +215,7 @@ export default function AdminOrdersPage() {
 
                                 {/* Right: Total & Action */}
                                 <div className="text-right flex flex-col items-end gap-3">
-                                    <div className="text-2xl font-bold text-primary-600">{Number(order.totalAmount).toFixed(2)} ₺</div>
+                                    <div className="text-2xl font-bold text-blue-600">{Number(order.totalAmount).toFixed(2)} ₺</div>
                                     <button
                                         onClick={() => openOrderDetails(order)}
                                         className="btn btn-sm bg-gray-900 text-white hover:bg-gray-800 flex items-center gap-2 shadow-sm"

@@ -77,7 +77,7 @@ export default function ReviewForm({ productId, onReviewAdded }: ReviewFormProps
                     <textarea
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
-                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none"
+                        className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
                         rows={3}
                         placeholder="Ürün hakkında düşünceleriniz..."
                     />
@@ -88,7 +88,7 @@ export default function ReviewForm({ productId, onReviewAdded }: ReviewFormProps
                 <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="btn btn-primary w-full md:w-auto px-8"
+                    className="w-full md:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-sm"
                 >
                     {isSubmitting ? 'Gönderiliyor...' : 'Yorumu Gönder'}
                 </button>

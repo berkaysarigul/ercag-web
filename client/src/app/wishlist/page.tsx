@@ -50,10 +50,10 @@ export default function WishlistPage() {
         }
     };
 
-    if (loading) return <div className="container py-12 text-center">Yükleniyor...</div>;
+    if (loading) return <div className="container pt-28 pb-12 text-center">Yükleniyor...</div>;
 
     return (
-        <div className="container py-8">
+        <div className="container pt-28 pb-8">
             <Breadcrumb />
             <div className="flex items-center justify-between mb-8 mt-6">
                 <h1 className="text-3xl font-bold text-gray-900">Favorilerim</h1>
@@ -69,7 +69,7 @@ export default function WishlistPage() {
                     </div>
                     <h3 className="text-lg font-semibold text-gray-700 mb-2">Favorileriniz Boş</h3>
                     <p className="text-gray-500 mb-6">Beğendiğiniz ürünleri favorilerinize ekleyerek daha sonra kolayca bulabilirsiniz.</p>
-                    <Link href="/products" className="btn btn-primary px-8">
+                    <Link href="/products" className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-md hover:shadow-lg inline-flex items-center justify-center">
                         Alışverişe Başla
                     </Link>
                 </div>
@@ -111,13 +111,13 @@ export default function WishlistPage() {
                                                 <span className="font-bold text-red-600">{discount.discountedPrice.toFixed(2)} ₺</span>
                                             </div>
                                         ) : (
-                                            <span className="font-bold text-[var(--primary)]">{price.toFixed(2)} ₺</span>
+                                            <span className="text-lg font-bold text-blue-600">{price.toFixed(2)} ₺</span>
                                         );
                                     })()}
                                 </div>
                             </Link>
                             <button
-                                className="btn btn-primary w-full mt-4"
+                                className="w-full py-3 mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-md hover:shadow-lg flex items-center justify-center"
                                 onClick={() => addToCart({ ...item.product, id: item.productId } as any)}
                             >
                                 Sepete Ekle

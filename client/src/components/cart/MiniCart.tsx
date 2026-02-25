@@ -56,9 +56,9 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
 
                         {/* Icon Container */}
                         <div className="relative w-32 h-32 mb-6">
-                            <div className="absolute inset-0 bg-gradient-to-br from-brand-100 to-brand-200 rounded-full animate-pulse"></div>
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full animate-pulse"></div>
                             <div className="relative w-full h-full flex items-center justify-center">
-                                <ShoppingBag className="w-16 h-16 text-brand-600" />
+                                <ShoppingBag className="w-16 h-16 text-blue-600" />
                             </div>
                         </div>
 
@@ -74,7 +74,7 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
                         {/* CTA Button */}
                         <button
                             onClick={onClose}
-                            className="px-8 py-4 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center gap-2"
+                            className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center gap-2"
                         >
                             <Sparkles className="w-5 h-5" />
                             Ürünleri İncele
@@ -117,7 +117,7 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
                         {/* Items */}
                         <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-white">
                             {items.map((item) => (
-                                <div key={item.id} className="group flex gap-4 p-4 bg-gray-50 hover:bg-brand-50 rounded-2xl transition-all duration-200 border border-transparent hover:border-brand-200 relative">
+                                <div key={item.id} className="group flex gap-4 p-4 bg-gray-50 hover:bg-blue-50 rounded-2xl transition-all duration-200 border border-transparent hover:border-blue-200 relative">
                                     {/* Image */}
                                     <div className="relative flex-shrink-0 w-24 h-24 bg-white rounded-xl overflow-hidden border border-gray-100">
                                         {item.image ? (
@@ -150,7 +150,7 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
                                             )}
                                         </div>
                                         <div className="flex items-center justify-between">
-                                            <span className="text-lg font-bold text-brand-600">
+                                            <span className="text-lg font-bold text-blue-600">
                                                 {Number(item.price).toFixed(2)} ₺
                                             </span>
 
@@ -219,7 +219,7 @@ export default function MiniCart({ isOpen, onClose }: MiniCartProps) {
                             <Link
                                 href="/cart"
                                 onClick={onClose}
-                                className="w-full py-4 bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white font-bold text-lg rounded-xl shadow-strong hover:shadow-hover transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2"
+                                className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold text-lg rounded-xl shadow-strong hover:shadow-hover transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2"
                             >
                                 <ShoppingBag className="w-5 h-5" />
                                 Siparişi Tamamla

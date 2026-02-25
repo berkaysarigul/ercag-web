@@ -51,24 +51,24 @@ export default function CampaignBanner() {
 
                 if (campaign.type === 'FLASH_SALE') {
                     return (
-                        <div key={campaign.id} className="bg-gradient-to-r from-red-600 to-orange-500 text-white p-4 rounded-xl shadow-lg flex flex-col md:flex-row items-center justify-between gap-3">
+                        <div key={campaign.id} className="bg-gradient-to-r from-rose-600 to-red-500 text-white p-5 rounded-2xl shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
                             <div className="flex items-center gap-4">
-                                <div className="bg-white/20 p-3 rounded-full animate-pulse shrink-0">
+                                <div className="bg-white/20 p-3.5 rounded-xl animate-pulse shrink-0">
                                     <Zap size={24} className="text-yellow-300" />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-xl">{campaign.name}</h3>
+                                    <h3 className="font-bold text-xl mb-0.5">{campaign.name}</h3>
                                     <p className="text-white/90 text-sm">Seçili ürünlerde %{config.discountPercent} indirim!</p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-2 bg-black/20 px-4 py-2 rounded-lg font-mono font-bold text-lg">
+                            <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                                <div className="flex items-center justify-center gap-2 bg-black/20 w-full sm:w-auto px-5 py-2.5 rounded-xl font-mono font-bold text-lg border border-white/10">
                                     <Clock size={18} />
                                     <span>{timeLeft[campaign.id] || '...'}</span>
                                 </div>
                                 <Link href={`/products?category=${config.categoryId}`}
-                                    className="bg-white text-blue-600 px-6 py-2 rounded-full font-bold hover:bg-blue-50 transition-colors shadow-sm whitespace-nowrap">
-                                    İncele →
+                                    className="bg-white text-rose-600 w-full sm:w-auto text-center px-6 py-2.5 rounded-xl font-bold hover:bg-rose-50 transition-colors shadow-sm whitespace-nowrap">
+                                    Fırsatı Yakala
                                 </Link>
                             </div>
                         </div>
@@ -77,18 +77,18 @@ export default function CampaignBanner() {
 
                 if (campaign.type === 'CATEGORY_DISCOUNT') {
                     return (
-                        <div key={campaign.id} className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white p-4 rounded-xl shadow-md flex items-center justify-between gap-3">
-                            <div className="flex items-center gap-3">
-                                <div className="bg-white/20 p-2.5 rounded-full shrink-0">
-                                    <Tag size={20} />
+                        <div key={campaign.id} className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-5 rounded-2xl shadow-md flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div className="flex items-center gap-4">
+                                <div className="bg-white/20 p-3 rounded-xl shrink-0">
+                                    <Tag size={22} />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-lg">{campaign.name}</h3>
-                                    <p className="text-sm text-white/90">Kategoride %{config.discountPercent} indirim fırsatı</p>
+                                    <h3 className="font-bold text-lg mb-0.5">{campaign.name}</h3>
+                                    <p className="text-sm text-blue-100">Kategoride %{config.discountPercent} indirim fırsatı</p>
                                 </div>
                             </div>
-                            <Link href={`/products?categoryId=${config.categoryId}`}
-                                className="bg-white/20 hover:bg-white/30 px-5 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap shrink-0">
+                            <Link href={`/products?category=${config.categoryId}`}
+                                className="bg-white/10 hover:bg-white/20 border border-white/20 px-6 py-2.5 rounded-xl text-sm font-semibold transition-colors whitespace-nowrap text-center w-full md:w-auto">
                                 Alışverişe Başla
                             </Link>
                         </div>
@@ -97,18 +97,18 @@ export default function CampaignBanner() {
 
                 if (campaign.type === 'BUY_X_GET_Y') {
                     return (
-                        <div key={campaign.id} className="bg-gradient-to-r from-purple-600 to-pink-500 text-white p-4 rounded-xl shadow-md flex items-center justify-between gap-3">
-                            <div className="flex items-center gap-3">
-                                <div className="bg-white/20 p-2.5 rounded-full shrink-0">
-                                    <ShoppingBag size={20} />
+                        <div key={campaign.id} className="bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white p-5 rounded-2xl shadow-md flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div className="flex items-center gap-4">
+                                <div className="bg-white/20 p-3 rounded-xl shrink-0">
+                                    <ShoppingBag size={22} />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-lg">{campaign.name}</h3>
-                                    <p className="text-sm text-white/90">{config.buyQuantity} al, {config.payQuantity} öde kampanyası!</p>
+                                    <h3 className="font-bold text-lg mb-0.5">{campaign.name}</h3>
+                                    <p className="text-sm text-fuchsia-100">{config.buyQuantity} al, {config.payQuantity} öde kampanyası!</p>
                                 </div>
                             </div>
                             <Link href="/products"
-                                className="bg-white/20 hover:bg-white/30 px-5 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap shrink-0">
+                                className="bg-white/10 hover:bg-white/20 border border-white/20 px-6 py-2.5 rounded-xl text-sm font-semibold transition-colors whitespace-nowrap text-center w-full md:w-auto">
                                 Keşfet
                             </Link>
                         </div>

@@ -113,15 +113,15 @@ export default function ProfilePage() {
     if (authLoading || !user) return <ProfileSkeleton />;
 
     return (
-        <div className="container py-12">
-            <h1 className="text-3xl font-bold text-primary mb-8">Hesabım</h1>
+        <div className="container pt-28 pb-12">
+            <h1 className="text-3xl font-bold text-blue-600 mb-8">Hesabım</h1>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                 {/* Sidebar */}
                 <div className="md:col-span-1">
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                         <div className="p-6 bg-gray-50 border-b border-gray-200 text-center">
-                            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-3">
+                            <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mx-auto mb-3">
                                 <User size={32} />
                             </div>
                             <h3 className="font-bold text-gray-900">{user.name}</h3>
@@ -130,19 +130,19 @@ export default function ProfilePage() {
                         <nav className="p-2">
                             <button
                                 onClick={() => setActiveTab('profile')}
-                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'profile' ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50'}`}
+                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'profile' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'}`}
                             >
                                 <User size={20} /> Profil Bilgileri
                             </button>
                             <button
                                 onClick={() => setActiveTab('orders')}
-                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'orders' ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50'}`}
+                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'orders' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'}`}
                             >
                                 <ShoppingBag size={20} /> Siparişlerim
                             </button>
                             <button
                                 onClick={() => setActiveTab('password')}
-                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'password' ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50'}`}
+                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'password' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'}`}
                             >
                                 <Key size={20} /> Şifre Değiştir
                             </button>
@@ -191,7 +191,7 @@ export default function ProfilePage() {
                                         placeholder="0555 123 45 67"
                                     />
                                 </div>
-                                <button type="submit" className="btn btn-primary" disabled={loading}>
+                                <button type="submit" className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-sm" disabled={loading}>
                                     {loading ? 'Güncelleniyor...' : 'Bilgileri Güncelle'}
                                 </button>
                             </form>
@@ -227,7 +227,7 @@ export default function ProfilePage() {
                                         onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                                     />
                                 </div>
-                                <button type="submit" className="btn btn-primary" disabled={loading}>
+                                <button type="submit" className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-sm" disabled={loading}>
                                     {loading ? 'Güncelleniyor...' : 'Şifreyi Güncelle'}
                                 </button>
                             </form>
@@ -290,7 +290,7 @@ export default function ProfilePage() {
                                                         )}
                                                     </div>
                                                     <div className="text-right">
-                                                        <p className="font-bold text-primary text-xl">{Number(order.totalAmount).toFixed(2)} ₺</p>
+                                                        <p className="font-bold text-blue-600 text-xl">{Number(order.totalAmount).toFixed(2)} ₺</p>
                                                         {order.pickupCode && (
                                                             <div className="text-xs bg-gray-100 px-2 py-1 rounded mt-1 inline-block font-mono">
                                                                 Kod: <strong>{order.pickupCode}</strong>

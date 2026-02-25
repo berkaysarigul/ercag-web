@@ -28,20 +28,22 @@ export default function MobileBottomNav() {
                     <Link
                         key={item.href}
                         href={item.href}
-                        className={`flex flex-col items-center gap-1 p-2 transition-all duration-300 relative ${isActive ? 'text-[var(--primary)] -translate-y-1' : 'text-gray-400 hover:text-gray-600'}`}
+                        className={`flex flex-col items-center justify-center w-14 gap-1 p-1 transition-all duration-300 relative ${isActive ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
                     >
-                        {isActive && (
-                            <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[var(--primary)] rounded-full shadow-[0_0_8px_var(--primary)] animate-pulse"></span>
-                        )}
-                        <div className={`relative transition-transform duration-300 ${isActive ? 'scale-110' : ''}`}>
-                            <item.icon size={24} strokeWidth={isActive ? 2.5 : 2} />
-                            {item.badge !== undefined && item.badge > 0 && (
-                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border border-white">
-                                    {item.badge}
-                                </span>
+                        <div className="relative flex flex-col items-center">
+                            {isActive && (
+                                <span className="absolute -top-3 w-1 h-1 bg-blue-600 rounded-full"></span>
                             )}
+                            <div className="relative">
+                                <item.icon size={22} strokeWidth={isActive ? 2.5 : 1.5} className="mt-1" />
+                                {item.badge !== undefined && item.badge > 0 && (
+                                    <span className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[10px] font-bold w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm">
+                                        {item.badge > 9 ? '9+' : item.badge}
+                                    </span>
+                                )}
+                            </div>
+                            <span className="text-[10px] font-medium mt-1">{item.label}</span>
                         </div>
-                        <span className="text-[10px] font-medium">{item.label}</span>
                     </Link>
                 );
             })}

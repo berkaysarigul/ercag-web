@@ -134,7 +134,7 @@ export default function AdminProductsPage() {
                             <Trash2 size={20} /> Seçilenleri Sil ({selectedIds.length})
                         </button>
                     )}
-                    <Link href="/admin/products/new" className="btn btn-primary flex items-center gap-2">
+                    <Link href="/admin/products/new" className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors shadow-sm flex items-center gap-2">
                         <Plus size={20} /> Yeni Ürün Ekle
                     </Link>
                 </div>
@@ -229,7 +229,7 @@ export default function AdminProductsPage() {
                                         <div className="flex items-center justify-end gap-2">
                                             <Link
                                                 href={`/admin/products/${product.id}`}
-                                                className="p-2 text-gray-400 hover:text-primary hover:bg-blue-50 rounded-lg transition-colors"
+                                                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                 title="Düzenle"
                                             >
                                                 <Edit size={18} />

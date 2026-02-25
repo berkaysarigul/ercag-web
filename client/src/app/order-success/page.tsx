@@ -11,11 +11,11 @@ function SuccessContent() {
     const amount = searchParams.get('amount');
 
     return (
-        <div className="container text-center py-16">
+        <div className="container text-center pt-28 pb-16">
             <div className="bg-white border rounded-2xl shadow-sm max-w-2xl mx-auto p-12">
                 <div className="text-6xl mb-6">🎉</div>
-                <h1 className="text-3xl mb-4 text-[var(--primary)] font-bold">Siparişiniz Alındı!</h1>
-                <p className="text-lg text-[var(--text-secondary)] mb-8">
+                <h1 className="text-3xl mb-4 text-blue-600 font-bold">Siparişiniz Alındı!</h1>
+                <p className="text-lg text-gray-500 mb-8">
                     Siparişiniz başarıyla oluşturuldu. Ekibimiz en kısa sürede hazırlamaya başlayacak.
                     <br />
                     Sipariş durumunu "Siparişlerim" sayfasından takip edebilirsiniz.
@@ -30,12 +30,12 @@ function SuccessContent() {
                             </div>
                             <div className="text-right">
                                 <p className="text-sm text-gray-500 mb-1">Tutar</p>
-                                <p className="font-bold text-brand-600 text-2xl">{Number(amount).toFixed(2)} ₺</p>
+                                <p className="font-bold text-blue-600 text-2xl">{Number(amount).toFixed(2)} ₺</p>
                             </div>
                         </div>
 
                         <p className="text-sm text-gray-500 mb-2">Teslimat Kodunuz:</p>
-                        <p className="text-5xl font-bold tracking-widest text-[var(--primary)] m-0">{code}</p>
+                        <p className="text-5xl font-bold tracking-widest text-blue-600 m-0">{code}</p>
                         <p className="text-sm text-gray-500 mt-4">
                             Ürünlerinizi teslim alırken bu kodu mağaza görevlisine iletiniz.
                         </p>
@@ -47,10 +47,10 @@ function SuccessContent() {
                 )}
 
                 <div className="flex gap-4 justify-center mt-8">
-                    <Link href="/" className="btn btn-primary px-8">
+                    <Link href="/" className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-md hover:shadow-lg inline-flex items-center justify-center">
                         Ana Sayfaya Dön
                     </Link>
-                    <Link href="/products" className="btn btn-outline px-8">
+                    <Link href="/products" className="px-8 py-3 bg-white hover:bg-gray-50 text-gray-800 font-bold rounded-xl transition-colors shadow-sm border border-gray-200 inline-flex items-center justify-center">
                         Alışverişe Devam Et
                     </Link>
                 </div>

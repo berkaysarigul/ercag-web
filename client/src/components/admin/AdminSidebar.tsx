@@ -34,14 +34,14 @@ export default function AdminSidebar() {
 
     return (
         <aside className={`
-            fixed left-0 top-0 h-screen w-64 bg-primary text-white flex flex-col shadow-xl z-50
+            fixed left-0 top-0 h-screen w-64 bg-slate-900 text-white flex flex-col shadow-xl z-50
             transition-transform duration-300 ease-in-out
             ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
         `}>
             {/* Logo Area */}
             {/* UI-03: primary-light/30 → brand-600/30 (primary.light artık tailwind'de tanımlı) */}
-            <div className="p-6 border-b border-primary-light/30 flex items-center gap-3">
-                <div className="w-8 h-8 bg-secondary rounded-lg flex items-center justify-center text-primary font-bold text-xl">
+            <div className="p-6 border-b border-white/10 flex items-center gap-3">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
                     E
                 </div>
                 <div>
@@ -60,11 +60,11 @@ export default function AdminSidebar() {
                             key={item.href}
                             href={item.href}
                             className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${isActive
-                                ? 'bg-primary-light text-white shadow-md'
-                                : 'text-gray-300 hover:bg-primary-light/50 hover:text-white'
+                                ? 'bg-blue-600 text-white shadow-md'
+                                : 'text-gray-300 hover:bg-white/10 hover:text-white'
                                 }`}
                         >
-                            <Icon size={20} className={isActive ? 'text-secondary' : 'text-gray-400 group-hover:text-white'} />
+                            <Icon size={20} className={isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'} />
                             <span className="font-medium">{item.name}</span>
                         </Link>
                     );
@@ -72,10 +72,10 @@ export default function AdminSidebar() {
             </nav>
 
             {/* User & Logout */}
-            <div className="p-4 border-t border-primary-light/30">
+            <div className="p-4 border-t border-white/10">
                 <button
                     onClick={logout}
-                    className="flex items-center gap-3 w-full px-4 py-3 text-gray-300 hover:text-white hover:bg-primary-light/50 rounded-lg transition-colors"
+                    className="flex items-center gap-3 w-full px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
                 >
                     <LogOut size={20} />
                     <span className="font-medium">Çıkış Yap</span>

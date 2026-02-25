@@ -5,7 +5,7 @@ const whatsappService = require('../services/whatsappService.js');
 let whatsappQueue;
 let whatsappWorker;
 
-if (process.env.NODE_ENV !== 'test') {
+if (redisClient && process.env.NODE_ENV !== 'test') {
     // Create the Queue
     whatsappQueue = new Queue('whatsapp-messages', {
         connection: redisClient
@@ -51,8 +51,33 @@ if (process.env.NODE_ENV !== 'test') {
         console.error(`❌ [Job ${job?.id}] has failed with ${err.message}`);
     });
 } else {
-    // Mock queue for testing
-    whatsappQueue = { add: async () => { } };
+    // Inline execution fallback when Redis is absent
+    whatsappQueue = {
+        add: async (name, jobData) => {
+            const { action, payload } = jobData;
+            console.log(`[Mock WhatsApp Queue] Inline execution for ${action}`);
+            try {
+                switch (action) {
+                    case 'sendOrderConfirmation':
+                        await whatsappService.sendOrderConfirmation(payload.phone, payload.orderId, payload.pickupCode);
+                        break;
+                    case 'sendOrderReady':
+                        await whatsappService.sendOrderReady(payload.phone, payload.orderId, payload.pickupCode);
+                        break;
+                    case 'sendOrderCompleted':
+                        await whatsappService.sendOrderCompleted(payload.phone, payload.orderId);
+                        break;
+                    case 'sendCustomMessage':
+                        await whatsappService.sendWhatsAppMessage(payload.phone, payload.message, payload.templateName);
+                        break;
+                    default:
+                        console.warn(`[Mock WhatsApp Queue] Unknown action: ${action}`);
+                }
+            } catch (error) {
+                console.error(`[Mock WhatsApp Queue] Execution failed:`, error.message);
+            }
+        }
+    };
 }
 
 module.exports = { whatsappQueue };

@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { Inter } from 'next/font/google';
+import { Inter, Playfair_Display } from 'next/font/google';
 import { Toaster } from 'sonner';
 import CookieConsent from '@/components/ui/CookieConsent';
 
@@ -10,6 +10,11 @@ const inter = Inter({
   display: 'swap',
 });
 
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-playfair',
+  display: 'swap',
+});
 
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -20,7 +25,7 @@ import ClientLayout from "@/components/layout/ClientLayout";
 
 // Moved themeColor here — Next.js 15+ requires it in generateViewport, not metadata
 export const viewport: Viewport = {
-  themeColor: '#1e3a8a',
+  themeColor: '#264a3d', // Eco Green
 };
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -71,8 +76,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="tr" className={inter.variable}>
-      <body className="font-sans antialiased text-gray-900 bg-gray-50">
+    <html lang="tr" className={`${inter.variable} ${playfair.variable}`}>
+      <body className="font-sans antialiased text-gray-900 bg-[#F4F4F0]">
         <AuthProvider>
           <SettingsProvider>
             <CampaignProvider>

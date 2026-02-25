@@ -30,92 +30,86 @@ export default function Footer() {
     ].filter(s => s.href);
 
     return (
-        <footer className="bg-[var(--primary)] text-white mt-auto">
+        <footer className="bg-[#f4f4f0] text-gray-800 mt-auto pt-16 pb-8 border-t border-[#e2e8f0]">
             {/* Main footer */}
-            <div className="container py-10">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+            <div className="container">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12">
 
-                    {/* Brand — 4 cols */}
-                    <div className="md:col-span-4 space-y-4">
-                        <div className="bg-white p-2 w-fit rounded-lg">
-                            <Image
-                                src="/logo.png"
-                                alt={settings.site_title || 'Erçağ Kırtasiye'}
-                                width={110}
-                                height={36}
-                                unoptimized
-                                className="object-contain"
-                            />
+                    {/* Brand */}
+                    <div className="md:col-span-4 space-y-5">
+                        <div className="flex flex-col">
+                            <span className="font-serif font-medium text-gray-900 text-3xl tracking-tight leading-none">Erçağ</span>
+                            <span className="text-xs text-primary italic font-serif mt-1">KIRTASİYE</span>
                         </div>
-                        <p className="text-white/60 text-sm leading-relaxed max-w-xs">
-                            {settings.site_description || 'Okul, ofis ve sanatsal tüm ihtiyaçlarınız için güvenilir adresiniz.'}
+                        <p className="text-gray-600 text-sm leading-relaxed max-w-xs">
+                            {settings.site_description || "İstanbul'un güvenilir kırtasiye mağazası."}
                         </p>
                         {socials.length > 0 && (
-                            <div className="flex gap-3 pt-1">
+                            <div className="flex gap-3 pt-2">
                                 {socials.map(({ href, icon: Icon, label }) => (
                                     <a key={label} href={href} target="_blank" rel="noopener noreferrer"
-                                        className="w-9 h-9 bg-white/10 hover:bg-amber-400 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
+                                        className="w-10 h-10 bg-white shadow-sm hover:bg-primary text-gray-600 hover:text-white rounded-full flex items-center justify-center transition-all duration-300"
                                         aria-label={label}>
-                                        <Icon size={16} />
+                                        <Icon size={18} />
                                     </a>
                                 ))}
                             </div>
                         )}
                     </div>
 
-                    {/* Quick Links — 2 cols */}
+                    {/* Quick Links */}
                     <div className="md:col-span-2">
-                        <h3 className="text-xs font-semibold uppercase tracking-widest text-amber-400 mb-4">Hızlı Erişim</h3>
-                        <ul className="space-y-2.5">
+                        <h3 className="text-sm font-serif italic text-gray-900 mb-4">Hızlı Erişim</h3>
+                        <ul className="space-y-3">
                             {quickLinks.map(({ href, label }) => (
                                 <li key={href}>
-                                    <Link href={href} className="text-white/60 hover:text-white text-sm transition-colors flex items-center gap-1 group">
+                                    <Link href={href} className="text-sm text-gray-600 hover:text-primary transition-colors flex items-center gap-1.5 group">
+                                        <ArrowUpRight size={14} className="text-primary/50 group-hover:text-primary transition-colors" />
                                         <span>{label}</span>
-                                        <ArrowUpRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                                     </Link>
                                 </li>
                             ))}
                         </ul>
                     </div>
 
-                    {/* Account — 2 cols */}
+                    {/* Account */}
                     <div className="md:col-span-2">
-                        <h3 className="text-xs font-semibold uppercase tracking-widest text-amber-400 mb-4">Hesabım</h3>
-                        <ul className="space-y-2.5">
+                        <h3 className="text-sm font-serif italic text-gray-900 mb-4">Hesabım</h3>
+                        <ul className="space-y-3">
                             {accountLinks.map(({ href, label }) => (
                                 <li key={href}>
-                                    <Link href={href} className="text-white/60 hover:text-white text-sm transition-colors flex items-center gap-1 group">
+                                    <Link href={href} className="text-sm text-gray-600 hover:text-primary transition-colors flex items-center gap-1.5 group">
+                                        <ArrowUpRight size={14} className="text-primary/50 group-hover:text-primary transition-colors" />
                                         <span>{label}</span>
-                                        <ArrowUpRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                                     </Link>
                                 </li>
                             ))}
                         </ul>
                     </div>
 
-                    {/* Contact — 4 cols */}
+                    {/* Contact */}
                     <div className="md:col-span-4">
-                        <h3 className="text-xs font-semibold uppercase tracking-widest text-amber-400 mb-4">İletişim</h3>
-                        <ul className="space-y-3">
-                            <li className="flex items-start gap-2.5">
-                                <MapPin size={14} className="text-amber-400 mt-0.5 shrink-0" />
-                                <span className="text-white/60 text-sm whitespace-pre-line">
+                        <h3 className="text-sm font-serif italic text-gray-900 mb-4">İletişim</h3>
+                        <ul className="space-y-4">
+                            <li className="flex items-start gap-4">
+                                <MapPin size={18} className="text-primary mt-0.5 shrink-0" />
+                                <span className="text-gray-600 text-sm whitespace-pre-line leading-relaxed">
                                     {settings.site_address || 'Atatürk Caddesi No: 123\nMerkez, İstanbul'}
                                 </span>
                             </li>
-                            <li className="flex items-center gap-2.5">
-                                <Phone size={14} className="text-amber-400 shrink-0" />
-                                <span className="text-white/60 text-sm">{settings.site_phone || '+90 (212) 123 45 67'}</span>
+                            <li className="flex items-center gap-4">
+                                <Phone size={18} className="text-primary shrink-0" />
+                                <span className="text-gray-600 text-sm">{settings.site_phone || '+90 (212) 123 45 67'}</span>
                             </li>
                             {settings.site_email && (
-                                <li className="flex items-center gap-2.5">
-                                    <Mail size={14} className="text-amber-400 shrink-0" />
-                                    <span className="text-white/60 text-sm">{settings.site_email}</span>
+                                <li className="flex items-center gap-4">
+                                    <Mail size={18} className="text-primary shrink-0" />
+                                    <span className="text-gray-600 text-sm">{settings.site_email}</span>
                                 </li>
                             )}
-                            <li className="flex items-center gap-2.5">
-                                <Clock size={14} className="text-amber-400 shrink-0" />
-                                <span className="text-white/60 text-sm">{settings.working_hours || 'Pzt – Cmt: 09:00 – 19:00'}</span>
+                            <li className="flex items-center gap-4">
+                                <Clock size={18} className="text-primary shrink-0" />
+                                <span className="text-gray-600 text-sm">{settings.working_hours || 'Pzt – Cmt: 09:00 – 19:30'}</span>
                             </li>
                         </ul>
                     </div>
@@ -123,10 +117,9 @@ export default function Footer() {
             </div>
 
             {/* Bottom bar */}
-            <div className="border-t border-white/10">
-                <div className="container py-4 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-white/40">
-                    <p>© {year} {settings.site_title || 'Erçağ Kırtasiye'}. Tüm hakları saklıdır.</p>
-                    <p>Click & Collect ile hızlı alışveriş</p>
+            <div className="border-t border-[#d1d1c4] mt-8">
+                <div className="container py-6 text-center">
+                    <p className="text-xs text-gray-500">© {year} {settings.site_title || 'Erçağ Kırtasiye'}. Tüm hakları saklıdır.</p>
                 </div>
             </div>
         </footer>

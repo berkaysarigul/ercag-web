@@ -5,7 +5,7 @@ const { recordStockMovement } = require('../services/stockService.js');
 let stockQueue;
 let stockWorker;
 
-if (process.env.NODE_ENV !== 'test') {
+if (redisClient && process.env.NODE_ENV !== 'test') {
     stockQueue = new Queue('stock-updates', {
         connection: redisClient
     });
@@ -49,8 +49,29 @@ if (process.env.NODE_ENV !== 'test') {
         console.error(`❌ [Job ${job?.id}] (Stock Update) has failed with ${err.message}`);
     });
 } else {
-    // Mock queue for testing
-    stockQueue = { add: async () => { } };
+    // Inline execution fallback when Redis is absent
+    stockQueue = {
+        add: async (name, jobData) => {
+            const { action, payload } = jobData;
+            console.log(`[Mock Stock Queue] Inline execution for ${action}`);
+            try {
+                if (action === 'reduceStockOnOrder') {
+                    const { items, orderId, adminId } = payload;
+                    for (const item of items) {
+                        await recordStockMovement(
+                            item.productId,
+                            'ORDER',
+                            -item.quantity,
+                            `Sipariş #${orderId}`,
+                            adminId
+                        );
+                    }
+                }
+            } catch (error) {
+                console.error(`[Mock Stock Queue] Execution failed:`, error.message);
+            }
+        }
+    };
 }
 
 module.exports = { stockQueue };

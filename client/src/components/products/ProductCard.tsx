@@ -60,108 +60,96 @@ export default function ProductCard({ product }: { product: Product }) {
     return (
         <Link
             href={`/products/${product.id}`}
-            className="group bg-white rounded-2xl border border-gray-100 shadow-soft hover:shadow-hover overflow-hidden transition-all duration-300 hover:-translate-y-2 animate-scale-in flex flex-col h-full"
+            className="group block"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            {/* Image Container */}
-            <div className="relative aspect-square bg-gray-50 overflow-hidden">
+            {/* Image Container with Eco Beige */}
+            <div className="relative aspect-[4/5] bg-[#E8E8E0] rounded-lg overflow-hidden mb-4">
                 {/* Top-left badges: stock + campaign */}
                 <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
                     {product.stock === 0 ? (
-                        <div className="flex items-center gap-1 px-2.5 py-1 bg-red-500 text-white text-xs font-bold rounded-full shadow-lg">
+                        <div className="flex items-center gap-1 px-3 py-1 bg-white/50 backdrop-blur-sm border border-white text-gray-700 text-[10px] uppercase font-bold tracking-wider rounded-full shadow-sm">
                             Tükendi
                         </div>
                     ) : (product.stock && product.stock <= 5) ? (
-                        <div className="flex items-center gap-1 px-2.5 py-1 bg-amber-500 text-white text-xs font-bold rounded-full shadow-lg">
+                        <div className="flex items-center gap-1 px-3 py-1 bg-white/50 backdrop-blur-sm border border-white text-gray-700 text-[10px] uppercase font-bold tracking-wider rounded-full shadow-sm">
                             Son {product.stock} Ürün
                         </div>
-                    ) : null}
+                    ) : (
+                        <div className="flex items-center gap-1 px-3 py-1 bg-white/50 backdrop-blur-sm border border-white text-gray-700 text-[10px] uppercase font-bold tracking-[0.1em] rounded-full shadow-sm">
+                            Yeni
+                        </div>
+                    )}
 
                     {/* Campaign badge */}
                     {discount && (
-                        <div className={`flex items-center gap-1 px-2.5 py-1 text-white text-xs font-bold rounded-full shadow-lg ${discount.campaignType === 'FLASH_SALE'
-                            ? 'bg-orange-500'
-                            : 'bg-blue-500'
-                            }`}>
+                        <div className={`flex items-center gap-1 px-3 py-1 text-white text-[10px] uppercase font-bold tracking-wider rounded-full shadow-sm bg-primary`}>
                             {discount.campaignType === 'FLASH_SALE'
                                 ? <Zap size={10} />
                                 : <Tag size={10} />
                             }
-                            -%{discount.discountPercent}
+                            -%{discount.discountPercent} İndirim
                         </div>
                     )}
                 </div>
 
-                {/* Wishlist Button */}
-                <button
-                    onClick={handleWishlist}
-                    className="absolute top-3 right-3 z-10 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:scale-110 text-gray-400 hover:text-red-500"
-                >
-                    <Heart size={16} />
-                </button>
+                {/* Arrow Button (Hover view) like in design */}
+                <div className="absolute top-1/2 left-3 -translate-y-1/2 z-20 w-8 h-8 bg-white/70 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-300 text-gray-600 cursor-pointer hover:bg-white hover:scale-105">
+                    <span className="text-sm">←</span>
+                </div>
 
                 {/* Image */}
                 {displayImage ? (
-                    <div className="relative w-full h-full">
-                        <Image
-                            src={displayImage.startsWith('http') ? displayImage : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${displayImage}`}
-                            alt={product.name}
-                            fill
-                            unoptimized
-                            sizes="(max-width: 768px) 100vw, 50vw"
-                            className="object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
+                    <div className="absolute inset-0 p-4">
+                        <div className="relative w-full h-full">
+                            <Image
+                                src={displayImage.startsWith('http') ? displayImage : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/uploads/${displayImage}`}
+                                alt={product.name}
+                                fill
+                                unoptimized
+                                sizes="(max-width: 768px) 100vw, 50vw"
+                                className="object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500"
+                            />
+                        </div>
                     </div>
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-100">
-                        <span className="text-4xl">📷</span>
+                    <div className="w-full h-full flex items-center justify-center text-primary/20 bg-transparent">
+                        <span className="text-4xl opacity-50">📷</span>
                     </div>
                 )}
             </div>
 
-            {/* Content */}
-            <div className="p-5 flex flex-col flex-1">
-                {/* Category & Rating */}
-                <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium text-brand-600 uppercase tracking-wider">
-                        {product.category?.name || 'Genel'}
-                    </span>
-                    <div className="flex items-center gap-1 text-xs text-gray-500">
-                        <Star size={12} className={`fill-yellow-400 ${product.rating ? 'text-yellow-400' : 'text-gray-300'}`} />
-                        <span className="font-semibold">{product.rating ? product.rating : '0.0'}</span>
-                        {product.reviewCount !== undefined && <span className="text-gray-400">({product.reviewCount})</span>}
-                    </div>
-                </div>
-
+            {/* Content (No border, transparent background like design) */}
+            <div className="flex flex-col flex-1 px-1">
                 {/* Product Name */}
-                <h3 className="font-bold text-gray-900 text-base mb-2 line-clamp-2 group-hover:text-brand-600 transition-colors flex-1">
+                <h3 className="font-semibold text-gray-900 text-sm mb-4 line-clamp-2 group-hover:text-primary transition-colors flex-1 leading-relaxed">
                     {product.name}
                 </h3>
 
                 {/* Campaign label */}
                 {discount && (
-                    <p className="text-xs text-orange-600 font-medium mb-1 truncate">
-                        🎯 {discount.campaignName}
-                    </p>
+                    <div className="flex items-center gap-1 text-[11px] text-rose-600 font-medium mb-2 truncate bg-rose-50 px-2 py-0.5 rounded w-fit">
+                        <Zap size={10} /> {discount.campaignName}
+                    </div>
                 )}
 
                 {/* Price & Action */}
-                <div className="flex items-end justify-between mt-4 pt-4 border-t border-gray-50">
-                    <div>
+                <div className="flex items-center justify-between mt-auto">
+                    <div className="flex items-center gap-2">
                         {discount ? (
                             <>
-                                <div className="text-sm text-gray-400 line-through leading-none mb-0.5">
-                                    {price.toFixed(2)} ₺
-                                </div>
-                                <div className="text-2xl font-bold text-red-600">
+                                <span className="text-sm font-bold text-gray-900 leading-none">
                                     {displayPrice.toFixed(2)} ₺
-                                </div>
+                                </span>
+                                <span className="text-xs text-gray-400 line-through leading-none">
+                                    {price.toFixed(2)} ₺
+                                </span>
                             </>
                         ) : (
-                            <div className="text-2xl font-bold text-gray-900">
+                            <span className="text-sm font-bold text-gray-900 leading-none">
                                 {price.toFixed(2)} ₺
-                            </div>
+                            </span>
                         )}
                     </div>
 
@@ -169,18 +157,19 @@ export default function ProductCard({ product }: { product: Product }) {
                         onClick={handleAddToCart}
                         disabled={product.stock === 0}
                         className={`
-                            flex items-center justify-center
-                            w-12 h-12
-                            bg-brand-600 hover:bg-brand-700
-                            text-white
-                            rounded-xl
-                            shadow-md hover:shadow-lg
-                            transform hover:scale-110 active:scale-95
-                            transition-all duration-200
-                            ${product.stock === 0 ? 'opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400 hover:scale-100' : ''}
+                            flex items-center justify-center gap-1.5 px-3 py-1.5
+                            text-white text-xs font-semibold
+                            rounded-full transition-all duration-200
+                            ${product.stock === 0
+                                ? 'bg-gray-400 cursor-not-allowed'
+                                : 'bg-primary hover:bg-[#1a332a]'}
                         `}
                     >
-                        <Plus size={20} />
+                        {product.stock === 0 ? (
+                            'Tükendi'
+                        ) : (
+                            <><Plus size={12} strokeWidth={3} /> Sepete Ekle</>
+                        )}
                     </button>
                 </div>
             </div>

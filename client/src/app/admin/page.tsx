@@ -139,7 +139,7 @@ export default function AdminDashboard() {
                             const height = (Number(d.revenue) / maxVal) * 100;
 
                             return (
-                                <div key={i} className="w-full bg-primary/10 rounded-t-lg relative group hover:bg-primary/20 transition-colors" style={{ height: `${height || 1}%` }}>
+                                <div key={i} className="w-full bg-blue-100 rounded-t-lg relative group hover:bg-blue-200 transition-colors" style={{ height: `${height || 1}%` }}>
                                     <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                                         {Number(d.revenue).toFixed(2)} ₺
                                     </div>
@@ -161,7 +161,7 @@ export default function AdminDashboard() {
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <div className="flex justify-between items-center mb-6">
                         <h3 className="text-lg font-bold text-gray-800">Son Siparişler</h3>
-                        <Link href="/admin/orders" className="text-sm text-primary hover:underline flex items-center">
+                        <Link href="/admin/orders" className="text-sm text-blue-600 hover:underline flex items-center">
                             Tümü <ArrowUpRight size={16} className="ml-1" />
                         </Link>
                     </div>

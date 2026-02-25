@@ -49,7 +49,7 @@ export default function AuthPage() {
     };
 
     return (
-        <div className="min-h-[60vh] flex items-center justify-center py-12 px-4">
+        <div className="min-h-[60vh] flex items-center justify-center pt-28 pb-12 px-4">
             <div className="w-full max-w-md">
                 <div className="bg-white rounded-2xl shadow-card border border-gray-100 p-8">
                     <h1 className="text-2xl font-bold text-center text-gray-900 mb-6">
@@ -124,7 +124,7 @@ export default function AuthPage() {
                             />
                             {isLogin && (
                                 <div className="flex justify-end mt-1">
-                                    <Link href="/auth/forgot-password" className="text-xs text-brand-600 hover:underline">
+                                    <Link href="/auth/forgot-password" className="text-xs text-blue-600 hover:underline">
                                         Şifremi Unuttum?
                                     </Link>
                                 </div>
@@ -148,7 +148,7 @@ export default function AuthPage() {
 
                         <button
                             type="submit"
-                            className="btn btn-primary w-full mt-2"
+                            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-md hover:shadow-lg mt-2 flex items-center justify-center"
                             disabled={loading}
                         >
                             {loading ? 'İşleniyor...' : (isLogin ? 'Giriş Yap' : 'Üye Ol ve Devam Et')}
@@ -156,10 +156,10 @@ export default function AuthPage() {
                     </form>
 
                     <div className="mt-6 text-center text-sm">
-                        {/* UI-01: var(--accent) → brand-600 */}
+                        {/* UI-01: var(--accent) → blue-600 */}
                         <button
                             onClick={() => setIsLogin(!isLogin)}
-                            className="text-brand-600 hover:underline bg-transparent border-none cursor-pointer"
+                            className="text-blue-600 hover:underline bg-transparent border-none cursor-pointer font-medium"
                         >
                             {isLogin ? 'Hesabın yok mu? Hemen üye ol' : 'Zaten üye misin? Giriş yap'}
                         </button>

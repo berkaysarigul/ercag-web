@@ -36,8 +36,35 @@ const recordStockMovement = async (productId, type, quantity, reason, createdBy 
         await checkLowStockAlert(result.product, result.newStock);
     }
 
-    if (quantity > 0 && result.previousStock === 0) {
-        await triggerStockAlerts(productId, result.product.name);
+    if (quantity > 0) {
+        const tx = prismaClient || prisma;
+        const updatedProduct = await tx.product.findUnique({
+            where: { id: productId },
+            select: { id: true, name: true, stock: true }
+        });
+
+        if (updatedProduct && updatedProduct.stock > 0) {
+            const alerts = await tx.stockAlert.findMany({
+                where: { productId, isNotified: false },
+                include: { user: { select: { email: true, name: true } } }
+            });
+
+            if (alerts.length > 0) {
+                const { sendStockAlertNotification } = require('./notificationService');
+                for (const alert of alerts) {
+                    if (alert.user?.email) {
+                        try {
+                            await sendStockAlertNotification(updatedProduct.name, alert.user.email);
+                        } catch (e) { }
+                    }
+                }
+                // Alert'leri bildirildi olarak işaretle
+                await tx.stockAlert.updateMany({
+                    where: { productId, isNotified: false },
+                    data: { isNotified: true }
+                });
+            }
+        }
     }
 
     return { previousStock: result.previousStock, newStock: result.newStock };
@@ -46,32 +73,6 @@ const recordStockMovement = async (productId, type, quantity, reason, createdBy 
 const checkLowStockAlert = async (product, currentStock) => {
     // Admin'lere düşük stok bildirimi (Gelecekte Socket.io veya Email ile)
     console.log(`⚠️ Düşük stok uyarısı: ${product.name} — ${currentStock} adet kaldı`);
-};
-
-const triggerStockAlerts = async (productId, productName) => {
-    try {
-        const { sendStockAlertNotification } = require('./notificationService');
-        // FIX-05: was using undefined 'prisma', now correct
-        const alerts = await prisma.stockAlert.findMany({
-            where: { productId },
-            include: { user: { select: { email: true } } }
-        });
-
-        for (const alert of alerts) {
-            if (alert.user.email) {
-                if (typeof sendStockAlertNotification === 'function') {
-                    await sendStockAlertNotification(productName, alert.user.email);
-                } else {
-                    console.log(`Sending stock alert for ${productName} to ${alert.user.email}`);
-                }
-            }
-        }
-
-        // Alert'leri temizle
-        await prisma.stockAlert.deleteMany({ where: { productId } });
-    } catch (error) {
-        console.error('Trigger Stock Alerts Error:', error);
-    }
 };
 
 module.exports = { recordStockMovement };

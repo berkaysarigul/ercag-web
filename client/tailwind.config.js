@@ -6,24 +6,24 @@ module.exports = {
     theme: {
         extend: {
             colors: {
-                // Ana Marka Renkleri
+                // Ana Marka Renkleri (Eco Orman Yeşili)
                 brand: {
-                    50: '#eff6ff',
-                    100: '#dbeafe',
-                    200: '#bfdbfe',
-                    300: '#93c5fd',
-                    400: '#60a5fa',
-                    500: '#3b82f6',  // Ana mavi
-                    600: '#2563eb',  // Primary
-                    700: '#1d4ed8',
-                    800: '#1e40af',
-                    900: '#1e3a8a',
-                    DEFAULT: '#2563eb', // Default to brand-600
+                    50: '#f2f7f5',
+                    100: '#e1efe8',
+                    200: '#c5e0d4',
+                    300: '#9bc9b6',
+                    400: '#6bab92',
+                    500: '#478f73',
+                    600: '#34725a',
+                    700: '#2c5d4b',
+                    800: '#264a3d', // Ana eco-green
+                    900: '#203d33',
+                    DEFAULT: '#264a3d',
                 },
                 primary: {
-                    DEFAULT: '#2563eb',
-                    foreground: '#ffffff',
-                    light: '#3b82f6', // UI-03: added primary-light so AdminSidebar refs don't break
+                    DEFAULT: '#264a3d',
+                    foreground: '#f4f4f0',
+                    light: '#478f73',
                 },
                 // Başarı (Yeşil - Stokta için)
                 success: {
@@ -49,14 +49,14 @@ module.exports = {
                     600: '#dc2626',
                     DEFAULT: '#ef4444',
                 },
-                background: '#F9FAFB', // Gray 50
-                surface: '#FFFFFF',
+                background: '#F4F4F0', // Eco Bej / Kırık Beyaz
+                surface: '#FFFFFF', // Kart vb için beyaz
                 text: {
-                    main: '#111827', // Gray 900
-                    secondary: '#4B5563', // Gray 600
-                    light: '#9CA3AF', // Gray 400
+                    main: '#2D3748', // Kömür/Koyu Gri
+                    secondary: '#4A5568',
+                    light: '#A0AEC0',
                 },
-                border: '#E5E7EB', // Gray 200
+                border: '#E2E8F0',
             },
             boxShadow: {
                 'soft': '0 2px 8px rgba(0, 0, 0, 0.04)',
@@ -85,6 +85,7 @@ module.exports = {
             },
             fontFamily: {
                 sans: ['var(--font-inter)', 'sans-serif'],
+                serif: ['var(--font-playfair)', 'serif'],
             },
         },
         container: {

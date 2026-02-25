@@ -132,10 +132,10 @@ export default function CartPage() {
     }
 
     return (
-        <div className="container py-12">
+        <div className="container pt-28 pb-12">
             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold text-primary flex items-center">
-                    <ShoppingBag className="mr-3" />
+                <h1 className="text-3xl font-serif text-gray-900 tracking-tight flex items-center">
+                    <ShoppingBag className="mr-3 text-primary" />
                     {step === 'cart' ? `Sepetim (${items.length} Ürün)` : 'Siparişi Tamamla'}
                 </h1>
                 {step === 'cart' && items.length > 0 && (
@@ -180,8 +180,8 @@ export default function CartPage() {
                                         <Link href={`/products/${item.id}`} className="font-semibold text-lg text-gray-900 hover:text-primary transition-colors">
                                             {item.name}
                                         </Link>
-                                        <p className="text-sm text-gray-500">{(item as any).category?.name}</p>
-                                        <div className="mt-2 font-bold text-primary text-lg">{Number(item.price).toFixed(2)} ₺</div>
+                                        <p className="text-xs text-gray-500 font-medium tracking-wide uppercase mt-1">{(item as any).category?.name}</p>
+                                        <div className="mt-2 text-lg font-bold text-primary">{Number(item.price).toFixed(2)} ₺</div>
                                     </div>
                                     <div className="flex flex-col items-end gap-3">
                                         <div className="flex items-center border border-gray-200 rounded-lg bg-gray-50">
@@ -196,7 +196,7 @@ export default function CartPage() {
                         </>
                     ) : (
                         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><User className="text-primary" /> Kişisel Bilgiler</h2>
+                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><User className="text-blue-600" /> Kişisel Bilgiler</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {user ? (
                                     <>
@@ -243,12 +243,12 @@ export default function CartPage() {
                                         </div>
                                     </>
                                 ) : (
-                                    <div className="md:col-span-2 bg-blue-50 border border-blue-100 rounded-xl p-6 flex flex-col items-center text-center">
-                                        <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-3">
-                                            <User size={24} />
+                                    <div className="md:col-span-2 bg-primary/5 border border-primary/20 rounded-xl p-8 flex flex-col items-center text-center">
+                                        <div className="w-14 h-14 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-4">
+                                            <User size={26} />
                                         </div>
-                                        <h3 className="text-lg font-bold text-gray-900 mb-1">Giriş Yapın veya Hızlı Üye Olun</h3>
-                                        <p className="text-sm text-gray-600 mb-0">
+                                        <h3 className="text-xl font-serif text-gray-900 mb-2">Giriş Yapın veya Hızlı Üye Olun</h3>
+                                        <p className="text-sm text-gray-600 max-w-sm mb-0 leading-relaxed">
                                             Siparişinizi tamamlamak için sağ taraftaki butona tıklayarak hızlıca giriş yapabilir veya üyelik oluşturabilirsiniz.
                                         </p>
                                     </div>
@@ -297,7 +297,7 @@ export default function CartPage() {
                                     <input
                                         type="text"
                                         placeholder="Kupon Kodu"
-                                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all uppercase"
+                                        className="flex-1 px-4 py-3 border border-gray-200 rounded-full focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all uppercase font-medium bg-gray-50 text-sm"
                                         value={couponCode}
                                         onChange={(e) => setCouponCode(e.target.value)}
                                     />
@@ -342,7 +342,7 @@ export default function CartPage() {
 
                         {step === 'cart' ? (
                             <button
-                                className="btn btn-secondary w-full py-4 text-lg font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all flex items-center justify-center gap-2"
+                                className="w-full py-4 bg-primary hover:bg-primary-dark text-white text-lg font-bold rounded-full shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all flex items-center justify-center gap-2 tracking-wide"
                                 onClick={() => setStep('info')}
                             >
                                 Devam Et <ArrowRight size={20} />
@@ -350,7 +350,7 @@ export default function CartPage() {
                         ) : (
                             <div className="flex flex-col gap-3">
                                 <button
-                                    className="btn btn-secondary w-full py-4 text-lg font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all flex items-center justify-center gap-2"
+                                    className="w-full py-4 bg-primary hover:bg-primary-dark text-white text-lg font-bold rounded-full shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all flex items-center justify-center gap-2"
                                     onClick={handleCheckout}
                                     disabled={loading}
                                 >
@@ -366,16 +366,16 @@ export default function CartPage() {
                             </div>
                         )}
 
-                        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-5 text-sm text-blue-900 shadow-sm">
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="bg-white p-2 rounded-lg shadow-sm">
-                                    <Store size={20} className="text-blue-600" />
+                        <div className="mt-6 bg-[#f2f7f5] border border-primary/10 rounded-2xl p-6 text-sm text-gray-800 shadow-sm">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="bg-white p-2.5 rounded-full shadow-sm">
+                                    <Store size={20} className="text-primary" />
                                 </div>
-                                <h3 className="font-bold text-base">Tıkla & Gel Al</h3>
+                                <h3 className="font-serif italic text-lg text-primary">Tıkla & Gel Al</h3>
                             </div>
-                            <p className="text-blue-800/80 leading-relaxed">
+                            <p className="text-gray-600 leading-relaxed">
                                 Siparişinizi mağazamızdan teslim alabilirsiniz.
-                                Ödemenizi teslimat sırasında <strong className="font-semibold text-blue-900">Nakit</strong> veya <strong className="font-semibold text-blue-900">Kredi Kartı</strong> ile güvenle yapabilirsiniz.
+                                Ödemenizi teslimat sırasında <strong className="font-semibold text-gray-900">Nakit</strong> veya <strong className="font-semibold text-gray-900">Kredi Kartı</strong> ile güvenle yapabilirsiniz.
                             </p>
                         </div>
                     </div>
