@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import { CheckCircle, Store } from 'lucide-react';
 
 function SuccessContent() {
     const searchParams = useSearchParams();
@@ -13,7 +14,9 @@ function SuccessContent() {
     return (
         <div className="container text-center pt-36 pb-16">
             <div className="bg-white border rounded-2xl shadow-sm max-w-2xl mx-auto p-12">
-                <div className="text-6xl mb-6">🎉</div>
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <CheckCircle size={48} className="text-green-500" />
+                </div>
                 <h1 className="text-3xl mb-4 text-primary font-bold">Siparişiniz Alındı!</h1>
                 <p className="text-lg text-gray-500 mb-8">
                     Siparişiniz başarıyla oluşturuldu. Ekibimiz en kısa sürede hazırlamaya başlayacak.
@@ -40,7 +43,7 @@ function SuccessContent() {
                             Ürünlerinizi teslim alırken bu kodu mağaza görevlisine iletiniz.
                         </p>
                         <div className="mt-6 p-4 bg-primary/5 text-primary text-sm rounded-lg flex items-start gap-3 text-left">
-                            <span className="text-xl">🏪</span>
+                            <Store size={20} className="text-primary mt-0.5 shrink-0" />
                             <span className="leading-relaxed">Ödemenizi ürünlerinizi mağazadan teslim alırken <strong>Nakit</strong> veya <strong>Kredi Kartı</strong> ile yapabilirsiniz.</span>
                         </div>
                     </div>
