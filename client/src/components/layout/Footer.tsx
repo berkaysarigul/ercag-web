@@ -12,6 +12,7 @@ export default function Footer() {
     const quickLinks = [
         { href: '/', label: 'Ana Sayfa' },
         { href: '/products', label: 'Tüm Ürünler' },
+        { href: '/order-track', label: 'Sipariş Takibi' },
         { href: '/privacy', label: 'Gizlilik Politikası' },
         { href: '/terms', label: 'Kullanım Koşulları' },
         { href: '/distance-sales', label: 'Mesafeli Satış Sözleşmesi' },

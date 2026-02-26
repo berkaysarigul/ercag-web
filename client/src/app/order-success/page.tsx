@@ -53,6 +53,11 @@ function SuccessContent() {
                     <Link href="/products" className="px-8 py-3 bg-white hover:bg-gray-50 text-gray-800 font-bold rounded-xl transition-colors shadow-sm border border-gray-200 inline-flex items-center justify-center">
                         Alışverişe Devam Et
                     </Link>
+                    {code && (
+                        <Link href={`/order-track`} className="px-8 py-3 bg-white hover:bg-gray-50 text-gray-800 font-bold rounded-xl transition-colors shadow-sm border border-gray-200 inline-flex items-center justify-center">
+                            Siparişimi Takip Et
+                        </Link>
+                    )}
                 </div>
             </div>
         </div>
