@@ -92,26 +92,23 @@ const emailTemplate = (title, content, ctaText = null, ctaUrl = null) => `
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background-color:#f8fafc;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+<body style="margin:0;padding:0;background-color:#f4f4f0;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
   <div style="max-width:600px;margin:0 auto;padding:20px;">
-    <!-- Header -->
-    <div style="background:linear-gradient(135deg,#1a56db,#1e3a8a);border-radius:16px 16px 0 0;padding:30px;text-align:center;">
+    <div style="background:linear-gradient(135deg,#264a3d,#1b3529);border-radius:16px 16px 0 0;padding:30px;text-align:center;">
       <h1 style="color:white;margin:0;font-size:24px;">Erçağ Kırtasiye</h1>
-      <p style="color:rgba(255,255,255,0.7);margin:5px 0 0;font-size:13px;">Click & Collect</p>
+      <p style="color:rgba(255,255,255,0.7);margin:5px 0 0;font-size:13px;">Tıkla & Gel Al</p>
     </div>
-    <!-- Content -->
     <div style="background:white;padding:30px;border:1px solid #e2e8f0;border-top:none;">
       <h2 style="color:#0f172a;margin:0 0 15px;font-size:20px;">${title}</h2>
       ${content}
       ${ctaText && ctaUrl ? `
         <div style="text-align:center;margin:25px 0;">
-          <a href="${ctaUrl}" style="background-color:#1a56db;color:white;padding:12px 30px;text-decoration:none;border-radius:10px;font-weight:600;font-size:14px;display:inline-block;">${ctaText}</a>
+          <a href="${ctaUrl}" style="background-color:#264a3d;color:white;padding:12px 30px;text-decoration:none;border-radius:10px;font-weight:600;font-size:14px;display:inline-block;">${ctaText}</a>
         </div>
       ` : ''}
     </div>
-    <!-- Footer -->
-    <div style="border-radius:0 0 16px 16px;background:#f1f5f9;padding:20px;text-align:center;border:1px solid #e2e8f0;border-top:none;">
-      <p style="color:#64748b;font-size:12px;margin:0;">Erçağ Kırtasiye | Merkez, İstanbul</p>
+    <div style="border-radius:0 0 16px 16px;background:#f2f7f5;padding:20px;text-align:center;border:1px solid #e2e8f0;border-top:none;">
+      <p style="color:#64748b;font-size:12px;margin:0;">Erçağ Kırtasiye</p>
       <p style="color:#94a3b8;font-size:11px;margin:5px 0 0;">Bu email otomatik gönderilmiştir.</p>
     </div>
   </div>
