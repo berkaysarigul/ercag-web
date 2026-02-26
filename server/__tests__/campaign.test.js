@@ -1,91 +1,161 @@
 const prisma = require('../src/lib/prisma');
+const { applyActiveCampaigns } = require('../src/controllers/campaignController');
 
-describe('Kampanya İndirimi Hesaplama', () => {
-    let testCategory, testProduct, flashCampaign;
+describe('Kampanya İndirimi Hesaplama (applyActiveCampaigns)', () => {
+    let categoryId, product1Id, product2Id;
+    let flashCampaignId, categoryCampaignId, bxgyCampaignId, expiredCampaignId;
 
     beforeAll(async () => {
-        testCategory = await prisma.category.create({
-            data: { name: 'Test Kampanya Kategori' }
+        // Clean
+        await prisma.campaign.deleteMany({ where: { name: { startsWith: 'TEST_CAMP_' } } });
+        await prisma.product.deleteMany({ where: { name: { startsWith: 'TEST_CAMP_' } } });
+        await prisma.category.deleteMany({ where: { name: 'TEST_CAMP_CAT' } });
+
+        // Setup
+        const cat = await prisma.category.create({ data: { name: 'TEST_CAMP_CAT' } });
+        categoryId = cat.id;
+
+        const p1 = await prisma.product.create({
+            data: { name: 'TEST_CAMP_PROD1', description: 'T', price: 100, stock: 50, categoryId }
         });
-        testProduct = await prisma.product.create({
-            data: { name: 'Test Kampanya Ürün', description: 'Test', price: 100.00, stock: 50, categoryId: testCategory.id }
+        product1Id = p1.id;
+
+        const p2 = await prisma.product.create({
+            data: { name: 'TEST_CAMP_PROD2', description: 'T', price: 60, stock: 50, categoryId }
         });
-        flashCampaign = await prisma.campaign.create({
+        product2Id = p2.id;
+
+        // Active Flash Sale %25 on product1
+        const fc = await prisma.campaign.create({
             data: {
-                name: 'Test Flash', type: 'FLASH_SALE', isActive: true,
-                startDate: new Date(Date.now() - 86400000),
-                endDate: new Date(Date.now() + 86400000),
-                config: JSON.stringify({ discountPercent: 20, productIds: [testProduct.id] })
+                name: 'TEST_CAMP_FLASH', type: 'FLASH_SALE', isActive: true,
+                startDate: new Date(Date.now() - 86400000), endDate: new Date(Date.now() + 86400000),
+                config: JSON.stringify({ discountPercent: 25, productIds: [product1Id] })
             }
         });
+        flashCampaignId = fc.id;
+
+        // Active Category Discount %10 on category
+        const cc = await prisma.campaign.create({
+            data: {
+                name: 'TEST_CAMP_CATDISC', type: 'CATEGORY_DISCOUNT', isActive: true,
+                startDate: new Date(Date.now() - 86400000), endDate: new Date(Date.now() + 86400000),
+                config: JSON.stringify({ categoryId: categoryId, discountPercent: 10 })
+            }
+        });
+        categoryCampaignId = cc.id;
+
+        // Active BUY_X_GET_Y: buy 3 pay 2
+        const bx = await prisma.campaign.create({
+            data: {
+                name: 'TEST_CAMP_BXGY', type: 'BUY_X_GET_Y', isActive: true,
+                startDate: new Date(Date.now() - 86400000), endDate: new Date(Date.now() + 86400000),
+                config: JSON.stringify({ buyQuantity: 3, payQuantity: 2, categoryId: categoryId })
+            }
+        });
+        bxgyCampaignId = bx.id;
+
+        // Expired campaign (should NOT apply)
+        const ec = await prisma.campaign.create({
+            data: {
+                name: 'TEST_CAMP_EXPIRED', type: 'FLASH_SALE', isActive: true,
+                startDate: new Date('2020-01-01'), endDate: new Date('2020-12-31'),
+                config: JSON.stringify({ discountPercent: 99, productIds: [product1Id] })
+            }
+        });
+        expiredCampaignId = ec.id;
     });
 
     afterAll(async () => {
-        await prisma.campaign.deleteMany({ where: { name: { startsWith: 'Test' } } });
-        await prisma.product.deleteMany({ where: { name: 'Test Kampanya Ürün' } });
-        await prisma.category.deleteMany({ where: { name: 'Test Kampanya Kategori' } });
+        await prisma.campaign.deleteMany({ where: { name: { startsWith: 'TEST_CAMP_' } } });
+        await prisma.product.deleteMany({ where: { name: { startsWith: 'TEST_CAMP_' } } });
+        await prisma.category.deleteMany({ where: { name: 'TEST_CAMP_CAT' } });
         await prisma.$disconnect();
     });
 
-    test('Flash Sale %20 indirim doğru hesaplanmalı', () => {
-        const config = JSON.parse(flashCampaign.config);
-        const discount = (100 * config.discountPercent) / 100;
-        expect(discount).toBe(20);
-    });
-
-    test('Süresi dolmuş kampanya geçersiz olmalı', async () => {
-        const expired = await prisma.campaign.create({
-            data: {
-                name: 'Test Expired', type: 'FLASH_SALE', isActive: true,
-                startDate: new Date(Date.now() - 172800000),
-                endDate: new Date(Date.now() - 86400000),
-                config: JSON.stringify({ discountPercent: 50, productIds: [testProduct.id] })
-            }
+    test('Flash Sale %25 doğru hesaplanmalı', async () => {
+        // Temporarily deactivate other campaigns to isolate
+        await prisma.campaign.updateMany({
+            where: { id: { in: [categoryCampaignId, bxgyCampaignId] } },
+            data: { isActive: false }
         });
-        const now = new Date();
-        expect(new Date(expired.endDate) >= now).toBe(false);
-        await prisma.campaign.delete({ where: { id: expired.id } });
-    });
 
-    test('isActive false kampanya uygulanmamalı', async () => {
-        const inactive = await prisma.campaign.create({
-            data: {
-                name: 'Test Inactive', type: 'FLASH_SALE', isActive: false,
-                startDate: new Date(Date.now() - 86400000),
-                endDate: new Date(Date.now() + 86400000),
-                config: JSON.stringify({ discountPercent: 50, productIds: [testProduct.id] })
-            }
-        });
-        expect(inactive.isActive).toBe(false);
-        await prisma.campaign.delete({ where: { id: inactive.id } });
-    });
-});
+        const items = [
+            { productId: product1Id, price: 100, quantity: 2, product: { categoryId } }
+        ];
+        const result = await applyActiveCampaigns(items);
+        // 100 * 2 * 25% = 50
+        expect(result.totalDiscount).toBe(50);
+        expect(result.appliedCampaigns.length).toBeGreaterThan(0);
 
-describe('Kupon Doğrulama', () => {
-    let testCoupon;
-
-    beforeAll(async () => {
-        testCoupon = await prisma.coupon.create({
-            data: { code: 'TESTKUPON26', discountType: 'PERCENTAGE', discountValue: 15, minOrderAmount: 50, isActive: true, expirationDate: new Date(Date.now() + 86400000) }
+        // Restore
+        await prisma.campaign.updateMany({
+            where: { id: { in: [categoryCampaignId, bxgyCampaignId] } },
+            data: { isActive: true }
         });
     });
 
-    afterAll(async () => {
-        await prisma.coupon.deleteMany({ where: { code: { startsWith: 'TEST' } } });
-        await prisma.$disconnect();
+    test('Category Discount %10 doğru hesaplanmalı', async () => {
+        await prisma.campaign.updateMany({
+            where: { id: { in: [flashCampaignId, bxgyCampaignId] } },
+            data: { isActive: false }
+        });
+
+        const items = [
+            { productId: product2Id, price: 60, quantity: 3, product: { categoryId } }
+        ];
+        const result = await applyActiveCampaigns(items);
+        // 60 * 3 * 10% = 18
+        expect(result.totalDiscount).toBe(18);
+
+        await prisma.campaign.updateMany({
+            where: { id: { in: [flashCampaignId, bxgyCampaignId] } },
+            data: { isActive: true }
+        });
     });
 
-    test('%15 kupon doğru hesaplanmalı', () => {
-        const discount = (200 * 15) / 100;
-        expect(discount).toBe(30);
+    test('Süresi dolmuş kampanya UYGULAMAMALI', async () => {
+        // Deactivate all active ones
+        await prisma.campaign.updateMany({
+            where: { id: { in: [flashCampaignId, categoryCampaignId, bxgyCampaignId] } },
+            data: { isActive: false }
+        });
+
+        const items = [
+            { productId: product1Id, price: 100, quantity: 1, product: { categoryId } }
+        ];
+        const result = await applyActiveCampaigns(items);
+        // Expired campaign should not apply
+        expect(result.totalDiscount).toBe(0);
+
+        await prisma.campaign.updateMany({
+            where: { id: { in: [flashCampaignId, categoryCampaignId, bxgyCampaignId] } },
+            data: { isActive: true }
+        });
     });
 
-    test('Min tutar altında kupon uygulanmamalı', () => {
-        expect(30 >= testCoupon.minOrderAmount).toBe(false);
+    test('Kampanya dışı ürüne indirim UYGULAMAMALI', async () => {
+        await prisma.campaign.updateMany({
+            where: { id: { in: [categoryCampaignId, bxgyCampaignId] } },
+            data: { isActive: false }
+        });
+
+        // Product2 is not in flash sale productIds
+        const items = [
+            { productId: product2Id, price: 60, quantity: 1, product: { categoryId } }
+        ];
+        const result = await applyActiveCampaigns(items);
+        expect(result.totalDiscount).toBe(0);
+
+        await prisma.campaign.updateMany({
+            where: { id: { in: [categoryCampaignId, bxgyCampaignId] } },
+            data: { isActive: true }
+        });
     });
 
-    test('İndirim sipariş tutarını geçmemeli', () => {
-        const discount = Math.min((20 * 100) / 100, 20);
-        expect(discount).toBe(20);
+    test('Boş items dizisi ile hata vermemeli', async () => {
+        const result = await applyActiveCampaigns([]);
+        expect(result.totalDiscount).toBe(0);
+        expect(result.appliedCampaigns).toEqual([]);
     });
 });

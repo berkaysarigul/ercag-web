@@ -1,0 +1,2700 @@
+﻿
+> server@1.0.0 test
+> jest --runInBand --forceExit
+
+node.exe : PASS __tests
+__/auth-advanced.test.j
+s (9.267 s)
+At C:\Program Files\nod
+ejs\npm.ps1:29 char:3
++   & $NODE_EXE $NPM_CL
+I_JS $args
++   ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (PASS __tests_   
+ _/...st.js (9.267     
+s):String) [], Rem    o
+teException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+  ÔùÅ Console
+
+    console.log
+      Ôä╣´©Å Redis is d
+isabled (USE_REDIS=fals
+e). Using Memory fallba
+ck.
+
+      at Object.log (sr
+c/config/redis.js:36:13
+)
+
+    console.log
+      [dotenv@17.2.3] i
+njecting env (0) from .
+env -- tip: ÔÜÖ´©Å  sup
+press all logs with { q
+uiet: true }
+
+      at _log (node_mod
+ules/dotenv/lib/main.js
+:142:11)
+
+    console.log
+      [32minfo[39m: P
+OST /api/auth/register 
+201 297 - 918.331 ms {"
+service":"ercag-kirtasi
+ye-api","timestamp":"20
+26-02-26 20:01:39"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/auth/login 200
+ 297 - 625.125 ms {"ser
+vice":"ercag-kirtasiye-
+api","timestamp":"2026-
+02-26 20:01:39"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/auth/login 200
+ 297 - 625.007 ms {"ser
+vice":"ercag-kirtasiye-
+api","timestamp":"2026-
+02-26 20:01:40"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/auth/login 400
+ 28 - 341.916 ms {"serv
+ice":"ercag-kirtasiye-a
+pi","timestamp":"2026-0
+2-26 20:01:40"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/auth/login 404
+ 69 - 282.937 ms {"serv
+ice":"ercag-kirtasiye-a
+pi","timestamp":"2026-0
+2-26 20:01:40"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/auth/register 
+400 63 - 280.836 ms {"s
+ervice":"ercag-kirtasiy
+e-api","timestamp":"202
+6-02-26 20:01:41"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/auth/register 
+400 63 - 283.113 ms {"s
+ervice":"ercag-kirtasiy
+e-api","timestamp":"202
+6-02-26 20:01:41"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      ======== EMAIL MO
+CK (No Credentials Prov
+ided) ========
+
+      at log (src/servi
+ces/notificationService
+.js:20:21)
+
+    console.log
+      To: test_authadva
+nced@test.com
+
+      at log (src/servi
+ces/notificationService
+.js:21:21)
+
+    console.log
+      Subject: ┼Şifre S
+─▒f─▒rlama Kodu
+
+      at log (src/servi
+ces/notificationService
+.js:22:21)
+
+    console.log
+      --- Content ---
+
+      at log (src/servi
+ces/notificationService
+.js:23:21)
+
+    console.log
+      <p>┼Şifre s─▒f─▒r
+lama kodunuz: <strong>2
+40442</strong></p><p>Bu
+ kod 15 dakika ge├ğerli
+dir.</p>
+
+      at log (src/servi
+ces/notificationService
+.js:24:21)
+
+    console.log
+      =================
+===========
+
+      at log (src/servi
+ces/notificationService
+.js:25:21)
+
+    console.log
+      [32minfo[39m: P
+OST /api/auth/forgot-pa
+ssword 200 79 - 568.807
+ ms {"service":"ercag-k
+irtasiye-api","timestam
+p":"2026-02-26 20:01:42
+"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/auth/verify-co
+de 200 44 - 284.554 ms 
+{"service":"ercag-kirta
+siye-api","timestamp":"
+2026-02-26 20:01:42"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/auth/reset-pas
+sword 200 72 - 633.839 
+ms {"service":"ercag-ki
+rtasiye-api","timestamp
+":"2026-02-26 20:01:43"
+}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/auth/login 200
+ 297 - 645.732 ms {"ser
+vice":"ercag-kirtasiye-
+api","timestamp":"2026-
+02-26 20:01:44"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: G
+ET /api/orders 403 38 -
+ 0.685 ms {"service":"e
+rcag-kirtasiye-api","ti
+mestamp":"2026-02-26 20
+:01:44"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: G
+ET /api/orders 401 37 -
+ 0.346 ms {"service":"e
+rcag-kirtasiye-api","ti
+mestamp":"2026-02-26 20
+:01:44"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+FAIL __tests__/product.
+test.js (7.812 s)
+  ÔùÅ Console
+
+    console.log
+      Ôä╣´©Å Redis is d
+isabled (USE_REDIS=fals
+e). Using Memory fallba
+ck.
+
+      at Object.log (sr
+c/config/redis.js:36:13
+)
+
+    console.log
+      [dotenv@17.2.3] i
+njecting env (0) from .
+env -- tip: Ô£à audit s
+ecrets and track compli
+ance: https://dotenvx.c
+om/ops
+
+      at _log (node_mod
+ules/dotenv/lib/main.js
+:142:11)
+
+    console.log
+      [32minfo[39m: G
+ET /api/products 200 20
+12 - 862.544 ms {"servi
+ce":"ercag-kirtasiye-ap
+i","timestamp":"2026-02
+-26 20:01:48"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/products 201 3
+32 - 759.304 ms {"servi
+ce":"ercag-kirtasiye-ap
+i","timestamp":"2026-02
+-26 20:01:49"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: G
+ET /api/products/17 200
+ 467 - 484.698 ms {"ser
+vice":"ercag-kirtasiye-
+api","timestamp":"2026-
+02-26 20:01:49"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: G
+ET /api/products/999999
+ 404 29 - 270.506 ms {"
+service":"ercag-kirtasi
+ye-api","timestamp":"20
+26-02-26 20:01:50"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+UT /api/products/17 200
+ 338 - 756.716 ms {"ser
+vice":"ercag-kirtasiye-
+api","timestamp":"2026-
+02-26 20:01:50"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: D
+ELETE /api/products/17 
+200 56 - 539.033 ms {"s
+ervice":"ercag-kirtasiy
+e-api","timestamp":"202
+6-02-26 20:01:51"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: G
+ET /api/products/search
+/suggestions?q=defter 2
+00 215 - 650.978 ms {"s
+ervice":"ercag-kirtasiy
+e-api","timestamp":"202
+6-02-26 20:01:52"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+  ÔùÅ ├£r├╝n Endpoint'l
+eri ÔÇ║ ├£r├╝n listesi 
+public eri┼şilebilir ol
+mal─▒
+
+    expect(received).to
+Be(expected) // Object.
+is equality
+
+    Expected: true
+    Received: false
+
+    [0m [90m 40 |[39
+m         [36mconst[3
+9m res [33m=[39m [36
+mawait[39m request(app
+)[33m.[39m[36mget[3
+9m([32m'/api/products'
+[39m)[33m;[39m
+     [90m 41 |[39m   
+      expect(res[33m.
+[39mstatusCode)[33m.[
+39mtoBe([35m200[39m)
+[33m;[39m
+    [31m[1m>[22m[39
+m[90m 42 |[39m       
+  expect([33mArray[39
+m[33m.[39misArray(res
+[33m.[39mbody))[33m.
+[39mtoBe([36mtrue[39
+m)[33m;[39m
+     [90m    |[39m   
+                       
+               [31m[1
+m^[22m[39m
+     [90m 43 |[39m   
+  })[33m;[39m
+     [90m 44 |[39m
+     [90m 45 |[39m   
+  test([32m'Admin ├╝r├
+╝n olu┼şturabilmeli'[3
+9m[33m,[39m [36masyn
+c[39m () [33m=>[39m 
+{[0m
+
+      at Object.toBe (_
+_tests__/product.test.j
+s:42:41)
+
+PASS __tests__/order-st
+atus.test.js (30.006 s)
+  ÔùÅ Console
+
+    console.log
+      Ôä╣´©Å Redis is d
+isabled (USE_REDIS=fals
+e). Using Memory fallba
+ck.
+
+      at Object.log (sr
+c/config/redis.js:36:13
+)
+
+    console.log
+      [dotenv@17.2.3] i
+njecting env (0) from .
+env -- tip: ­şöÉ preven
+t committing .env to co
+de: https://dotenvx.com
+/precommit
+
+      at _log (node_mod
+ules/dotenv/lib/main.js
+:142:11)
+
+    console.log
+      [32minfo[39m: P
+OST /api/auth/register 
+201 307 - 854.371 ms {"
+service":"ercag-kirtasi
+ye-api","timestamp":"20
+26-02-26 20:01:56"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [Mock WhatsApp Qu
+eue] Inline execution f
+or sendOrderConfirmatio
+n
+
+      at Object.log (sr
+c/queues/whatsappQueue.
+js:58:21)
+
+    console.log
+      ======== WHATSAPP
+ MOCK ========
+
+      at log (src/servi
+ces/whatsappService.js:
+6:21)
+
+    console.log
+      To: 05550000001
+
+      at log (src/servi
+ces/whatsappService.js:
+7:21)
+
+    console.log
+      Message: ­şøÆ Sip
+ari┼şiniz al─▒nd─▒!
+      
+      Sipari┼ş No: #12
+      Teslimat Kodu: 25
+1B20
+      
+      Sipari┼şiniz haz─
+▒r oldu─şunda size tekr
+ar bilgi verece─şiz.
+      
+      ÔÇö Er├ğa─ş K─▒rt
+asiye
+
+      at log (src/servi
+ces/whatsappService.js:
+8:21)
+
+    console.log
+      =================
+===============
+
+      at log (src/servi
+ces/whatsappService.js:
+9:21)
+
+    console.log
+      [32minfo[39m: P
+OST /api/orders 201 640
+ - 1902.108 ms {"servic
+e":"ercag-kirtasiye-api
+","timestamp":"2026-02-
+26 20:01:58"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [Mock Stock Queue
+] Inline execution for 
+reduceStockOnOrder
+
+      at Object.log (sr
+c/queues/stockQueue.js:
+56:21)
+
+    console.log
+      ======== EMAIL MO
+CK (No Credentials Prov
+ided) ========
+
+      at log (src/servi
+ces/notificationService
+.js:20:21)
+
+    console.log
+      To: test_status_c
+ustomer@test.com
+
+      at log (src/servi
+ces/notificationService
+.js:21:21)
+
+    console.log
+      Subject: Sipari┼ş
+iniz Haz─▒rlan─▒yor ­şô
+Ğ
+
+      at log (src/servi
+ces/notificationService
+.js:22:21)
+
+    console.log
+      --- Content ---
+
+      at log (src/servi
+ces/notificationService
+.js:23:21)
+
+    console.log
+      
+      <!DOCTYPE html>
+      <html>
+      <head><meta chars
+et="utf-8"><meta name="
+viewport" content="widt
+h=device-width, initial
+-scale=1.0"></head>
+      <body style="marg
+in:0;padding:0;backgrou
+nd-color:#f4f4f0;font-f
+amily:'Inter',-apple-sy
+stem,BlinkMacSystemFont
+,'Segoe UI',Roboto,sans
+-serif;">
+        <div style="max
+-width:600px;margin:0 a
+uto;padding:20px;">
+          <div style="b
+ackground:linear-gradie
+nt(135deg,#264a3d,#1b35
+29);border-radius:16px 
+16px 0 0;padding:30px;t
+ext-align:center;">
+            <h1 style="
+color:white;margin:0;fo
+nt-size:24px;">Er├ğa─ş 
+K─▒rtasiye</h1>
+            <p style="c
+olor:rgba(255,255,255,0
+.7);margin:5px 0 0;font
+-size:13px;">T─▒kla & G
+el Al</p>
+          </div>
+          <div style="b
+ackground:white;padding
+:30px;border:1px solid 
+#e2e8f0;border-top:none
+;">
+            <h2 style="
+color:#0f172a;margin:0 
+0 15px;font-size:20px;"
+>Sipari┼şiniz Haz─▒rlan
+─▒yor ­şôĞ</h2>
+            <p style="c
+olor:#334155;">Sipari┼ş
+ <strong>#12</strong> o
+nayland─▒ ve ekibimiz t
+araf─▒ndan haz─▒rlanmay
+a ba┼şland─▒.</p>
+                       
+      <p style="color:#
+334155;">Haz─▒r oldu─şu
+nda size tekrar bilgi v
+erece─şiz.</p>
+            
+              <div styl
+e="text-align:center;ma
+rgin:25px 0;">
+                <a href
+="http://localhost:3000
+/profile?tab=orders" st
+yle="background-color:#
+264a3d;color:white;padd
+ing:12px 30px;text-deco
+ration:none;border-radi
+us:10px;font-weight:600
+;font-size:14px;display
+:inline-block;">Sipari┼
+şimi G├Âr├╝nt├╝le</a>
+              </div>
+            
+          </div>
+          <div style="b
+order-radius:0 0 16px 1
+6px;background:#f2f7f5;
+padding:20px;text-align
+:center;border:1px soli
+d #e2e8f0;border-top:no
+ne;">
+            <p style="c
+olor:#64748b;font-size:
+12px;margin:0;">Er├ğa─ş
+ K─▒rtasiye</p>
+            <p style="c
+olor:#94a3b8;font-size:
+11px;margin:5px 0 0;">B
+u email otomatik g├Ânde
+rilmi┼ştir.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+
+      at log (src/servi
+ces/notificationService
+.js:24:21)
+
+    console.log
+      =================
+===========
+
+      at log (src/servi
+ces/notificationService
+.js:25:21)
+
+    console.log
+      ======== SMS MOCK
+ ========
+
+      at log (src/servi
+ces/notificationService
+.js:47:21)
+
+    console.log
+      To: 05550000001
+
+      at log (src/servi
+ces/notificationService
+.js:48:21)
+
+    console.log
+      Message: Siparisi
+niz #12 hazirlaniyor. H
+azir olunca haber verec
+egiz. - Ercag Kirtasiye
+
+      at log (src/servi
+ces/notificationService
+.js:49:21)
+
+    console.log
+      =================
+=========
+
+      at log (src/servi
+ces/notificationService
+.js:50:21)
+
+    console.log
+      [32minfo[39m: P
+UT /api/orders/12/statu
+s 200 679 - 1274.874 ms
+ {"service":"ercag-kirt
+asiye-api","timestamp":
+"2026-02-26 20:02:00"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      ======== EMAIL MO
+CK (No Credentials Prov
+ided) ========
+
+      at log (src/servi
+ces/notificationService
+.js:20:21)
+
+    console.log
+      To: test_status_c
+ustomer@test.com
+
+      at log (src/servi
+ces/notificationService
+.js:21:21)
+
+    console.log
+      Subject: Sipari┼ş
+iniz HAZIR! Ô£à
+
+      at log (src/servi
+ces/notificationService
+.js:22:21)
+
+    console.log
+      --- Content ---
+
+      at log (src/servi
+ces/notificationService
+.js:23:21)
+
+    console.log
+      
+      <!DOCTYPE html>
+      <html>
+      <head><meta chars
+et="utf-8"><meta name="
+viewport" content="widt
+h=device-width, initial
+-scale=1.0"></head>
+      <body style="marg
+in:0;padding:0;backgrou
+nd-color:#f4f4f0;font-f
+amily:'Inter',-apple-sy
+stem,BlinkMacSystemFont
+,'Segoe UI',Roboto,sans
+-serif;">
+        <div style="max
+-width:600px;margin:0 a
+uto;padding:20px;">
+          <div style="b
+ackground:linear-gradie
+nt(135deg,#264a3d,#1b35
+29);border-radius:16px 
+16px 0 0;padding:30px;t
+ext-align:center;">
+            <h1 style="
+color:white;margin:0;fo
+nt-size:24px;">Er├ğa─ş 
+K─▒rtasiye</h1>
+            <p style="c
+olor:rgba(255,255,255,0
+.7);margin:5px 0 0;font
+-size:13px;">T─▒kla & G
+el Al</p>
+          </div>
+          <div style="b
+ackground:white;padding
+:30px;border:1px solid 
+#e2e8f0;border-top:none
+;">
+            <h2 style="
+color:#0f172a;margin:0 
+0 15px;font-size:20px;"
+>Sipari┼şiniz HAZIR! Ô£
+à</h2>
+            <p style="c
+olor:#334155;">Sipari┼ş
+ <strong>#12</strong> h
+az─▒rland─▒ ve sizi bek
+liyor!</p>
+                       
+      <div style="backg
+round:#f0fdf4;border:2p
+x dashed #86efac;border
+-radius:12px;padding:20
+px;text-align:center;ma
+rgin:20px 0;">
+                       
+        <p style="color
+:#64748b;font-size:13px
+;margin:0 0 5px;">Tesli
+mat Kodunuz</p>
+                       
+        <p style="color
+:#059669;font-size:36px
+;font-weight:800;letter
+-spacing:4px;margin:0;"
+>251B20</p>
+                       
+      </div>
+                       
+      <p style="color:#
+334155;">Bu kodu ma─şaz
+a kasas─▒nda g├Âsterere
+k ├╝r├╝nlerinizi teslim
+ alabilirsiniz.</p>
+            
+              <div styl
+e="text-align:center;ma
+rgin:25px 0;">
+                <a href
+="http://localhost:3000
+/profile?tab=orders" st
+yle="background-color:#
+264a3d;color:white;padd
+ing:12px 30px;text-deco
+ration:none;border-radi
+us:10px;font-weight:600
+;font-size:14px;display
+:inline-block;">Sipari┼
+şimi G├Âr├╝nt├╝le</a>
+              </div>
+            
+          </div>
+          <div style="b
+order-radius:0 0 16px 1
+6px;background:#f2f7f5;
+padding:20px;text-align
+:center;border:1px soli
+d #e2e8f0;border-top:no
+ne;">
+            <p style="c
+olor:#64748b;font-size:
+12px;margin:0;">Er├ğa─ş
+ K─▒rtasiye</p>
+            <p style="c
+olor:#94a3b8;font-size:
+11px;margin:5px 0 0;">B
+u email otomatik g├Ânde
+rilmi┼ştir.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+
+      at log (src/servi
+ces/notificationService
+.js:24:21)
+
+    console.log
+      =================
+===========
+
+      at log (src/servi
+ces/notificationService
+.js:25:21)
+
+    console.log
+      ======== SMS MOCK
+ ========
+
+      at log (src/servi
+ces/notificationService
+.js:47:21)
+
+    console.log
+      To: 05550000001
+
+      at log (src/servi
+ces/notificationService
+.js:48:21)
+
+    console.log
+      Message: Siparisi
+niz #12 HAZIR! Teslim k
+odunuz: 251B20. Magazam
+izdan teslim alabilirsi
+niz. - Ercag Kirtasiye
+
+      at log (src/servi
+ces/notificationService
+.js:49:21)
+
+    console.log
+      =================
+=========
+
+      at log (src/servi
+ces/notificationService
+.js:50:21)
+
+    console.log
+      [32minfo[39m: P
+UT /api/orders/12/statu
+s 200 808 - 1865.836 ms
+ {"service":"ercag-kirt
+asiye-api","timestamp":
+"2026-02-26 20:02:01"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      ======== EMAIL MO
+CK (No Credentials Prov
+ided) ========
+
+      at log (src/servi
+ces/notificationService
+.js:20:21)
+
+    console.log
+      To: test_status_c
+ustomer@test.com
+
+      at log (src/servi
+ces/notificationService
+.js:21:21)
+
+    console.log
+      Subject: Sipari┼ş
+iniz Teslim Edildi ­şÄë
+
+      at log (src/servi
+ces/notificationService
+.js:22:21)
+
+    console.log
+      --- Content ---
+
+      at log (src/servi
+ces/notificationService
+.js:23:21)
+
+    console.log
+      
+      <!DOCTYPE html>
+      <html>
+      <head><meta chars
+et="utf-8"><meta name="
+viewport" content="widt
+h=device-width, initial
+-scale=1.0"></head>
+      <body style="marg
+in:0;padding:0;backgrou
+nd-color:#f4f4f0;font-f
+amily:'Inter',-apple-sy
+stem,BlinkMacSystemFont
+,'Segoe UI',Roboto,sans
+-serif;">
+        <div style="max
+-width:600px;margin:0 a
+uto;padding:20px;">
+          <div style="b
+ackground:linear-gradie
+nt(135deg,#264a3d,#1b35
+29);border-radius:16px 
+16px 0 0;padding:30px;t
+ext-align:center;">
+            <h1 style="
+color:white;margin:0;fo
+nt-size:24px;">Er├ğa─ş 
+K─▒rtasiye</h1>
+            <p style="c
+olor:rgba(255,255,255,0
+.7);margin:5px 0 0;font
+-size:13px;">T─▒kla & G
+el Al</p>
+          </div>
+          <div style="b
+ackground:white;padding
+:30px;border:1px solid 
+#e2e8f0;border-top:none
+;">
+            <h2 style="
+color:#0f172a;margin:0 
+0 15px;font-size:20px;"
+>Sipari┼şiniz Teslim Ed
+ildi ­şÄë</h2>
+            <p style="c
+olor:#334155;">Sipari┼ş
+ <strong>#12</strong> b
+a┼şar─▒yla teslim edild
+i.</p>
+                       
+      <p style="color:#
+334155;">Bizi tercih et
+ti─şiniz i├ğin te┼şekk├
+╝r ederiz! ├£r├╝nlerimi
+zi de─şerlendirmeyi unu
+tmay─▒n.</p>
+            
+              <div styl
+e="text-align:center;ma
+rgin:25px 0;">
+                <a href
+="http://localhost:3000
+/profile?tab=orders" st
+yle="background-color:#
+264a3d;color:white;padd
+ing:12px 30px;text-deco
+ration:none;border-radi
+us:10px;font-weight:600
+;font-size:14px;display
+:inline-block;">Sipari┼
+şimi G├Âr├╝nt├╝le</a>
+              </div>
+            
+          </div>
+          <div style="b
+order-radius:0 0 16px 1
+6px;background:#f2f7f5;
+padding:20px;text-align
+:center;border:1px soli
+d #e2e8f0;border-top:no
+ne;">
+            <p style="c
+olor:#64748b;font-size:
+12px;margin:0;">Er├ğa─ş
+ K─▒rtasiye</p>
+            <p style="c
+olor:#94a3b8;font-size:
+11px;margin:5px 0 0;">B
+u email otomatik g├Ânde
+rilmi┼ştir.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+
+      at log (src/servi
+ces/notificationService
+.js:24:21)
+
+    console.log
+      =================
+===========
+
+      at log (src/servi
+ces/notificationService
+.js:25:21)
+
+    console.log
+      ======== SMS MOCK
+ ========
+
+      at log (src/servi
+ces/notificationService
+.js:47:21)
+
+    console.log
+      To: 05550000001
+
+      at log (src/servi
+ces/notificationService
+.js:48:21)
+
+    console.log
+      Message: Siparisi
+niz #12 teslim edildi. 
+Bizi tercih ettiginiz i
+cin tesekkurler! - Erca
+g Kirtasiye
+
+      at log (src/servi
+ces/notificationService
+.js:49:21)
+
+    console.log
+      =================
+=========
+
+      at log (src/servi
+ces/notificationService
+.js:50:21)
+
+    console.log
+      [32minfo[39m: P
+UT /api/orders/12/statu
+s 200 945 - 2328.173 ms
+ {"service":"ercag-kirt
+asiye-api","timestamp":
+"2026-02-26 20:02:04"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+UT /api/orders/12/statu
+s 400 58 - 806.099 ms {
+"service":"ercag-kirtas
+iye-api","timestamp":"2
+026-02-26 20:02:05"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+UT /api/orders/12/statu
+s 400 60 - 796.789 ms {
+"service":"ercag-kirtas
+iye-api","timestamp":"2
+026-02-26 20:02:05"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [Mock WhatsApp Qu
+eue] Inline execution f
+or sendOrderConfirmatio
+n
+
+      at Object.log (sr
+c/queues/whatsappQueue.
+js:58:21)
+
+    console.log
+      ======== WHATSAPP
+ MOCK ========
+
+      at log (src/servi
+ces/whatsappService.js:
+6:21)
+
+    console.log
+      To: 05550000001
+
+      at log (src/servi
+ces/whatsappService.js:
+7:21)
+
+    console.log
+      Message: ­şøÆ Sip
+ari┼şiniz al─▒nd─▒!
+      
+      Sipari┼ş No: #13
+      Teslimat Kodu: D4
+18FD
+      
+      Sipari┼şiniz haz─
+▒r oldu─şunda size tekr
+ar bilgi verece─şiz.
+      
+      ÔÇö Er├ğa─ş K─▒rt
+asiye
+
+      at log (src/servi
+ces/whatsappService.js:
+8:21)
+
+    console.log
+      =================
+===============
+
+      at log (src/servi
+ces/whatsappService.js:
+9:21)
+
+    console.log
+      [32minfo[39m: P
+OST /api/orders 201 640
+ - 2040.975 ms {"servic
+e":"ercag-kirtasiye-api
+","timestamp":"2026-02-
+26 20:02:07"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      ======== EMAIL MO
+CK (No Credentials Prov
+ided) ========
+
+      at log (src/servi
+ces/notificationService
+.js:20:21)
+
+    console.log
+      To: test_status_c
+ustomer@test.com
+
+      at log (src/servi
+ces/notificationService
+.js:21:21)
+
+    console.log
+      Subject: Sipari┼ş
+iniz ─░ptal Edildi
+
+      at log (src/servi
+ces/notificationService
+.js:22:21)
+
+    console.log
+      --- Content ---
+
+      at log (src/servi
+ces/notificationService
+.js:23:21)
+
+    console.log
+      
+      <!DOCTYPE html>
+      <html>
+      <head><meta chars
+et="utf-8"><meta name="
+viewport" content="widt
+h=device-width, initial
+-scale=1.0"></head>
+      <body style="marg
+in:0;padding:0;backgrou
+nd-color:#f4f4f0;font-f
+amily:'Inter',-apple-sy
+stem,BlinkMacSystemFont
+,'Segoe UI',Roboto,sans
+-serif;">
+        <div style="max
+-width:600px;margin:0 a
+uto;padding:20px;">
+          <div style="b
+ackground:linear-gradie
+nt(135deg,#264a3d,#1b35
+29);border-radius:16px 
+16px 0 0;padding:30px;t
+ext-align:center;">
+            <h1 style="
+color:white;margin:0;fo
+nt-size:24px;">Er├ğa─ş 
+K─▒rtasiye</h1>
+            <p style="c
+olor:rgba(255,255,255,0
+.7);margin:5px 0 0;font
+-size:13px;">T─▒kla & G
+el Al</p>
+          </div>
+          <div style="b
+ackground:white;padding
+:30px;border:1px solid 
+#e2e8f0;border-top:none
+;">
+            <h2 style="
+color:#0f172a;margin:0 
+0 15px;font-size:20px;"
+>Sipari┼şiniz ─░ptal Ed
+ildi</h2>
+            <p style="c
+olor:#334155;">Sipari┼ş
+ <strong>#13</strong> i
+ptal edildi.</p>
+                       
+      <p style="color:#
+334155;">Herhangi bir s
+orunuz varsa ma─şazam─▒
+zla ileti┼şime ge├ğebil
+irsiniz.</p>
+            
+              <div styl
+e="text-align:center;ma
+rgin:25px 0;">
+                <a href
+="http://localhost:3000
+/profile?tab=orders" st
+yle="background-color:#
+264a3d;color:white;padd
+ing:12px 30px;text-deco
+ration:none;border-radi
+us:10px;font-weight:600
+;font-size:14px;display
+:inline-block;">Sipari┼
+şimi G├Âr├╝nt├╝le</a>
+              </div>
+            
+          </div>
+          <div style="b
+order-radius:0 0 16px 1
+6px;background:#f2f7f5;
+padding:20px;text-align
+:center;border:1px soli
+d #e2e8f0;border-top:no
+ne;">
+            <p style="c
+olor:#64748b;font-size:
+12px;margin:0;">Er├ğa─ş
+ K─▒rtasiye</p>
+            <p style="c
+olor:#94a3b8;font-size:
+11px;margin:5px 0 0;">B
+u email otomatik g├Ânde
+rilmi┼ştir.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+
+      at log (src/servi
+ces/notificationService
+.js:24:21)
+
+    console.log
+      =================
+===========
+
+      at log (src/servi
+ces/notificationService
+.js:25:21)
+
+    console.log
+      ======== SMS MOCK
+ ========
+
+      at log (src/servi
+ces/notificationService
+.js:47:21)
+
+    console.log
+      To: 05550000001
+
+      at log (src/servi
+ces/notificationService
+.js:48:21)
+
+    console.log
+      Message: Siparisi
+niz #13 iptal edildi. S
+orulariniz icin magazam
+izi arayabilirsiniz. - 
+Ercag Kirtasiye
+
+      at log (src/servi
+ces/notificationService
+.js:49:21)
+
+    console.log
+      =================
+=========
+
+      at log (src/servi
+ces/notificationService
+.js:50:21)
+
+    console.log
+      [32minfo[39m: P
+UT /api/orders/13/statu
+s 200 679 - 1364.381 ms
+ {"service":"ercag-kirt
+asiye-api","timestamp":
+"2026-02-26 20:02:09"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [Mock WhatsApp Qu
+eue] Inline execution f
+or sendOrderConfirmatio
+n
+
+      at Object.log (sr
+c/queues/whatsappQueue.
+js:58:21)
+
+    console.log
+      ======== WHATSAPP
+ MOCK ========
+
+      at log (src/servi
+ces/whatsappService.js:
+6:21)
+
+    console.log
+      To: 05550000001
+
+      at log (src/servi
+ces/whatsappService.js:
+7:21)
+
+    console.log
+      Message: ­şøÆ Sip
+ari┼şiniz al─▒nd─▒!
+      
+      Sipari┼ş No: #14
+      Teslimat Kodu: ED
+6489
+      
+      Sipari┼şiniz haz─
+▒r oldu─şunda size tekr
+ar bilgi verece─şiz.
+      
+      ÔÇö Er├ğa─ş K─▒rt
+asiye
+
+      at log (src/servi
+ces/whatsappService.js:
+8:21)
+
+    console.log
+      =================
+===============
+
+      at log (src/servi
+ces/whatsappService.js:
+9:21)
+
+    console.log
+      [32minfo[39m: P
+OST /api/orders 201 640
+ - 2048.624 ms {"servic
+e":"ercag-kirtasiye-api
+","timestamp":"2026-02-
+26 20:02:11"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+UT /api/orders/14/statu
+s 400 54 - 797.293 ms {
+"service":"ercag-kirtas
+iye-api","timestamp":"2
+026-02-26 20:02:12"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [Mock WhatsApp Qu
+eue] Inline execution f
+or sendOrderConfirmatio
+n
+
+      at Object.log (sr
+c/queues/whatsappQueue.
+js:58:21)
+
+    console.log
+      ======== WHATSAPP
+ MOCK ========
+
+      at log (src/servi
+ces/whatsappService.js:
+6:21)
+
+    console.log
+      To: 05550000001
+
+      at log (src/servi
+ces/whatsappService.js:
+7:21)
+
+    console.log
+      Message: ­şøÆ Sip
+ari┼şiniz al─▒nd─▒!
+      
+      Sipari┼ş No: #15
+      Teslimat Kodu: CD
+D3E7
+      
+      Sipari┼şiniz haz─
+▒r oldu─şunda size tekr
+ar bilgi verece─şiz.
+      
+      ÔÇö Er├ğa─ş K─▒rt
+asiye
+
+      at log (src/servi
+ces/whatsappService.js:
+8:21)
+
+    console.log
+      =================
+===============
+
+      at log (src/servi
+ces/whatsappService.js:
+9:21)
+
+    console.log
+      [32minfo[39m: P
+OST /api/orders 201 640
+ - 2154.331 ms {"servic
+e":"ercag-kirtasiye-api
+","timestamp":"2026-02-
+26 20:02:14"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+UT /api/orders/15/cance
+l 200 705 - 855.275 ms 
+{"service":"ercag-kirta
+siye-api","timestamp":"
+2026-02-26 20:02:15"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [Mock WhatsApp Qu
+eue] Inline execution f
+or sendOrderConfirmatio
+n
+
+      at Object.log (sr
+c/queues/whatsappQueue.
+js:58:21)
+
+    console.log
+      ======== WHATSAPP
+ MOCK ========
+
+      at log (src/servi
+ces/whatsappService.js:
+6:21)
+
+    console.log
+      To: 05550000001
+
+      at log (src/servi
+ces/whatsappService.js:
+7:21)
+
+    console.log
+      Message: ­şøÆ Sip
+ari┼şiniz al─▒nd─▒!
+      
+      Sipari┼ş No: #16
+      Teslimat Kodu: EF
+F35D
+      
+      Sipari┼şiniz haz─
+▒r oldu─şunda size tekr
+ar bilgi verece─şiz.
+      
+      ÔÇö Er├ğa─ş K─▒rt
+asiye
+
+      at log (src/servi
+ces/whatsappService.js:
+8:21)
+
+    console.log
+      =================
+===============
+
+      at log (src/servi
+ces/whatsappService.js:
+9:21)
+
+    console.log
+      [32minfo[39m: P
+OST /api/orders 201 640
+ - 2104.289 ms {"servic
+e":"ercag-kirtasiye-api
+","timestamp":"2026-02-
+26 20:02:17"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [Mock Stock Queue
+] Inline execution for 
+reduceStockOnOrder
+
+      at Object.log (sr
+c/queues/stockQueue.js:
+56:21)
+
+    console.log
+      ======== EMAIL MO
+CK (No Credentials Prov
+ided) ========
+
+      at log (src/servi
+ces/notificationService
+.js:20:21)
+
+    console.log
+      To: test_status_c
+ustomer@test.com
+
+      at log (src/servi
+ces/notificationService
+.js:21:21)
+
+    console.log
+      Subject: Sipari┼ş
+iniz Haz─▒rlan─▒yor ­şô
+Ğ
+
+      at log (src/servi
+ces/notificationService
+.js:22:21)
+
+    console.log
+      --- Content ---
+
+      at log (src/servi
+ces/notificationService
+.js:23:21)
+
+    console.log
+      
+      <!DOCTYPE html>
+      <html>
+      <head><meta chars
+et="utf-8"><meta name="
+viewport" content="widt
+h=device-width, initial
+-scale=1.0"></head>
+      <body style="marg
+in:0;padding:0;backgrou
+nd-color:#f4f4f0;font-f
+amily:'Inter',-apple-sy
+stem,BlinkMacSystemFont
+,'Segoe UI',Roboto,sans
+-serif;">
+        <div style="max
+-width:600px;margin:0 a
+uto;padding:20px;">
+          <div style="b
+ackground:linear-gradie
+nt(135deg,#264a3d,#1b35
+29);border-radius:16px 
+16px 0 0;padding:30px;t
+ext-align:center;">
+            <h1 style="
+color:white;margin:0;fo
+nt-size:24px;">Er├ğa─ş 
+K─▒rtasiye</h1>
+            <p style="c
+olor:rgba(255,255,255,0
+.7);margin:5px 0 0;font
+-size:13px;">T─▒kla & G
+el Al</p>
+          </div>
+          <div style="b
+ackground:white;padding
+:30px;border:1px solid 
+#e2e8f0;border-top:none
+;">
+            <h2 style="
+color:#0f172a;margin:0 
+0 15px;font-size:20px;"
+>Sipari┼şiniz Haz─▒rlan
+─▒yor ­şôĞ</h2>
+            <p style="c
+olor:#334155;">Sipari┼ş
+ <strong>#16</strong> o
+nayland─▒ ve ekibimiz t
+araf─▒ndan haz─▒rlanmay
+a ba┼şland─▒.</p>
+                       
+      <p style="color:#
+334155;">Haz─▒r oldu─şu
+nda size tekrar bilgi v
+erece─şiz.</p>
+            
+              <div styl
+e="text-align:center;ma
+rgin:25px 0;">
+                <a href
+="http://localhost:3000
+/profile?tab=orders" st
+yle="background-color:#
+264a3d;color:white;padd
+ing:12px 30px;text-deco
+ration:none;border-radi
+us:10px;font-weight:600
+;font-size:14px;display
+:inline-block;">Sipari┼
+şimi G├Âr├╝nt├╝le</a>
+              </div>
+            
+          </div>
+          <div style="b
+order-radius:0 0 16px 1
+6px;background:#f2f7f5;
+padding:20px;text-align
+:center;border:1px soli
+d #e2e8f0;border-top:no
+ne;">
+            <p style="c
+olor:#64748b;font-size:
+12px;margin:0;">Er├ğa─ş
+ K─▒rtasiye</p>
+            <p style="c
+olor:#94a3b8;font-size:
+11px;margin:5px 0 0;">B
+u email otomatik g├Ânde
+rilmi┼ştir.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+
+      at log (src/servi
+ces/notificationService
+.js:24:21)
+
+    console.log
+      =================
+===========
+
+      at log (src/servi
+ces/notificationService
+.js:25:21)
+
+    console.log
+      ======== SMS MOCK
+ ========
+
+      at log (src/servi
+ces/notificationService
+.js:47:21)
+
+    console.log
+      To: 05550000001
+
+      at log (src/servi
+ces/notificationService
+.js:48:21)
+
+    console.log
+      Message: Siparisi
+niz #16 hazirlaniyor. H
+azir olunca haber verec
+egiz. - Ercag Kirtasiye
+
+      at log (src/servi
+ces/notificationService
+.js:49:21)
+
+    console.log
+      =================
+=========
+
+      at log (src/servi
+ces/notificationService
+.js:50:21)
+
+    console.log
+      [32minfo[39m: P
+UT /api/orders/16/statu
+s 200 679 - 1363.598 ms
+ {"service":"ercag-kirt
+asiye-api","timestamp":
+"2026-02-26 20:02:18"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+UT /api/orders/16/cance
+l 400 112 - 577.174 ms 
+{"service":"ercag-kirta
+siye-api","timestamp":"
+2026-02-26 20:02:19"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+PASS __tests__/order-tr
+ack.test.js (17.491 s)
+  ÔùÅ Console
+
+    console.log
+      Ôä╣´©Å Redis is d
+isabled (USE_REDIS=fals
+e). Using Memory fallba
+ck.
+
+      at Object.log (sr
+c/config/redis.js:36:13
+)
+
+    console.log
+      [dotenv@17.2.3] i
+njecting env (0) from .
+env -- tip: ­şôí add ob
+servability to secrets:
+ https://dotenvx.com/op
+s
+
+      at _log (node_mod
+ules/dotenv/lib/main.js
+:142:11)
+
+    console.log
+      [32minfo[39m: P
+OST /api/auth/register 
+201 292 - 954.384 ms {"
+service":"ercag-kirtasi
+ye-api","timestamp":"20
+26-02-26 20:02:27"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [Mock WhatsApp Qu
+eue] Inline execution f
+or sendOrderConfirmatio
+n
+
+      at Object.log (sr
+c/queues/whatsappQueue.
+js:58:21)
+
+    console.log
+      ======== WHATSAPP
+ MOCK ========
+
+      at log (src/servi
+ces/whatsappService.js:
+6:21)
+
+    console.log
+      To: 05550000050
+
+      at log (src/servi
+ces/whatsappService.js:
+7:21)
+
+    console.log
+      Message: ­şøÆ Sip
+ari┼şiniz al─▒nd─▒!
+      
+      Sipari┼ş No: #17
+      Teslimat Kodu: AF
+5FD6
+      
+      Sipari┼şiniz haz─
+▒r oldu─şunda size tekr
+ar bilgi verece─şiz.
+      
+      ÔÇö Er├ğa─ş K─▒rt
+asiye
+
+      at log (src/servi
+ces/whatsappService.js:
+8:21)
+
+    console.log
+      =================
+===============
+
+      at log (src/servi
+ces/whatsappService.js:
+9:21)
+
+    console.log
+      [32minfo[39m: P
+OST /api/orders 201 629
+ - 2132.195 ms {"servic
+e":"ercag-kirtasiye-api
+","timestamp":"2026-02-
+26 20:02:29"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: G
+ET /api/orders/track/AF
+5FD6 200 176 - 531.125 
+ms {"service":"ercag-ki
+rtasiye-api","timestamp
+":"2026-02-26 20:02:30"
+}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: G
+ET /api/orders/track/XX
+XXXX 404 32 - 348.351 m
+s {"service":"ercag-kir
+tasiye-api","timestamp"
+:"2026-02-26 20:02:30"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/orders/verify-
+code 200 1045 - 946.103
+ ms {"service":"ercag-k
+irtasiye-api","timestam
+p":"2026-02-26 20:02:31
+"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [Mock WhatsApp Qu
+eue] Inline execution f
+or sendOrderConfirmatio
+n
+
+      at Object.log (sr
+c/queues/whatsappQueue.
+js:58:21)
+
+    console.log
+      ======== WHATSAPP
+ MOCK ========
+
+      at log (src/servi
+ces/whatsappService.js:
+6:21)
+
+    console.log
+      To: 05550000050
+
+      at log (src/servi
+ces/whatsappService.js:
+7:21)
+
+    console.log
+      Message: ­şøÆ Sip
+ari┼şiniz al─▒nd─▒!
+      
+      Sipari┼ş No: #18
+      Teslimat Kodu: 59
+FE68
+      
+      Sipari┼şiniz haz─
+▒r oldu─şunda size tekr
+ar bilgi verece─şiz.
+      
+      ÔÇö Er├ğa─ş K─▒rt
+asiye
+
+      at log (src/servi
+ces/whatsappService.js:
+8:21)
+
+    console.log
+      =================
+===============
+
+      at log (src/servi
+ces/whatsappService.js:
+9:21)
+
+    console.log
+      [32minfo[39m: P
+OST /api/orders 201 629
+ - 2142.550 ms {"servic
+e":"ercag-kirtasiye-api
+","timestamp":"2026-02-
+26 20:02:33"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: G
+ET /api/orders 200 1871
+ - 827.422 ms {"service
+":"ercag-kirtasiye-api"
+,"timestamp":"2026-02-2
+6 20:02:34"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [Mock Stock Queue
+] Inline execution for 
+reduceStockOnOrder
+
+      at Object.log (sr
+c/queues/stockQueue.js:
+56:21)
+
+    console.log
+      ======== EMAIL MO
+CK (No Credentials Prov
+ided) ========
+
+      at log (src/servi
+ces/notificationService
+.js:20:21)
+
+    console.log
+      To: test_track_cu
+st@test.com
+
+      at log (src/servi
+ces/notificationService
+.js:21:21)
+
+    console.log
+      Subject: Sipari┼ş
+iniz Haz─▒rlan─▒yor ­şô
+Ğ
+
+      at log (src/servi
+ces/notificationService
+.js:22:21)
+
+    console.log
+      --- Content ---
+
+      at log (src/servi
+ces/notificationService
+.js:23:21)
+
+    console.log
+      
+      <!DOCTYPE html>
+      <html>
+      <head><meta chars
+et="utf-8"><meta name="
+viewport" content="widt
+h=device-width, initial
+-scale=1.0"></head>
+      <body style="marg
+in:0;padding:0;backgrou
+nd-color:#f4f4f0;font-f
+amily:'Inter',-apple-sy
+stem,BlinkMacSystemFont
+,'Segoe UI',Roboto,sans
+-serif;">
+        <div style="max
+-width:600px;margin:0 a
+uto;padding:20px;">
+          <div style="b
+ackground:linear-gradie
+nt(135deg,#264a3d,#1b35
+29);border-radius:16px 
+16px 0 0;padding:30px;t
+ext-align:center;">
+            <h1 style="
+color:white;margin:0;fo
+nt-size:24px;">Er├ğa─ş 
+K─▒rtasiye</h1>
+            <p style="c
+olor:rgba(255,255,255,0
+.7);margin:5px 0 0;font
+-size:13px;">T─▒kla & G
+el Al</p>
+          </div>
+          <div style="b
+ackground:white;padding
+:30px;border:1px solid 
+#e2e8f0;border-top:none
+;">
+            <h2 style="
+color:#0f172a;margin:0 
+0 15px;font-size:20px;"
+>Sipari┼şiniz Haz─▒rlan
+─▒yor ­şôĞ</h2>
+            <p style="c
+olor:#334155;">Sipari┼ş
+ <strong>#17</strong> o
+nayland─▒ ve ekibimiz t
+araf─▒ndan haz─▒rlanmay
+a ba┼şland─▒.</p>
+                       
+      <p style="color:#
+334155;">Haz─▒r oldu─şu
+nda size tekrar bilgi v
+erece─şiz.</p>
+            
+              <div styl
+e="text-align:center;ma
+rgin:25px 0;">
+                <a href
+="http://localhost:3000
+/profile?tab=orders" st
+yle="background-color:#
+264a3d;color:white;padd
+ing:12px 30px;text-deco
+ration:none;border-radi
+us:10px;font-weight:600
+;font-size:14px;display
+:inline-block;">Sipari┼
+şimi G├Âr├╝nt├╝le</a>
+              </div>
+            
+          </div>
+          <div style="b
+order-radius:0 0 16px 1
+6px;background:#f2f7f5;
+padding:20px;text-align
+:center;border:1px soli
+d #e2e8f0;border-top:no
+ne;">
+            <p style="c
+olor:#64748b;font-size:
+12px;margin:0;">Er├ğa─ş
+ K─▒rtasiye</p>
+            <p style="c
+olor:#94a3b8;font-size:
+11px;margin:5px 0 0;">B
+u email otomatik g├Ânde
+rilmi┼ştir.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+
+      at log (src/servi
+ces/notificationService
+.js:24:21)
+
+    console.log
+      =================
+===========
+
+      at log (src/servi
+ces/notificationService
+.js:25:21)
+
+    console.log
+      ======== SMS MOCK
+ ========
+
+      at log (src/servi
+ces/notificationService
+.js:47:21)
+
+    console.log
+      To: 05550000050
+
+      at log (src/servi
+ces/notificationService
+.js:48:21)
+
+    console.log
+      Message: Siparisi
+niz #17 hazirlaniyor. H
+azir olunca haber verec
+egiz. - Ercag Kirtasiye
+
+      at log (src/servi
+ces/notificationService
+.js:49:21)
+
+    console.log
+      =================
+=========
+
+      at log (src/servi
+ces/notificationService
+.js:50:21)
+
+    console.log
+      [32minfo[39m: P
+UT /api/orders/17/statu
+s 200 668 - 1421.468 ms
+ {"service":"ercag-kirt
+asiye-api","timestamp":
+"2026-02-26 20:02:36"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+PASS __tests__/campaign
+.test.js (7.924 s)
+PASS __tests__/authoriz
+ation.test.js (6.711 s)
+  ÔùÅ Console
+
+    console.log
+      Ôä╣´©Å Redis is d
+isabled (USE_REDIS=fals
+e). Using Memory fallba
+ck.
+
+      at Object.log (sr
+c/config/redis.js:36:13
+)
+
+    console.log
+      [dotenv@17.2.3] i
+njecting env (0) from .
+env -- tip: ÔÜÖ´©Å  spe
+cify custom .env file p
+ath with { path: '/cust
+om/path/.env' }
+
+      at _log (node_mod
+ules/dotenv/lib/main.js
+:142:11)
+
+    console.log
+      [32minfo[39m: G
+ET /api/orders/all 403 
+52 - 264.702 ms {"servi
+ce":"ercag-kirtasiye-ap
+i","timestamp":"2026-02
+-26 20:02:51"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: G
+ET /api/orders/all 200 
+1977 - 1285.695 ms {"se
+rvice":"ercag-kirtasiye
+-api","timestamp":"2026
+-02-26 20:02:52"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: G
+ET /api/orders/all 200 
+1977 - 836.076 ms {"ser
+vice":"ercag-kirtasiye-
+api","timestamp":"2026-
+02-26 20:02:53"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: G
+ET /api/users 403 52 - 
+264.551 ms {"service":"
+ercag-kirtasiye-api","t
+imestamp":"2026-02-26 2
+0:02:54"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: G
+ET /api/users 403 52 - 
+262.168 ms {"service":"
+ercag-kirtasiye-api","t
+imestamp":"2026-02-26 2
+0:02:54"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: G
+ET /api/users 200 821 -
+ 541.372 ms {"service":
+"ercag-kirtasiye-api","
+timestamp":"2026-02-26 
+20:02:54"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/campaigns 403 
+52 - 263.813 ms {"servi
+ce":"ercag-kirtasiye-ap
+i","timestamp":"2026-02
+-26 20:02:55"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+PASS __tests__/stock-se
+rvice.test.js (7.086 s)
+PASS __tests__/order.te
+st.js (6.065 s)
+  ÔùÅ Console
+
+    console.log
+      Ôä╣´©Å Redis is d
+isabled (USE_REDIS=fals
+e). Using Memory fallba
+ck.
+
+      at Object.log (sr
+c/config/redis.js:36:13
+)
+
+    console.log
+      [dotenv@17.2.3] i
+njecting env (0) from .
+env -- tip: ÔÜÖ´©Å  wri
+te to custom object wit
+h { processEnv: myObjec
+t }
+
+      at _log (node_mod
+ules/dotenv/lib/main.js
+:142:11)
+
+    console.log
+      [32minfo[39m: P
+OST /api/auth/register 
+201 289 - 858.427 ms {"
+service":"ercag-kirtasi
+ye-api","timestamp":"20
+26-02-26 20:03:04"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [Mock WhatsApp Qu
+eue] Inline execution f
+or sendOrderConfirmatio
+n
+
+      at Object.log (sr
+c/queues/whatsappQueue.
+js:58:21)
+
+    console.log
+      ======== WHATSAPP
+ MOCK ========
+
+      at log (src/servi
+ces/whatsappService.js:
+6:21)
+
+    console.log
+      To: 05559998877
+
+      at log (src/servi
+ces/whatsappService.js:
+7:21)
+
+    console.log
+      Message: ­şøÆ Sip
+ari┼şiniz al─▒nd─▒!
+      
+      Sipari┼ş No: #19
+      Teslimat Kodu: 60
+100B
+      
+      Sipari┼şiniz haz─
+▒r oldu─şunda size tekr
+ar bilgi verece─şiz.
+      
+      ÔÇö Er├ğa─ş K─▒rt
+asiye
+
+      at log (src/servi
+ces/whatsappService.js:
+8:21)
+
+    console.log
+      =================
+===============
+
+      at log (src/servi
+ces/whatsappService.js:
+9:21)
+
+    console.log
+      [32minfo[39m: P
+OST /api/orders 201 631
+ - 1899.392 ms {"servic
+e":"ercag-kirtasiye-api
+","timestamp":"2026-02-
+26 20:03:07"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+PASS __tests__/auth.tes
+t.js (6.562 s)
+  ÔùÅ Console
+
+    console.log
+      Ôä╣´©Å Redis is d
+isabled (USE_REDIS=fals
+e). Using Memory fallba
+ck.
+
+      at Object.log (sr
+c/config/redis.js:36:13
+)
+
+    console.log
+      [dotenv@17.2.3] i
+njecting env (0) from .
+env -- tip: ÔÜÖ´©Å  loa
+d multiple .env files w
+ith { path: ['.env.loca
+l', '.env'] }
+
+      at _log (node_mod
+ules/dotenv/lib/main.js
+:142:11)
+
+    console.log
+      [32minfo[39m: P
+OST /api/auth/register 
+201 282 - 950.772 ms {"
+service":"ercag-kirtasi
+ye-api","timestamp":"20
+26-02-26 20:03:10"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/auth/register 
+400 56 - 0.368 ms {"ser
+vice":"ercag-kirtasiye-
+api","timestamp":"2026-
+02-26 20:03:10"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/auth/login 200
+ 282 - 648.340 ms {"ser
+vice":"ercag-kirtasiye-
+api","timestamp":"2026-
+02-26 20:03:11"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/auth/login 400
+ 28 - 350.025 ms {"serv
+ice":"ercag-kirtasiye-a
+pi","timestamp":"2026-0
+2-26 20:03:11"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+PASS __tests__/coupon.t
+est.js (6.121 s)
+  ÔùÅ Console
+
+    console.log
+      Ôä╣´©Å Redis is d
+isabled (USE_REDIS=fals
+e). Using Memory fallba
+ck.
+
+      at Object.log (sr
+c/config/redis.js:36:13
+)
+
+    console.log
+      [dotenv@17.2.3] i
+njecting env (0) from .
+env -- tip: ­şôí add ob
+servability to secrets:
+ https://dotenvx.com/op
+s
+
+      at _log (node_mod
+ules/dotenv/lib/main.js
+:142:11)
+
+    console.log
+      [32minfo[39m: P
+OST /api/coupons/valida
+te 200 101 - 296.628 ms
+ {"service":"ercag-kirt
+asiye-api","timestamp":
+"2026-02-26 20:03:18"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/coupons/valida
+te 200 102 - 295.173 ms
+ {"service":"ercag-kirt
+asiye-api","timestamp":
+"2026-02-26 20:03:18"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/coupons/valida
+te 400 59 - 292.404 ms 
+{"service":"ercag-kirta
+siye-api","timestamp":"
+2026-02-26 20:03:19"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/coupons/valida
+te 400 46 - 292.449 ms 
+{"service":"ercag-kirta
+siye-api","timestamp":"
+2026-02-26 20:03:19"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/coupons/valida
+te 400 46 - 293.378 ms 
+{"service":"ercag-kirta
+siye-api","timestamp":"
+2026-02-26 20:03:19"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/coupons/valida
+te 404 47 - 294.913 ms 
+{"service":"ercag-kirta
+siye-api","timestamp":"
+2026-02-26 20:03:20"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/coupons/valida
+te 200 102 - 294.519 ms
+ {"service":"ercag-kirt
+asiye-api","timestamp":
+"2026-02-26 20:03:20"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+    console.log
+      [32minfo[39m: P
+OST /api/coupons/valida
+te 200 101 - 293.057 ms
+ {"service":"ercag-kirt
+asiye-api","timestamp":
+"2026-02-26 20:03:20"}
+
+      at Console.log (n
+ode_modules/winston/lib
+/winston/transports/con
+sole.js:87:23)
+
+PASS __tests__/stock.te
+st.js
+
+Test Suites: 1 failed, 
+10 passed, 11 total
+Tests:       1 failed, 
+63 passed, 64 total
+Snapshots:   0 total
+Time:        107.212 s,
+ estimated 108 s
+Ran all test suites.
+Force exiting Jest: Hav
+e you considered using 
+`--detectOpenHandles` t
+o detect async operatio
+ns that kept running af
+ter all tests finished?
