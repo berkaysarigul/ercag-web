@@ -7,6 +7,7 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useCampaigns } from '@/context/CampaignContext';
 import Link from 'next/link';
+import Script from 'next/script';
 import { toast } from 'sonner';
 import { FileText, X, Share2, Star, Clock, Heart, Bell, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -157,6 +158,41 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
     return (
         <div className="container pt-28 pb-8">
+            <Script
+                id="product-jsonld"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        '@context': 'https://schema.org',
+                        '@type': 'Product',
+                        name: product.name,
+                        description: product.description,
+                        image: product.image
+                            ? (product.image.startsWith('http') ? product.image : `${process.env.NEXT_PUBLIC_API_URL || ''}/uploads/${product.image}`)
+                            : undefined,
+                        category: product.category?.name,
+                        offers: {
+                            '@type': 'Offer',
+                            price: displayPrice.toFixed(2),
+                            priceCurrency: 'TRY',
+                            availability: product.stock > 0
+                                ? 'https://schema.org/InStock'
+                                : 'https://schema.org/OutOfStock',
+                            seller: {
+                                '@type': 'Organization',
+                                name: 'Erçağ Kırtasiye',
+                            }
+                        },
+                        ...(stats.count > 0 ? {
+                            aggregateRating: {
+                                '@type': 'AggregateRating',
+                                ratingValue: stats.average.toFixed(1),
+                                reviewCount: stats.count,
+                            }
+                        } : {})
+                    })
+                }}
+            />
             <nav className="flex text-sm text-gray-500 mb-6" aria-label="Breadcrumb">
                 <ol className="inline-flex items-center space-x-1">
                     <li><Link href="/" className="hover:text-blue-600 transition-colors">Ana Sayfa</Link></li>
