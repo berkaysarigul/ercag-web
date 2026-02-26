@@ -12,4 +12,22 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401 || error.response?.status === 403) {
+            // Token geçersiz — temizle ve login'e yönlendir
+            if (typeof window !== 'undefined') {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                // Auth sayfasındaysa redirect yapma (sonsuz döngü olmasın)
+                if (!window.location.pathname.startsWith('/auth')) {
+                    window.location.href = '/auth';
+                }
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
 export default api;

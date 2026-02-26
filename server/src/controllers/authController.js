@@ -285,4 +285,28 @@ const resetPassword = async (req, res) => {
     }
 };
 
-module.exports = { register, login, forgotPassword, verifyResetCode, resetPassword, verify2FA, toggle2FA };
+const me = async (req, res) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.id },
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                phone: true,
+                role: true,
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'Kullanıcı bulunamadı' });
+        }
+
+        res.json({ user });
+    } catch (error) {
+        console.error('Me endpoint error:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+module.exports = { register, login, forgotPassword, verifyResetCode, resetPassword, verify2FA, toggle2FA, me };
