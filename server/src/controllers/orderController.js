@@ -53,25 +53,49 @@ const createOrder = async (req, res) => {
             });
         }
 
+        // ── Kampanya İndirimi ──
+        const { applyActiveCampaigns } = require('./campaignController');
+
+        // applyActiveCampaigns için item'lara product bilgisi ekle (categoryId gerekiyor)
+        const itemsWithProduct = [];
+        for (const item of orderItemsData) {
+            const product = await prisma.product.findUnique({
+                where: { id: item.productId },
+                select: { id: true, categoryId: true }
+            });
+            itemsWithProduct.push({
+                ...item,
+                productId: item.productId,
+                product: product
+            });
+        }
+
+        const campaignResult = await applyActiveCampaigns(itemsWithProduct);
+        const campaignDiscount = Math.min(campaignResult.totalDiscount, totalAmount);
+        const campaignDetails = campaignResult.appliedCampaigns;
+
+        // Kampanya indirimini totalAmount'tan düş (kupon indirimi bunun üzerine uygulanacak)
+        let afterCampaignTotal = totalAmount - Math.min(campaignDiscount, totalAmount);
+
         // Apply Coupon Logic
         let discountAmount = 0;
         if (couponCode) {
             const coupon = await prisma.coupon.findUnique({ where: { code: couponCode } });
             if (coupon && coupon.isActive) {
                 if (!coupon.expirationDate || new Date() < coupon.expirationDate) {
-                    if (totalAmount >= coupon.minOrderAmount) {
+                    if (afterCampaignTotal >= coupon.minOrderAmount) {
                         if (coupon.discountType === 'PERCENTAGE') {
-                            discountAmount = (totalAmount * Number(coupon.discountValue)) / 100;
+                            discountAmount = (afterCampaignTotal * Number(coupon.discountValue)) / 100;
                         } else {
                             discountAmount = Number(coupon.discountValue);
                         }
-                        discountAmount = Math.min(discountAmount, totalAmount);
+                        discountAmount = Math.min(discountAmount, afterCampaignTotal);
                     }
                 }
             }
         }
 
-        const finalAmount = totalAmount - discountAmount;
+        const finalAmount = afterCampaignTotal - discountAmount;
         const pickupCode = await generatePickupCode();
 
         const order = await prisma.order.create({
@@ -85,6 +109,8 @@ const createOrder = async (req, res) => {
                 totalAmount: finalAmount,
                 couponCode,
                 discountAmount,
+                campaignDiscount,
+                campaignDetails: campaignDetails.length > 0 ? JSON.stringify(campaignDetails) : null,
                 status: 'PENDING',
                 pickupCode,
                 statusHistory: JSON.stringify([{ status: 'PENDING', timestamp: new Date(), note: 'Sipariş oluşturuldu' }]),

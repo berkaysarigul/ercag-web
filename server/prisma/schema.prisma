@@ -157,9 +157,11 @@ model Order {
   handledBy       User? @relation("HandledOrders", fields: [handledByUserId], references: [id])
 
   // Financials
-  totalAmount    Decimal
-  couponCode     String?
-  discountAmount Decimal @default(0)
+  totalAmount      Decimal
+  couponCode       String?
+  discountAmount   Decimal @default(0)
+  campaignDiscount Decimal @default(0)
+  campaignDetails  String? // JSON array of applied campaigns
 
   items     OrderItem[]
   createdAt DateTime    @default(now())
