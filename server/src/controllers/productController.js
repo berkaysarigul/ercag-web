@@ -132,8 +132,18 @@ const createProduct = async (req, res) => {
             });
         }
 
-        const { name, description, price, categoryId, stock, isFeatured } = validation.data;
+        const { name, description, price, categoryId, stock, isFeatured, sku, barcode, lowStockThreshold } = validation.data;
         const files = req.files || [];
+
+        // SKU/Barkod benzersizlik kontrolü
+        if (sku) {
+            const existingSku = await prisma.product.findFirst({ where: { sku, isDeleted: false } });
+            if (existingSku) return res.status(400).json({ error: `Bu SKU zaten kullanılıyor: ${sku}` });
+        }
+        if (barcode) {
+            const existingBarcode = await prisma.product.findFirst({ where: { barcode, isDeleted: false } });
+            if (existingBarcode) return res.status(400).json({ error: `Bu barkod zaten kullanılıyor: ${barcode}` });
+        }
 
         let mainImage = null;
         if (files.length > 0) {
@@ -143,11 +153,14 @@ const createProduct = async (req, res) => {
         const product = await prisma.product.create({
             data: {
                 name,
-                description,
-                price: price,
-                categoryId: categoryId,
-                stock: stock,
-                isFeatured: isFeatured,
+                description: description || '',
+                price,
+                categoryId,
+                stock,
+                isFeatured,
+                sku: sku || null,
+                barcode: barcode || null,
+                lowStockThreshold: lowStockThreshold || 5,
                 image: mainImage,
                 images: {
                     create: files.map((file, index) => ({
@@ -156,14 +169,18 @@ const createProduct = async (req, res) => {
                     }))
                 }
             },
-            include: { images: true }
+            include: { images: true, category: true }
         });
         res.status(201).json(product);
 
-        // Audit log (non-blocking — after response sent)
-        logAudit(req.user?.id, 'product.create', 'Product', product.id, { name: product.name, price: product.price }, req.ip);
+        logAudit(req.user?.id, 'product.create', 'Product', product.id, { name: product.name, sku: product.sku, price: product.price }, req.ip);
     } catch (error) {
         console.error('Create Product Error:', error);
+        if (error.code === 'P2002') {
+            const target = error.meta?.target;
+            if (target?.includes('sku')) return res.status(400).json({ error: 'Bu SKU zaten kullanılıyor' });
+            if (target?.includes('barcode')) return res.status(400).json({ error: 'Bu barkod zaten kullanılıyor' });
+        }
         res.status(500).json({ error: 'Failed to create product', details: error.message });
     }
 };
@@ -174,7 +191,7 @@ const updateProduct = async (req, res) => {
         const { id } = req.params;
         // Debug log removed
 
-        const { name, description, price, categoryId, isFeatured } = req.body;
+        const { name, description, price, categoryId, isFeatured, sku, barcode, lowStockThreshold } = req.body;
         const files = req.files || [];
 
         // Create a data object for update
@@ -184,7 +201,10 @@ const updateProduct = async (req, res) => {
             price: price ? parseFloat(price) : undefined,
             categoryId: categoryId ? parseInt(categoryId) : undefined,
             stock: req.body.stock ? parseInt(req.body.stock) : undefined,
-            isFeatured: isFeatured !== undefined ? (isFeatured === 'true' || isFeatured === true) : undefined
+            isFeatured: isFeatured !== undefined ? (isFeatured === 'true' || isFeatured === true) : undefined,
+            sku: sku !== undefined ? (sku || null) : undefined,
+            barcode: barcode !== undefined ? (barcode || null) : undefined,
+            lowStockThreshold: lowStockThreshold !== undefined ? parseInt(lowStockThreshold) : undefined,
         };
 
         // Handle Image Deletion
@@ -274,6 +294,11 @@ const updateProduct = async (req, res) => {
         logAudit(req.user?.id, 'product.update', 'Product', parseInt(id), { name: product.name }, req.ip);
     } catch (error) {
         console.error(error);
+        if (error.code === 'P2002') {
+            const target = error.meta?.target;
+            if (target?.includes('sku')) return res.status(400).json({ error: 'Bu SKU zaten başka üründe kullanılıyor' });
+            if (target?.includes('barcode')) return res.status(400).json({ error: 'Bu barkod zaten başka üründe kullanılıyor' });
+        }
         res.status(500).json({ error: 'Failed to update product' });
     }
 };
@@ -359,4 +384,271 @@ const searchSuggestions = async (req, res) => {
     }
 };
 
-module.exports = { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, bulkDeleteProducts, searchSuggestions };
+const XLSX = require('xlsx');
+const { bulkProductRowSchema } = require('../utils/validationSchemas');
+
+/**
+ * CSV/Excel şablon indir
+ * GET /api/products/bulk-template
+ */
+const downloadBulkTemplate = async (req, res) => {
+    try {
+        // Mevcut kategorileri çek
+        const categories = await prisma.category.findMany({ select: { name: true }, orderBy: { name: 'asc' } });
+        const categoryNames = categories.map(c => c.name).join(', ');
+
+        const templateData = [
+            {
+                'Ürün Adı': 'Faber-Castell 12li Boya Kalemi',
+                'Açıklama': 'Yüksek pigmentli, kırılmaya dayanıklı boya kalemleri',
+                'Fiyat': '89.90',
+                'Kategori': categories[0]?.name || 'Yazı Gereçleri',
+                'Stok': '100',
+                'SKU': 'FC-BK-012',
+                'Barkod': '8690826012345',
+                'Düşük Stok Eşiği': '5',
+            },
+            {
+                'Ürün Adı': 'Kraf Spiralli Defter A4',
+                'Açıklama': '100 yaprak, çizgili, polipropilen kapak',
+                'Fiyat': '34.50',
+                'Kategori': categories[1]?.name || 'Defterler',
+                'Stok': '200',
+                'SKU': 'KRF-DEF-A4',
+                'Barkod': '8690826054321',
+                'Düşük Stok Eşiği': '10',
+            }
+        ];
+
+        const ws = XLSX.utils.json_to_sheet(templateData);
+
+        // Sütun genişlikleri
+        ws['!cols'] = [
+            { wch: 35 }, // Ürün Adı
+            { wch: 50 }, // Açıklama
+            { wch: 10 }, // Fiyat
+            { wch: 20 }, // Kategori
+            { wch: 8 },  // Stok
+            { wch: 15 }, // SKU
+            { wch: 18 }, // Barkod
+            { wch: 18 }, // Düşük Stok Eşiği
+        ];
+
+        // Bilgi satırı ekle (kategori listesi)
+        XLSX.utils.sheet_add_aoa(ws, [
+            [],
+            ['Mevcut Kategoriler:', categoryNames],
+            ['NOT:', 'Kategori adlarını tam olarak yukarıdaki listeden yazınız. Büyük/küçük harf duyarlıdır.']
+        ], { origin: -1 });
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Ürünler');
+
+        const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=ercag-urun-sablonu.xlsx');
+        res.send(buffer);
+    } catch (error) {
+        console.error('Template Download Error:', error);
+        res.status(500).json({ error: 'Şablon oluşturulamadı' });
+    }
+};
+
+/**
+ * Toplu ürün yükle (CSV/Excel)
+ * POST /api/products/bulk-import
+ */
+const bulkImportProducts = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'Dosya yüklenmedi' });
+        }
+
+        const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const rawData = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+        if (rawData.length === 0) {
+            return res.status(400).json({ error: 'Dosya boş veya okunamadı' });
+        }
+
+        // Mevcut kategorileri al (isim → id mapping)
+        const categories = await prisma.category.findMany();
+        const categoryMap = {};
+        categories.forEach(c => { categoryMap[c.name] = c.id; });
+
+        // Mevcut SKU ve barkodları al (çakışma kontrolü)
+        const existingSkus = new Set();
+        const existingBarcodes = new Set();
+        const existingProducts = await prisma.product.findMany({
+            where: { isDeleted: false },
+            select: { sku: true, barcode: true }
+        });
+        existingProducts.forEach(p => {
+            if (p.sku) existingSkus.add(p.sku);
+            if (p.barcode) existingBarcodes.add(p.barcode);
+        });
+
+        const results = { created: 0, skipped: 0, errors: [] };
+        const batchSkus = new Set(); // Bu dosya içindeki SKU'lar (dosya içi çakışma)
+        const batchBarcodes = new Set();
+
+        // Header mapping (Türkçe → İngilizce)
+        const headerMap = {
+            'Ürün Adı': 'name', 'Urun Adi': 'name', 'name': 'name',
+            'Açıklama': 'description', 'Aciklama': 'description', 'description': 'description',
+            'Fiyat': 'price', 'price': 'price',
+            'Kategori': 'categoryName', 'category': 'categoryName', 'categoryName': 'categoryName',
+            'Stok': 'stock', 'stock': 'stock',
+            'SKU': 'sku', 'sku': 'sku',
+            'Barkod': 'barcode', 'barcode': 'barcode',
+            'Düşük Stok Eşiği': 'lowStockThreshold', 'Dusuk Stok Esigi': 'lowStockThreshold', 'lowStockThreshold': 'lowStockThreshold',
+        };
+
+        for (let i = 0; i < rawData.length; i++) {
+            const rawRow = rawData[i];
+            const rowNum = i + 2; // Excel satır numarası (header + 1-indexed)
+
+            // Header map uygula
+            const row = {};
+            for (const [key, value] of Object.entries(rawRow)) {
+                const mappedKey = headerMap[key] || headerMap[key.trim()] || key;
+                row[mappedKey] = typeof value === 'string' ? value.trim() : value;
+            }
+
+            // Boş satırları atla (bilgi satırları vs.)
+            if (!row.name || String(row.name).startsWith('Mevcut Kategori') || String(row.name).startsWith('NOT:')) {
+                continue;
+            }
+
+            // Zod validasyonu
+            const validation = bulkProductRowSchema.safeParse(row);
+            if (!validation.success) {
+                const errorMessages = Object.entries(validation.error.flatten().fieldErrors)
+                    .map(([field, msgs]) => `${field}: ${msgs.join(', ')}`)
+                    .join('; ');
+                results.errors.push({ row: rowNum, name: row.name || '?', error: errorMessages });
+                results.skipped++;
+                continue;
+            }
+
+            const data = validation.data;
+
+            // Kategori kontrolü
+            const categoryId = categoryMap[data.categoryName];
+            if (!categoryId) {
+                results.errors.push({ row: rowNum, name: data.name, error: `Kategori bulunamadı: "${data.categoryName}"` });
+                results.skipped++;
+                continue;
+            }
+
+            // SKU çakışma kontrolü
+            if (data.sku) {
+                if (existingSkus.has(data.sku) || batchSkus.has(data.sku)) {
+                    results.errors.push({ row: rowNum, name: data.name, error: `SKU zaten mevcut: ${data.sku}` });
+                    results.skipped++;
+                    continue;
+                }
+                batchSkus.add(data.sku);
+            }
+
+            // Barkod çakışma kontrolü
+            if (data.barcode) {
+                if (existingBarcodes.has(data.barcode) || batchBarcodes.has(data.barcode)) {
+                    results.errors.push({ row: rowNum, name: data.name, error: `Barkod zaten mevcut: ${data.barcode}` });
+                    results.skipped++;
+                    continue;
+                }
+                batchBarcodes.add(data.barcode);
+            }
+
+            // Ürünü oluştur
+            try {
+                await prisma.product.create({
+                    data: {
+                        name: data.name,
+                        description: data.description || '',
+                        price: data.price,
+                        categoryId,
+                        stock: data.stock,
+                        sku: data.sku || null,
+                        barcode: data.barcode || null,
+                        lowStockThreshold: data.lowStockThreshold || 5,
+                    }
+                });
+                results.created++;
+            } catch (dbError) {
+                results.errors.push({ row: rowNum, name: data.name, error: dbError.message });
+                results.skipped++;
+            }
+        }
+
+        // Redis cache temizle
+        const { invalidateCache } = require('../config/redis.js');
+        await invalidateCache('products_all_*');
+
+        // Audit log
+        logAudit(req.user?.id, 'product.bulk_import', 'Product', null, {
+            created: results.created, skipped: results.skipped, errorCount: results.errors.length
+        }, req.ip);
+
+        res.json({
+            message: `${results.created} ürün başarıyla eklendi, ${results.skipped} satır atlandı.`,
+            ...results
+        });
+    } catch (error) {
+        console.error('Bulk Import Error:', error);
+        res.status(500).json({ error: 'İçe aktarma başarısız', details: error.message });
+    }
+};
+
+/**
+ * Ürün listesini Excel olarak dışa aktar
+ * GET /api/products/export
+ */
+const exportProducts = async (req, res) => {
+    try {
+        const products = await prisma.product.findMany({
+            where: { isDeleted: false },
+            include: { category: true },
+            orderBy: { id: 'asc' }
+        });
+
+        const exportData = products.map(p => ({
+            'ID': p.id,
+            'Ürün Adı': p.name,
+            'Açıklama': p.description,
+            'Fiyat': Number(p.price),
+            'Kategori': p.category?.name || '',
+            'Stok': p.stock,
+            'SKU': p.sku || '',
+            'Barkod': p.barcode || '',
+            'Düşük Stok Eşiği': p.lowStockThreshold,
+            'Öne Çıkan': p.isFeatured ? 'Evet' : 'Hayır',
+            'Oluşturulma': p.createdAt.toISOString().split('T')[0],
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        ws['!cols'] = [
+            { wch: 6 }, { wch: 35 }, { wch: 50 }, { wch: 10 }, { wch: 20 },
+            { wch: 8 }, { wch: 15 }, { wch: 18 }, { wch: 18 }, { wch: 10 }, { wch: 12 }
+        ];
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Ürünler');
+
+        const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename=ercag-urunler-${new Date().toISOString().split('T')[0]}.xlsx`);
+        res.send(buffer);
+    } catch (error) {
+        console.error('Export Error:', error);
+        res.status(500).json({ error: 'Dışa aktarma başarısız' });
+    }
+};
+
+module.exports = { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, bulkDeleteProducts, searchSuggestions, downloadBulkTemplate, bulkImportProducts, exportProducts };
+

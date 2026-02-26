@@ -20,11 +20,14 @@ const loginSchema = z.object({
 // Product Schemas
 const createProductSchema = z.object({
     name: z.string().min(1, 'Ürün adı gereklidir').max(200),
-    description: z.string().max(5000).optional(),
+    description: z.string().max(5000).optional().default(''),
     price: z.preprocess((val) => parseFloat(val), z.number().positive('Fiyat pozitif olmalıdır')),
     categoryId: z.preprocess((val) => parseInt(val), z.number().int().positive('Kategori seçilmelidir')),
     stock: z.preprocess((val) => parseInt(val), z.number().int().min(0).default(0)),
-    isFeatured: z.preprocess((val) => val === 'true' || val === true, z.boolean().default(false))
+    isFeatured: z.preprocess((val) => val === 'true' || val === true, z.boolean().default(false)),
+    sku: z.string().max(50).optional().or(z.literal('')),
+    barcode: z.string().max(50).optional().or(z.literal('')),
+    lowStockThreshold: z.preprocess((val) => val ? parseInt(val) : 5, z.number().int().min(0).default(5)),
 });
 
 // Order Schemas
@@ -44,10 +47,23 @@ const createOrderSchema = z.object({
 // Settings Schema
 const updateSettingsSchema = z.record(z.string(), z.any()); // Simple record check, specific keys checked in controller logic if needed
 
+// Bulk Import Row Schema
+const bulkProductRowSchema = z.object({
+    name: z.string().min(1, 'Ürün adı gereklidir'),
+    description: z.string().optional().default(''),
+    price: z.preprocess((val) => parseFloat(val), z.number().positive('Fiyat pozitif olmalıdır')),
+    categoryName: z.string().min(1, 'Kategori adı gereklidir'),
+    stock: z.preprocess((val) => parseInt(val) || 0, z.number().int().min(0).default(0)),
+    sku: z.string().optional().or(z.literal('')),
+    barcode: z.string().optional().or(z.literal('')),
+    lowStockThreshold: z.preprocess((val) => val ? parseInt(val) : 5, z.number().int().min(0).default(5)),
+});
+
 module.exports = {
     registerSchema,
     loginSchema,
     createProductSchema,
     createOrderSchema,
-    updateSettingsSchema
+    updateSettingsSchema,
+    bulkProductRowSchema
 };

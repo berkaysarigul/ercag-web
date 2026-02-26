@@ -25,6 +25,10 @@ export default function NewProductPage() {
         price: '',
         stock: '100', // Default stock
         categoryId: '',
+        sku: '',
+        barcode: '',
+        lowStockThreshold: '5',
+        isFeatured: false,
     });
     const [images, setImages] = useState<File[]>([]);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
@@ -56,6 +60,10 @@ export default function NewProductPage() {
         data.append('price', formData.price);
         data.append('stock', formData.stock);
         data.append('categoryId', formData.categoryId);
+        if (formData.sku) data.append('sku', formData.sku);
+        if (formData.barcode) data.append('barcode', formData.barcode);
+        data.append('lowStockThreshold', formData.lowStockThreshold);
+        data.append('isFeatured', String(formData.isFeatured));
 
         images.forEach((file) => {
             data.append('images', file);
@@ -172,6 +180,64 @@ export default function NewProductPage() {
                                         value={formData.stock}
                                         onChange={e => setFormData({ ...formData, stock: e.target.value })}
                                     />
+                                </div>
+                            </div>
+
+                            {/* SKU & Barkod */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        SKU <span className="text-gray-400 font-normal">(opsiyonel)</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="input w-full"
+                                        placeholder="Örn: FC-BK-012"
+                                        value={formData.sku}
+                                        onChange={e => setFormData({ ...formData, sku: e.target.value.toUpperCase() })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Barkod <span className="text-gray-400 font-normal">(opsiyonel)</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="input w-full"
+                                        placeholder="Örn: 8690826012345"
+                                        value={formData.barcode}
+                                        onChange={e => setFormData({ ...formData, barcode: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Düşük Stok Eşiği & Öne Çıkan */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Düşük Stok Eşiği</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        className="input w-full"
+                                        placeholder="5"
+                                        value={formData.lowStockThreshold}
+                                        onChange={e => setFormData({ ...formData, lowStockThreshold: e.target.value })}
+                                    />
+                                    <p className="text-xs text-gray-400 mt-1">Bu değerin altında stok uyarısı verilir.</p>
+                                </div>
+                                <div className="flex items-end pb-2">
+                                    <label className="flex items-center gap-3 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary"
+                                            checked={formData.isFeatured}
+                                            onChange={e => setFormData({ ...formData, isFeatured: e.target.checked })}
+                                        />
+                                        <div>
+                                            <span className="text-sm font-medium text-gray-700">Öne Çıkan Ürün</span>
+                                            <p className="text-xs text-gray-400">Ana sayfada gösterilir.</p>
+                                        </div>
+                                    </label>
                                 </div>
                             </div>
 

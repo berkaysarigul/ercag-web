@@ -28,6 +28,10 @@ export default function EditProductPage() {
         price: '',
         stock: '',
         categoryId: '',
+        sku: '',
+        barcode: '',
+        lowStockThreshold: '5',
+        isFeatured: false,
     });
     const [newImages, setNewImages] = useState<File[]>([]);
     const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
@@ -57,7 +61,11 @@ export default function EditProductPage() {
                     description: product.description,
                     price: product.price,
                     stock: (product.stock || 0).toString(),
-                    categoryId: product.categoryId.toString()
+                    categoryId: product.categoryId.toString(),
+                    sku: product.sku || '',
+                    barcode: product.barcode || '',
+                    lowStockThreshold: (product.lowStockThreshold || 5).toString(),
+                    isFeatured: product.isFeatured || false,
                 });
 
                 // Populate existing images
@@ -111,6 +119,10 @@ export default function EditProductPage() {
         data.append('price', formData.price);
         data.append('stock', formData.stock);
         data.append('categoryId', formData.categoryId);
+        data.append('sku', formData.sku);
+        data.append('barcode', formData.barcode);
+        data.append('lowStockThreshold', formData.lowStockThreshold);
+        data.append('isFeatured', String(formData.isFeatured));
         if (deletedImageIds.length > 0) {
             data.append('deletedImageIds', JSON.stringify(deletedImageIds));
         }
@@ -267,6 +279,67 @@ export default function EditProductPage() {
                                         onChange={e => setFormData({ ...formData, stock: e.target.value })}
                                         style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}
                                     />
+                                </div>
+                            </div>
+
+                            {/* SKU & Barkod */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        SKU <span className="text-gray-400 font-normal">(opsiyonel)</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="input w-full"
+                                        placeholder="Örn: FC-BK-012"
+                                        value={formData.sku}
+                                        onChange={e => setFormData({ ...formData, sku: e.target.value.toUpperCase() })}
+                                        style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Barkod <span className="text-gray-400 font-normal">(opsiyonel)</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="input w-full"
+                                        placeholder="Örn: 8690826012345"
+                                        value={formData.barcode}
+                                        onChange={e => setFormData({ ...formData, barcode: e.target.value })}
+                                        style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Düşük Stok Eşiği & Öne Çıkan */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Düşük Stok Eşiği</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        className="input w-full"
+                                        placeholder="5"
+                                        value={formData.lowStockThreshold}
+                                        onChange={e => setFormData({ ...formData, lowStockThreshold: e.target.value })}
+                                        style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}
+                                    />
+                                    <p className="text-xs text-gray-400 mt-1">Bu değerin altında stok uyarısı verilir.</p>
+                                </div>
+                                <div className="flex items-end pb-2">
+                                    <label className="flex items-center gap-3 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary"
+                                            checked={formData.isFeatured}
+                                            onChange={e => setFormData({ ...formData, isFeatured: e.target.checked })}
+                                        />
+                                        <div>
+                                            <span className="text-sm font-medium text-gray-700">Öne Çıkan Ürün</span>
+                                            <p className="text-xs text-gray-400">Ana sayfada gösterilir.</p>
+                                        </div>
+                                    </label>
                                 </div>
                             </div>
 
