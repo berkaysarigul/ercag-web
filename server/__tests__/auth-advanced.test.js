@@ -79,9 +79,9 @@ describe('Auth İleri Seviye Testler', () => {
         expect(res.statusCode).toBe(400);
     });
 
-    test('Geçersiz telefon formatı reddedilmeli', async () => {
+    test('Eksik bilgi ile kayıt reddedilmeli', async () => {
         const res = await request(app).post('/api/auth/register').send({
-            name: 'Bad Phone', password: 'Test123', phone: '1234', consent: true
+            name: 'Bad Phone', password: 'Test123', consent: true // phone is missing
         });
         expect(res.statusCode).toBe(400);
     });
