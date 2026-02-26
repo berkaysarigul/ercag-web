@@ -14,6 +14,7 @@ export default function Footer() {
         { href: '/products', label: 'Tüm Ürünler' },
         { href: '/privacy', label: 'Gizlilik Politikası' },
         { href: '/terms', label: 'Kullanım Koşulları' },
+        { href: '/distance-sales', label: 'Mesafeli Satış Sözleşmesi' },
     ];
 
     const accountLinks = [

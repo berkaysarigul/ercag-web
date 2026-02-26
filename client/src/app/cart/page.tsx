@@ -21,6 +21,7 @@ export default function CartPage() {
     const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discountAmount: number } | null>(null);
     const [couponMessage, setCouponMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
     const [showAuthModal, setShowAuthModal] = useState(false);
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
 
     // Checkout State
     const [step, setStep] = useState<'cart' | 'info'>('cart');
@@ -280,6 +281,25 @@ export default function CartPage() {
                                         ></textarea>
                                     </div>
                                 </div>
+                                {/* Sözleşme Onayı */}
+                                <div className="md:col-span-2 mt-4">
+                                    <label className="flex items-start gap-3 cursor-pointer group">
+                                        <input
+                                            type="checkbox"
+                                            checked={acceptedTerms}
+                                            onChange={(e) => setAcceptedTerms(e.target.checked)}
+                                            className="mt-1 w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary shrink-0"
+                                        />
+                                        <span className="text-sm text-gray-600 leading-relaxed">
+                                            <Link href="/distance-sales" target="_blank" className="text-primary font-medium hover:underline">
+                                                Mesafeli Satış Sözleşmesi
+                                            </Link>'ni ve{' '}
+                                            <Link href="/terms" target="_blank" className="text-primary font-medium hover:underline">
+                                                Kullanım Koşulları
+                                            </Link>'nı okudum, kabul ediyorum.
+                                        </span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -352,7 +372,7 @@ export default function CartPage() {
                                 <button
                                     className="w-full py-4 bg-primary hover:bg-primary-dark text-white text-lg font-bold rounded-full shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all flex items-center justify-center gap-2"
                                     onClick={handleCheckout}
-                                    disabled={loading}
+                                    disabled={loading || !acceptedTerms}
                                 >
                                     {loading ? 'İşleniyor...' : (user ? 'Siparişi Tamamla' : 'Giriş Yap / Üye Ol ve Tamamla')}
                                     {!loading && <ArrowRight size={20} />}
