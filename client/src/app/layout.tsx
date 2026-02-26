@@ -3,6 +3,7 @@ import "./globals.css";
 import { Inter, Playfair_Display } from 'next/font/google';
 import { Toaster } from 'sonner';
 import CookieConsent from '@/components/ui/CookieConsent';
+import Script from 'next/script';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -77,6 +78,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="tr" className={`${inter.variable} ${playfair.variable}`}>
+      {process.env.NEXT_PUBLIC_GA_ID && (
+        <>
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+            strategy="afterInteractive"
+          />
+          <Script id="ga" strategy="afterInteractive">
+            {`
+                      window.dataLayer = window.dataLayer || [];
+                      function gtag(){dataLayer.push(arguments);}
+                      gtag('js', new Date());
+                      gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
+                  `}
+          </Script>
+        </>
+      )}
       <body className="font-sans antialiased text-gray-900 bg-[#F4F4F0]">
         <AuthProvider>
           <SettingsProvider>

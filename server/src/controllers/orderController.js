@@ -323,6 +323,17 @@ const updateOrderStatus = async (req, res) => {
 
         const updatedOrder = await prisma.order.findUnique({ where: { id: parseInt(id) } });
 
+        // Sipariş tamamlandığında loyalty puan ekle
+        if (status === 'COMPLETED' && order.userId) {
+            try {
+                const { awardPointsForOrder } = require('./loyaltyController');
+                await awardPointsForOrder(order.userId, Number(order.totalAmount), order.id);
+            } catch (err) {
+                console.error('Loyalty puan ekleme hatası:', err);
+                // Puan hatası sipariş akışını bozmasın
+            }
+        }
+
         // Socket Notification
         const io = req.app.get('io');
         if (io) {
