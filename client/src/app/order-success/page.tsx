@@ -11,10 +11,10 @@ function SuccessContent() {
     const amount = searchParams.get('amount');
 
     return (
-        <div className="container text-center pt-28 pb-16">
+        <div className="container text-center pt-36 pb-16">
             <div className="bg-white border rounded-2xl shadow-sm max-w-2xl mx-auto p-12">
                 <div className="text-6xl mb-6">🎉</div>
-                <h1 className="text-3xl mb-4 text-blue-600 font-bold">Siparişiniz Alındı!</h1>
+                <h1 className="text-3xl mb-4 text-primary font-bold">Siparişiniz Alındı!</h1>
                 <p className="text-lg text-gray-500 mb-8">
                     Siparişiniz başarıyla oluşturuldu. Ekibimiz en kısa sürede hazırlamaya başlayacak.
                     <br />
@@ -30,16 +30,16 @@ function SuccessContent() {
                             </div>
                             <div className="text-right">
                                 <p className="text-sm text-gray-500 mb-1">Tutar</p>
-                                <p className="font-bold text-blue-600 text-2xl">{Number(amount).toFixed(2)} ₺</p>
+                                <p className="font-bold text-primary text-2xl">{Number(amount).toFixed(2)} ₺</p>
                             </div>
                         </div>
 
                         <p className="text-sm text-gray-500 mb-2">Teslimat Kodunuz:</p>
-                        <p className="text-5xl font-bold tracking-widest text-blue-600 m-0">{code}</p>
+                        <p className="text-5xl font-bold tracking-widest text-primary m-0">{code}</p>
                         <p className="text-sm text-gray-500 mt-4">
                             Ürünlerinizi teslim alırken bu kodu mağaza görevlisine iletiniz.
                         </p>
-                        <div className="mt-6 p-4 bg-blue-50 text-blue-800 text-sm rounded-lg flex items-start gap-3 text-left">
+                        <div className="mt-6 p-4 bg-primary/5 text-primary text-sm rounded-lg flex items-start gap-3 text-left">
                             <span className="text-xl">🏪</span>
                             <span className="leading-relaxed">Ödemenizi ürünlerinizi mağazadan teslim alırken <strong>Nakit</strong> veya <strong>Kredi Kartı</strong> ile yapabilirsiniz.</span>
                         </div>
@@ -47,7 +47,7 @@ function SuccessContent() {
                 )}
 
                 <div className="flex gap-4 justify-center mt-8">
-                    <Link href="/" className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-md hover:shadow-lg inline-flex items-center justify-center">
+                    <Link href="/" className="px-8 py-3 bg-primary hover:bg-[#1a332a] text-white font-bold rounded-xl transition-colors shadow-md hover:shadow-lg inline-flex items-center justify-center">
                         Ana Sayfaya Dön
                     </Link>
                     <Link href="/products" className="px-8 py-3 bg-white hover:bg-gray-50 text-gray-800 font-bold rounded-xl transition-colors shadow-sm border border-gray-200 inline-flex items-center justify-center">

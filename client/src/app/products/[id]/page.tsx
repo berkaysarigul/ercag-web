@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 async function getProduct(id: string) {
     try {
-        const res = await fetch(`${API_URL}/api/products/${id}`, { next: { revalidate: 3600 } });
+        const res = await fetch(`${API_URL}/api/products/${id}`, { cache: 'no-store' });
         if (!res.ok) return null;
         return res.json();
     } catch (error) {

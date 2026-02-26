@@ -132,7 +132,7 @@ export default function CartPage() {
     }
 
     return (
-        <div className="container pt-28 pb-12">
+        <div className="container pt-36 pb-12">
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-serif text-gray-900 tracking-tight flex items-center">
                     <ShoppingBag className="mr-3 text-primary" />
@@ -196,7 +196,7 @@ export default function CartPage() {
                         </>
                     ) : (
                         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><User className="text-blue-600" /> Kişisel Bilgiler</h2>
+                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><User className="text-primary" /> Kişisel Bilgiler</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {user ? (
                                     <>
