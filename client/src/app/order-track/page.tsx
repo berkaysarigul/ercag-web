@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import api from '@/lib/api';
-import { Search, Package, CheckCircle, Truck, XCircle, ArrowRight, ShoppingBag, Clock } from 'lucide-react';
+import { Search, Package, CheckCircle, Truck, XCircle, ArrowRight, ShoppingBag, Clock, Store } from 'lucide-react';
 import Link from 'next/link';
 
 const STATUS_STEPS = [
@@ -91,9 +91,17 @@ export default function OrderTrackPage() {
                                     <p className="text-xl font-bold text-primary">{Number(order.totalAmount).toFixed(2)} ₺</p>
                                 </div>
                             </div>
-                            <p className="text-xs text-gray-400 mt-2">
-                                {new Date(order.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                            </p>
+                            <div className="flex justify-between items-end mt-2">
+                                <p className="text-xs text-gray-400">
+                                    {new Date(order.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                                {order.branch && (
+                                    <div className="flex items-center gap-1.5 text-sm font-medium text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100/50 shadow-sm">
+                                        <Store size={16} />
+                                        {order.branch.name} Şubesi
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         <div className="p-6">

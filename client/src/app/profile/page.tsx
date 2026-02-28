@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api';
-import { User, ShoppingBag, Key, LogOut, Package, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { User, ShoppingBag, Key, LogOut, Package, Clock, CheckCircle, XCircle, Store } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { ProfileSkeleton } from '@/components/profile/ProfileSkeleton';
@@ -258,7 +258,7 @@ export default function ProfilePage() {
                                     <p className="text-gray-500">Henüz siparişiniz bulunmuyor.</p>
                                 ) : (
                                     <div className="space-y-4">
-                                        {orders.map((order: { id: number; status: string; createdAt: string; totalAmount: number; pickupCode: string | null; items: { id: number; quantity: number; price: number; product: { name: string } }[] }) => (
+                                        {orders.map((order: { id: number; status: string; createdAt: string; totalAmount: number; pickupCode: string | null; branch?: { name: string } | null; items: { id: number; quantity: number; price: number; product: { name: string } }[] }) => (
                                             <div key={order.id} className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
                                                 <div className="flex justify-between items-start mb-4">
                                                     <div>
@@ -269,6 +269,12 @@ export default function ProfilePage() {
                                                         <p className="text-sm text-gray-500 mt-1">
                                                             {new Date(order.createdAt).toLocaleDateString('tr-TR')} - {new Date(order.createdAt).toLocaleTimeString('tr-TR')}
                                                         </p>
+                                                        {order.branch && (
+                                                            <div className="flex items-center gap-1 mt-2 text-sm text-emerald-700 bg-emerald-50 px-2 py-1.5 rounded-md w-fit border border-emerald-100">
+                                                                <Store size={14} />
+                                                                {order.branch.name} Şubesi
+                                                            </div>
+                                                        )}
                                                         {order.status === 'PENDING' && (
                                                             <button
                                                                 onClick={async () => {

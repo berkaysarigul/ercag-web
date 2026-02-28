@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import api from '@/lib/api';
-import { Search, Clock, Package, User, Phone, Eye, RefreshCw, ChevronLeft, ChevronRight, Copy, Check, ChevronDown } from 'lucide-react';
+import { Search, Clock, Package, User, Phone, Eye, RefreshCw, ChevronLeft, ChevronRight, Copy, Check, ChevronDown, Store } from 'lucide-react';
 import { toast } from 'sonner';
 import OrderDetailsModal from '@/components/admin/OrderDetailsModal';
 import { useSocket } from '@/context/SocketContext';
@@ -22,6 +22,7 @@ interface Order {
     completedAt?: string;
     readyAt?: string;
     user?: { name?: string; email?: string; phone?: string } | null;
+    branch?: { name: string } | null;
     fullName?: string;
     phoneNumber?: string;
     email?: string;
@@ -297,6 +298,12 @@ export default function AdminOrdersPage() {
                                                 <Phone size={13} />
                                                 {order.phoneNumber || order.user?.phone}
                                             </span>
+                                            {order.branch && (
+                                                <span className="flex items-center gap-1 font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">
+                                                    <Store size={12} />
+                                                    {order.branch.name}
+                                                </span>
+                                            )}
                                             {order.note && (
                                                 <span className="text-amber-600 text-xs italic truncate max-w-[200px]" title={order.note}>
                                                     📝 {order.note}

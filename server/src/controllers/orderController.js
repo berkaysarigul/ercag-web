@@ -156,7 +156,10 @@ const getUserOrders = async (req, res) => {
         const userId = req.user.id;
         const orders = await prisma.order.findMany({
             where: { userId },
-            include: { items: { include: { product: true } } },
+            include: {
+                items: { include: { product: true } },
+                branch: { select: { name: true } }
+            },
             orderBy: { createdAt: 'desc' }
         });
         res.json(orders);
@@ -468,6 +471,7 @@ const trackOrder = async (req, res) => {
                 totalAmount: true,
                 createdAt: true,
                 readyAt: true,
+                branch: { select: { name: true } },
                 items: {
                     select: {
                         quantity: true,

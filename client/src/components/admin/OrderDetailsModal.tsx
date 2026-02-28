@@ -1,6 +1,6 @@
 'use client';
 
-import { XCircle, CheckCircle, Package, User, Phone, Clock, FileText, Download, History } from 'lucide-react';
+import { XCircle, CheckCircle, Package, User, Phone, Clock, FileText, Download, History, Store } from 'lucide-react';
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
 import { Fragment } from 'react';
 import jsPDF from 'jspdf';
@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 interface OrderDetailsModalProps {
     isOpen: boolean;
     onClose: () => void;
-    order: { id: number; createdAt: string; fullName?: string; phoneNumber?: string; email?: string; user?: { name?: string; phone?: string; email?: string }; items: { id: number; quantity: number; price: number | string; product: { name: string } }[]; totalAmount: number | string; discountAmount?: number | string; campaignDiscount?: number | string; campaignDetails?: string; couponCode?: string; note?: string; status: string; statusHistory?: string | { status: string; date: string; user?: string; note?: string; timestamp?: string }[]; pickupCode?: string; completedAt?: string; readyAt?: string };
+    order: { id: number; createdAt: string; fullName?: string; phoneNumber?: string; email?: string; user?: { name?: string; phone?: string; email?: string }; branch?: { name: string } | null; items: { id: number; quantity: number; price: number | string; product: { name: string } }[]; totalAmount: number | string; discountAmount?: number | string; campaignDiscount?: number | string; campaignDetails?: string; couponCode?: string; note?: string; status: string; statusHistory?: string | { status: string; date: string; user?: string; note?: string; timestamp?: string }[]; pickupCode?: string; completedAt?: string; readyAt?: string };
     onStatusChange: (orderId: number, status: string) => Promise<void>;
 }
 
@@ -193,6 +193,12 @@ export default function OrderDetailsModal({ isOpen, onClose, order, onStatusChan
                                                             <Phone size={16} />
                                                             <span>{order.phoneNumber || order.user?.phone}</span>
                                                         </div>
+                                                        {order.branch && (
+                                                            <div className="flex items-center gap-3 text-emerald-600 mt-2 font-medium bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100/50 w-fit">
+                                                                <Store size={16} />
+                                                                <span>{order.branch.name} Şubesi</span>
+                                                            </div>
+                                                        )}
                                                         {order.pickupCode && (
                                                             <div className="mt-4 p-3 bg-brand-50 rounded-lg border border-primary/10 text-center">
                                                                 <p className="text-xs text-primary mb-1">Teslimat Kodu</p>
