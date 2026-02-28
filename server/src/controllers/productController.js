@@ -708,5 +708,95 @@ const exportProducts = async (req, res) => {
     }
 };
 
-module.exports = { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, bulkDeleteProducts, searchSuggestions, downloadBulkTemplate, bulkImportProducts, exportProducts };
+const bulkUpdatePrices = async (req, res) => {
+    try {
+        const { scope, scopeId, action, value } = req.body;
+        // scope: "all" | "category" | "brand" | "subcategory"
+        // action: "increase_percent" | "decrease_percent" | "increase_fixed" | "decrease_fixed" | "set_price"
+
+        if (!action || value === undefined || value === null) {
+            return res.status(400).json({ error: 'action ve value gerekli' });
+        }
+
+        const numValue = parseFloat(value);
+        if (isNaN(numValue) || numValue < 0) {
+            return res.status(400).json({ error: 'Geçersiz değer' });
+        }
+
+        // Filtre oluştur
+        const where = { isDeleted: false };
+        if (scope === 'category' && scopeId) {
+            // Ana kategori + alt kategorileri dahil et
+            const children = await prisma.category.findMany({ where: { parentId: parseInt(scopeId) }, select: { id: true } });
+            where.categoryId = { in: [parseInt(scopeId), ...children.map(c => c.id)] };
+        } else if (scope === 'subcategory' && scopeId) {
+            where.categoryId = parseInt(scopeId);
+        } else if (scope === 'brand' && scopeId) {
+            where.brandId = parseInt(scopeId);
+        }
+
+        const products = await prisma.product.findMany({
+            where,
+            select: { id: true, name: true, price: true },
+        });
+
+        if (products.length === 0) {
+            return res.status(400).json({ error: 'Bu filtreye uyan ürün bulunamadı' });
+        }
+
+        const updates = products.map(p => {
+            const oldPrice = Number(p.price);
+            let newPrice;
+
+            switch (action) {
+                case 'increase_percent': newPrice = oldPrice * (1 + numValue / 100); break;
+                case 'decrease_percent': newPrice = oldPrice * (1 - numValue / 100); break;
+                case 'increase_fixed': newPrice = oldPrice + numValue; break;
+                case 'decrease_fixed': newPrice = oldPrice - numValue; break;
+                case 'set_price': newPrice = numValue; break;
+                default: newPrice = oldPrice;
+            }
+
+            newPrice = Math.max(0, Math.round(newPrice * 100) / 100);
+            return { id: p.id, name: p.name, oldPrice, newPrice, diff: newPrice - oldPrice };
+        });
+
+        // Sadece önizleme mi?
+        if (req.query.preview === 'true') {
+            return res.json({
+                affectedCount: updates.length,
+                preview: updates.slice(0, 50),
+                totalOldSum: updates.reduce((s, u) => s + u.oldPrice, 0),
+                totalNewSum: updates.reduce((s, u) => s + u.newPrice, 0),
+            });
+        }
+
+        // Uygula (transaction)
+        await prisma.$transaction(
+            updates.map(u => prisma.product.update({ where: { id: u.id }, data: { price: u.newPrice } }))
+        );
+
+        // Redis cache temizle
+        if (redisClient) {
+            try {
+                const keys = await redisClient.keys('products_all_*');
+                if (keys.length > 0) await redisClient.del(keys);
+            } catch (_) { }
+        }
+
+        // Audit log
+        await logAudit(
+            req.user?.id || 0, 'product.bulk_price_update', 'Product', null,
+            JSON.stringify({ scope, scopeId, action, value: numValue, affectedCount: updates.length }),
+            req.ip
+        );
+
+        res.json({ message: `${updates.length} ürün güncellendi`, affectedCount: updates.length });
+    } catch (error) {
+        console.error('Bulk Price Update Error:', error);
+        res.status(500).json({ error: 'Toplu fiyat güncellemesi başarısız' });
+    }
+};
+
+module.exports = { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, bulkDeleteProducts, searchSuggestions, downloadBulkTemplate, bulkImportProducts, exportProducts, bulkUpdatePrices };
 

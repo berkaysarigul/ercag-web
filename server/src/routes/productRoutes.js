@@ -33,6 +33,7 @@ router.get('/search/suggestions', productController.searchSuggestions);
 router.get('/bulk-template', authenticateToken, isAdmin, productController.downloadBulkTemplate);
 router.post('/bulk-import', authenticateToken, isAdmin, csvUpload.single('file'), productController.bulkImportProducts);
 router.post('/bulk-delete', authenticateToken, isAdmin, productController.bulkDeleteProducts);
+router.post('/bulk-price-update', authenticateToken, isAdmin, productController.bulkUpdatePrices);
 router.get('/export', authenticateToken, isAdmin, productController.exportProducts);
 
 // Dynamic routes
