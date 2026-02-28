@@ -29,7 +29,7 @@ const createOrder = async (req, res) => {
             });
         }
 
-        const { items, couponCode, fullName, phoneNumber, email, note, pickupRequestedTime } = validation.data;
+        const { items, couponCode, fullName, phoneNumber, email, note, pickupRequestedTime, branchId } = validation.data;
 
         // Calculate total and verify prices
         let totalAmount = 0;
@@ -113,6 +113,7 @@ const createOrder = async (req, res) => {
                 campaignDetails: campaignDetails.length > 0 ? JSON.stringify(campaignDetails) : null,
                 status: 'PENDING',
                 pickupCode,
+                branchId: branchId ? parseInt(branchId) : null,
                 statusHistory: JSON.stringify([{ status: 'PENDING', timestamp: new Date(), note: 'Sipariş oluşturuldu' }]),
                 items: {
                     create: orderItemsData
@@ -196,7 +197,8 @@ const getAllOrders = async (req, res) => {
                 where,
                 include: {
                     items: { include: { product: { select: { name: true, image: true } } } },
-                    user: { select: { name: true, email: true, phone: true } }
+                    user: { select: { name: true, email: true, phone: true } },
+                    branch: { select: { name: true } }
                 },
                 orderBy: { createdAt: 'desc' },
                 skip,

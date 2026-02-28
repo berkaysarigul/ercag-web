@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import { CartSkeleton } from '@/components/cart/CartSkeleton';
 import { toast } from 'sonner';
 import Image from 'next/image';
-import { Trash2, Plus, Minus, ArrowRight, Store, ShoppingBag, User, Phone, Mail, Clock, FileText } from 'lucide-react';
+import { Trash2, Plus, Minus, ArrowRight, Store, ShoppingBag, User, Phone, Mail, Clock, FileText, MapPin } from 'lucide-react';
 import AuthModal from '@/components/auth/AuthModal';
 
 export default function CartPage() {
@@ -22,6 +22,10 @@ export default function CartPage() {
     const [couponMessage, setCouponMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [acceptedTerms, setAcceptedTerms] = useState(false);
+
+    // Branch State
+    const [branches, setBranches] = useState<{ id: number; name: string; address: string; district: string | null; phone: string | null }[]>([]);
+    const [selectedBranch, setSelectedBranch] = useState<number | null>(null);
 
     // Checkout State
     const [step, setStep] = useState<'cart' | 'info'>('cart');
@@ -44,10 +48,16 @@ export default function CartPage() {
         }
     }, [user]);
 
-    // Refresh cart from server on mount to get latest campaign discounts
     useEffect(() => {
         if (user) refreshCart();
     }, [user]);
+
+    useEffect(() => {
+        api.get('/branches?active=true').then(res => {
+            setBranches(res.data);
+            if (res.data.length === 1) setSelectedBranch(res.data[0].id); // Tek şube varsa otomatik seç
+        });
+    }, []);
 
     const couponDiscount = appliedCoupon ? appliedCoupon.discountAmount : 0;
     const campaignDiscount = discountAmount;
@@ -88,6 +98,11 @@ export default function CartPage() {
             return;
         }
 
+        if (!selectedBranch) {
+            toast.error('Lütfen teslim alacağınız şubeyi seçin.');
+            return;
+        }
+
         setLoading(true);
         try {
             const orderData = {
@@ -96,6 +111,7 @@ export default function CartPage() {
                     quantity: item.quantity
                 })),
                 couponCode: appliedCoupon?.code,
+                branchId: selectedBranch,
                 ...formData
             };
             const res = await api.post('/orders', orderData);
@@ -196,109 +212,143 @@ export default function CartPage() {
                             ))}
                         </>
                     ) : (
-                        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><User className="text-primary" /> Kişisel Bilgiler</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {user ? (
-                                    <>
-                                        <div>
-                                            <label className="label">Ad Soyad (Zorunlu)</label>
-                                            <div className="relative">
-                                                <User className="absolute left-3 top-3 text-gray-400" size={18} />
-                                                <input
-                                                    type="text"
-                                                    className="input pl-10 w-full"
-                                                    placeholder="Adınız ve Soyadınız"
-                                                    value={formData.fullName}
-                                                    onChange={e => setFormData({ ...formData, fullName: e.target.value })}
-                                                    required
-                                                />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label className="label">Telefon (Zorunlu)</label>
-                                            <div className="relative">
-                                                <Phone className="absolute left-3 top-3 text-gray-400" size={18} />
-                                                <input
-                                                    type="tel"
-                                                    className="input pl-10 w-full"
-                                                    placeholder="05xxxxxxxxx"
-                                                    value={formData.phoneNumber}
-                                                    onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
-                                                    required
-                                                />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label className="label">E-posta (Opsiyonel)</label>
-                                            <div className="relative">
-                                                <Mail className="absolute left-3 top-3 text-gray-400" size={18} />
-                                                <input
-                                                    type="email"
-                                                    className="input pl-10 w-full"
-                                                    placeholder="ornek@email.com"
-                                                    value={formData.email}
-                                                    onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                                />
-                                            </div>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className="md:col-span-2 bg-primary/5 border border-primary/20 rounded-xl p-8 flex flex-col items-center text-center">
-                                        <div className="w-14 h-14 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-4">
-                                            <User size={26} />
-                                        </div>
-                                        <h3 className="text-xl font-serif text-gray-900 mb-2">Giriş Yapın veya Hızlı Üye Olun</h3>
-                                        <p className="text-sm text-gray-600 max-w-sm mb-0 leading-relaxed">
-                                            Siparişinizi tamamlamak için sağ taraftaki butona tıklayarak hızlıca giriş yapabilir veya üyelik oluşturabilirsiniz.
-                                        </p>
-                                    </div>
-                                )}
-                                <div>
-                                    <label className="label">Teslim Alma Zamanı</label>
-                                    <div className="relative">
-                                        <Clock className="absolute left-3 top-3 text-gray-400" size={18} />
-                                        <select
-                                            className="input pl-10 w-full"
-                                            value={formData.pickupRequestedTime}
-                                            onChange={e => setFormData({ ...formData, pickupRequestedTime: e.target.value })}
-                                        >
-                                            <option value="Bugün">Bugün (Mağazada Ödeme)</option>
-                                            <option value="Yarın">Yarın</option>
-                                            <option value="Daha Sonra">Daha Sonra</option>
-                                        </select>
+                        <div className="space-y-4">
+                            {/* Şube Seçimi */}
+                            {branches.length > 1 && (
+                                <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+                                    <h3 className="font-bold text-gray-900 mb-1 flex items-center gap-2">
+                                        <MapPin size={18} className="text-primary" /> Teslim Alınacak Şube
+                                    </h3>
+                                    <p className="text-sm text-gray-500 mb-4">Siparişinizi hangi şubemizden teslim almak istersiniz?</p>
+                                    <div className="grid gap-3">
+                                        {branches.map(b => (
+                                            <button key={b.id} type="button" onClick={() => setSelectedBranch(b.id)}
+                                                className={`w-full text-left p-4 rounded-xl border-2 transition-all ${selectedBranch === b.id
+                                                        ? 'border-primary bg-primary/5 shadow-sm'
+                                                        : 'border-gray-200 hover:border-gray-300'
+                                                    }`}>
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedBranch === b.id ? 'border-primary' : 'border-gray-300'
+                                                        }`}>
+                                                        {selectedBranch === b.id && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-semibold text-gray-900">{b.name}</p>
+                                                        <p className="text-xs text-gray-500 mt-0.5">{b.address}</p>
+                                                        {b.phone && <p className="text-xs text-gray-400 mt-0.5">{b.phone}</p>}
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
-                                <div className="md:col-span-2">
-                                    <label className="label">Sipariş Notu</label>
-                                    <div className="relative">
-                                        <FileText className="absolute left-3 top-3 text-gray-400" size={18} />
-                                        <textarea
-                                            className="input pl-10 w-full min-h-[80px]"
-                                            placeholder="Varsa notunuz..."
-                                            value={formData.note}
-                                            onChange={e => setFormData({ ...formData, note: e.target.value })}
-                                        ></textarea>
+                            )}
+
+                            {/* Kişisel Bilgiler */}
+                            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                                <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><User className="text-primary" /> Kişisel Bilgiler</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {user ? (
+                                        <>
+                                            <div>
+                                                <label className="label">Ad Soyad (Zorunlu)</label>
+                                                <div className="relative">
+                                                    <User className="absolute left-3 top-3 text-gray-400" size={18} />
+                                                    <input
+                                                        type="text"
+                                                        className="input pl-10 w-full"
+                                                        placeholder="Adınız ve Soyadınız"
+                                                        value={formData.fullName}
+                                                        onChange={e => setFormData({ ...formData, fullName: e.target.value })}
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="label">Telefon (Zorunlu)</label>
+                                                <div className="relative">
+                                                    <Phone className="absolute left-3 top-3 text-gray-400" size={18} />
+                                                    <input
+                                                        type="tel"
+                                                        className="input pl-10 w-full"
+                                                        placeholder="05xxxxxxxxx"
+                                                        value={formData.phoneNumber}
+                                                        onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="label">E-posta (Opsiyonel)</label>
+                                                <div className="relative">
+                                                    <Mail className="absolute left-3 top-3 text-gray-400" size={18} />
+                                                    <input
+                                                        type="email"
+                                                        className="input pl-10 w-full"
+                                                        placeholder="ornek@email.com"
+                                                        value={formData.email}
+                                                        onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="md:col-span-2 bg-primary/5 border border-primary/20 rounded-xl p-8 flex flex-col items-center text-center">
+                                            <div className="w-14 h-14 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-4">
+                                                <User size={26} />
+                                            </div>
+                                            <h3 className="text-xl font-serif text-gray-900 mb-2">Giriş Yapın veya Hızlı Üye Olun</h3>
+                                            <p className="text-sm text-gray-600 max-w-sm mb-0 leading-relaxed">
+                                                Siparişinizi tamamlamak için sağ taraftaki butona tıklayarak hızlıca giriş yapabilir veya üyelik oluşturabilirsiniz.
+                                            </p>
+                                        </div>
+                                    )}
+                                    <div>
+                                        <label className="label">Teslim Alma Zamanı</label>
+                                        <div className="relative">
+                                            <Clock className="absolute left-3 top-3 text-gray-400" size={18} />
+                                            <select
+                                                className="input pl-10 w-full"
+                                                value={formData.pickupRequestedTime}
+                                                onChange={e => setFormData({ ...formData, pickupRequestedTime: e.target.value })}
+                                            >
+                                                <option value="Bugün">Bugün (Mağazada Ödeme)</option>
+                                                <option value="Yarın">Yarın</option>
+                                                <option value="Daha Sonra">Daha Sonra</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                {/* Sözleşme Onayı */}
-                                <div className="md:col-span-2 mt-4">
-                                    <label className="flex items-start gap-3 cursor-pointer group">
-                                        <input
-                                            type="checkbox"
-                                            checked={acceptedTerms}
-                                            onChange={(e) => setAcceptedTerms(e.target.checked)}
-                                            className="mt-1 w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary shrink-0"
-                                        />
-                                        <span className="text-sm text-gray-600 leading-relaxed">
-                                            <Link href="/distance-sales" target="_blank" className="text-primary font-medium hover:underline">
-                                                Mesafeli Satış Sözleşmesi
-                                            </Link>'ni ve{' '}
-                                            <Link href="/terms" target="_blank" className="text-primary font-medium hover:underline">
-                                                Kullanım Koşulları
-                                            </Link>'nı okudum, kabul ediyorum.
-                                        </span>
-                                    </label>
+                                    <div className="md:col-span-2">
+                                        <label className="label">Sipariş Notu</label>
+                                        <div className="relative">
+                                            <FileText className="absolute left-3 top-3 text-gray-400" size={18} />
+                                            <textarea
+                                                className="input pl-10 w-full min-h-[80px]"
+                                                placeholder="Varsa notunuz..."
+                                                value={formData.note}
+                                                onChange={e => setFormData({ ...formData, note: e.target.value })}
+                                            ></textarea>
+                                        </div>
+                                    </div>
+                                    {/* Sözleşme Onayı */}
+                                    <div className="md:col-span-2 mt-4">
+                                        <label className="flex items-start gap-3 cursor-pointer group">
+                                            <input
+                                                type="checkbox"
+                                                checked={acceptedTerms}
+                                                onChange={(e) => setAcceptedTerms(e.target.checked)}
+                                                className="mt-1 w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary shrink-0"
+                                            />
+                                            <span className="text-sm text-gray-600 leading-relaxed">
+                                                <Link href="/distance-sales" target="_blank" className="text-primary font-medium hover:underline">
+                                                    Mesafeli Satış Sözleşmesi
+                                                </Link>'ni ve{' '}
+                                                <Link href="/terms" target="_blank" className="text-primary font-medium hover:underline">
+                                                    Kullanım Koşulları
+                                                </Link>'nı okudum, kabul ediyorum.
+                                            </span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>

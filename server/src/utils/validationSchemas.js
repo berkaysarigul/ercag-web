@@ -41,7 +41,8 @@ const createOrderSchema = z.object({
     email: z.string().email().optional().or(z.literal('')),
     note: z.string().max(500).optional(),
     pickupRequestedTime: z.string().optional(),
-    couponCode: z.string().optional()
+    couponCode: z.string().optional(),
+    branchId: z.number().int().positive().optional().nullable(),
 });
 
 // Settings Schema

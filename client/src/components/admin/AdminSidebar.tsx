@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useAdmin } from '@/context/AdminContext';
 import { cn } from '@/lib/utils';
 // UI-21: Duplicate ikonlar düzeltildi — FolderTree Kategoriler için, ShoppingBag Ürünler için, Package Stok için
-import { LayoutDashboard, Package, ShoppingBag, Users, FolderTree, Ticket, MessageSquare, LogOut, Settings, ScanBarcode, BarChart3, TrendingUp, Shield, Menu, X, Star, GalleryHorizontal, PieChart, Tag } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingBag, Users, FolderTree, Ticket, MessageSquare, LogOut, Settings, ScanBarcode, BarChart3, TrendingUp, Shield, Menu, X, Star, GalleryHorizontal, PieChart, Tag, MapPin } from 'lucide-react';
 
 export default function AdminSidebar() {
     const pathname = usePathname();
@@ -27,6 +27,7 @@ export default function AdminSidebar() {
         { name: 'Kampanyalar', href: '/admin/campaigns', icon: TrendingUp, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Analitik & Rapor', href: '/admin/analytics', icon: PieChart, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Denetim Günlüğü', href: '/admin/audit-log', icon: Shield, roles: ['SUPER_ADMIN'] },
+        { name: 'Şubeler', href: '/admin/branches', icon: MapPin, roles: ['SUPER_ADMIN'] },
         { name: 'Ayarlar', href: '/admin/settings', icon: Settings, roles: ['SUPER_ADMIN', 'ADMIN'] },
     ];
 
