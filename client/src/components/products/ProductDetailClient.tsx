@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import api from '@/lib/api';
 import { useCart } from '@/context/CartContext';
@@ -46,6 +46,50 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+
+    // === VARYANT STATE ===
+    const [variants, setVariants] = useState<any[]>([]);
+    const [selectedAttributes, setSelectedAttributes] = useState<Record<number, number>>({}); // typeId -> valueId
+    const [selectedVariant, setSelectedVariant] = useState<any>(null);
+
+    // Varyantları çek
+    useEffect(() => {
+        api.get(`/variants/product/${product.id}`).then(res => {
+            setVariants(res.data);
+        }).catch(() => { });
+    }, [product.id]);
+
+    // Özellik tiplerini varyantlardan çıkar
+    const attributeTypes = useMemo(() => {
+        const typeMap = new Map<number, any>();
+        variants.forEach(v => {
+            v.attributes?.forEach((attr: any) => {
+                const type = attr.attributeValue.attributeType;
+                if (!typeMap.has(type.id)) {
+                    typeMap.set(type.id, { ...type, values: new Map() });
+                }
+                const val = attr.attributeValue;
+                typeMap.get(type.id).values.set(val.id, val);
+            });
+        });
+        return Array.from(typeMap.values()).map((t: any) => ({
+            ...t,
+            values: Array.from(t.values.values())
+        }));
+    }, [variants]);
+
+    // Seçilen özelliklere göre varyant bul
+    useEffect(() => {
+        if (attributeTypes.length === 0 || Object.keys(selectedAttributes).length < attributeTypes.length) {
+            setSelectedVariant(null);
+            return;
+        }
+        const match = variants.find(v => {
+            const variantValueIds = v.attributes.map((a: any) => a.attributeValueId);
+            return Object.values(selectedAttributes).every((valId: any) => variantValueIds.includes(valId));
+        });
+        setSelectedVariant(match || null);
+    }, [selectedAttributes, variants, attributeTypes]);
 
     useEffect(() => {
         if (product.category) {
@@ -151,10 +195,31 @@ export default function ProductDetailClient({ product }: { product: Product }) {
     };
 
     const { getProductDiscount } = useCampaigns();
-    const price = Number(product.price);
+    const basePrice = Number(product.price);
     const categoryId = product.category?.id || (product as any).categoryId;
-    const discount = getProductDiscount(product.id, categoryId, price);
-    const displayPrice = discount ? discount.discountedPrice : price;
+    const discount = getProductDiscount(product.id, categoryId, basePrice);
+
+    // Varyant seçiliyse varyant fiyatını kullan, yoksa kampanya fiyatını
+    const variantPrice = selectedVariant?.price ? Number(selectedVariant.price) : null;
+    const displayPrice = variantPrice ?? (discount ? discount.discountedPrice : basePrice);
+    const displayStock = selectedVariant ? selectedVariant.stock : product.stock;
+
+    const handleAddToCart = () => {
+        if (variants.length > 0 && !selectedVariant) {
+            toast.error('Lütfen seçenekleri belirleyin');
+            return;
+        }
+        addToCart({
+            ...product,
+            price: displayPrice,
+            quantity,
+            ...(selectedVariant ? {
+                variantId: selectedVariant.id,
+                variantLabel: selectedVariant.attributes.map((a: any) => a.attributeValue.value).join(' / '),
+            } : {}),
+        });
+        toast.success('Ürün sepete eklendi');
+    };
 
     return (
         <div className="container pt-28 pb-8">
@@ -175,7 +240,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                             '@type': 'Offer',
                             price: displayPrice.toFixed(2),
                             priceCurrency: 'TRY',
-                            availability: product.stock > 0
+                            availability: displayStock > 0
                                 ? 'https://schema.org/InStock'
                                 : 'https://schema.org/OutOfStock',
                             seller: {
@@ -225,7 +290,6 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                                 Görsel Yok
                             </div>
                         )}
-                        {/* Discount Badge if needed logic here */}
                     </div>
                     {/* Thumbnails */}
                     {allImages.length > 1 && (
@@ -259,23 +323,23 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                     <div>
                         <div className="flex justify-between items-start">
                             <span className="text-sm text-gray-500 uppercase tracking-wider">{product.category?.name}</span>
-                            {getStockBadge(product.stock)}
+                            {getStockBadge(displayStock)}
                         </div>
                         <h1 className="text-3xl font-bold text-gray-900 mt-1">{product.name}</h1>
                     </div>
 
                     <div className="flex items-end gap-4">
                         <div>
-                            {discount ? (
+                            {discount && !variantPrice ? (
                                 <>
-                                    <div className="text-lg text-gray-400 line-through">{price.toFixed(2)} ₺</div>
+                                    <div className="text-lg text-gray-400 line-through">{basePrice.toFixed(2)} ₺</div>
                                     <div className="text-3xl font-bold text-red-600">{displayPrice.toFixed(2)} ₺</div>
                                 </>
                             ) : (
-                                <div className="text-3xl font-bold text-blue-600">{price.toFixed(2)} ₺</div>
+                                <div className="text-3xl font-bold text-blue-600">{displayPrice.toFixed(2)} ₺</div>
                             )}
                         </div>
-                        {discount && (
+                        {discount && !variantPrice && (
                             <span className="px-3 py-1 bg-red-100 text-red-700 text-sm font-bold rounded-full">
                                 %{discount.discountPercent} İndirim
                             </span>
@@ -289,7 +353,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                         </div>
                     </div>
 
-                    {discount && (
+                    {discount && !variantPrice && (
                         <div className="flex items-center gap-2 text-sm font-medium text-orange-600 bg-orange-50 px-3 py-2 rounded-lg border border-orange-100 w-fit">
                             {discount.campaignType === 'FLASH_SALE' ? '⚡' : '🏷️'} {discount.campaignName}
                         </div>
@@ -305,10 +369,54 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                         <p>{product.description}</p>
                     </div>
 
+                    {/* === VARYANT SEÇİCİ === */}
+                    {attributeTypes.length > 0 && (
+                        <div className="space-y-4">
+                            {attributeTypes.map((type: any) => (
+                                <div key={type.id}>
+                                    <label className="block text-sm font-semibold text-gray-700 mb-2">{type.name}</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {type.values.map((val: any) => {
+                                            const isSelected = selectedAttributes[type.id] === val.id;
+                                            const isColor = !!val.colorHex;
+
+                                            return isColor ? (
+                                                <button
+                                                    key={val.id}
+                                                    type="button"
+                                                    onClick={() => setSelectedAttributes(prev => ({ ...prev, [type.id]: val.id }))}
+                                                    className={`w-9 h-9 rounded-full border-2 transition-all ${isSelected ? 'border-primary ring-2 ring-primary/30 scale-110' : 'border-gray-300 hover:border-gray-400'}`}
+                                                    style={{ backgroundColor: val.colorHex }}
+                                                    title={val.value}
+                                                />
+                                            ) : (
+                                                <button
+                                                    key={val.id}
+                                                    type="button"
+                                                    onClick={() => setSelectedAttributes(prev => ({ ...prev, [type.id]: val.id }))}
+                                                    className={`px-4 py-2 rounded-xl text-sm font-medium border-2 transition-all ${isSelected
+                                                        ? 'border-primary bg-primary/5 text-primary'
+                                                        : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}
+                                                >
+                                                    {val.value}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            ))}
+
+                            {/* Varyant bulunamadı uyarısı */}
+                            {Object.keys(selectedAttributes).length === attributeTypes.length && !selectedVariant && (
+                                <p className="text-sm text-red-500">Bu kombinasyon mevcut değil.</p>
+                            )}
+                        </div>
+                    )}
+
                     {/* Action Buttons */}
                     <div className="pt-6 border-t space-y-4">
                         <div className="flex gap-4">
-                            {product.stock > 0 ? (
+                            {displayStock > 0 ? (
                                 <>
                                     <div className="flex items-center border border-gray-300 rounded-lg">
                                         <button
@@ -318,14 +426,11 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                                         <span className="px-4 font-medium">{quantity}</span>
                                         <button
                                             className="px-4 py-2 hover:bg-gray-100"
-                                            onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                                            onClick={() => setQuantity(Math.min(displayStock, quantity + 1))}
                                         >+</button>
                                     </div>
                                     <button
-                                        onClick={() => {
-                                            addToCart({ ...product, price: displayPrice, quantity });
-                                            toast.success('Ürün sepete eklendi');
-                                        }}
+                                        onClick={handleAddToCart}
                                         className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-md hover:shadow-lg flex-1 text-lg py-3 flex items-center justify-center gap-2"
                                     >
                                         Sepete Ekle

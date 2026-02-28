@@ -123,7 +123,23 @@ const getProductById = async (req, res) => {
                 id: parseInt(id),
                 isDeleted: false
             },
-            include: { category: true, images: true }
+            include: {
+                category: true,
+                images: true,
+                variants: {
+                    where: { isActive: true },
+                    include: {
+                        attributes: {
+                            include: {
+                                attributeValue: {
+                                    include: { attributeType: true },
+                                },
+                            },
+                        },
+                    },
+                    orderBy: { createdAt: 'asc' },
+                },
+            }
         });
         if (!product) return res.status(404).json({ error: 'Product not found' });
         res.json(product);
