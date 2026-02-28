@@ -7,7 +7,7 @@ import MegaMenu from '@/components/layout/MegaMenu';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import MiniCart from '@/components/cart/MiniCart';
-import { ShoppingCart, User, Heart, Search, ChevronDown, LogOut, Package, Phone, MapPin, Clock, Zap } from 'lucide-react';
+import { ShoppingCart, User, Heart, Search, ChevronDown, LogOut, Package, Phone, MapPin, Clock, Zap, Gift } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useSettings } from '@/context/SettingsContext';
 import SearchAutocomplete from '@/components/search/SearchAutocomplete';
@@ -165,6 +165,11 @@ export default function Header() {
                                             className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors">
                                             <Package size={16} className="text-gray-400 group-hover:text-primary" />
                                             Siparişlerim
+                                        </Link>
+                                        <Link href="/spin" onClick={() => setUserMenuOpen(false)}
+                                            className="flex items-center gap-3 px-4 py-2 text-sm text-purple-600 hover:bg-purple-50 transition-colors font-medium">
+                                            <Gift size={16} />
+                                            🎰 Hediye Çarkı
                                         </Link>
                                         <div className="border-t border-gray-50 mt-2 pt-2">
                                             <button onClick={() => { logout(); setUserMenuOpen(false); }}
