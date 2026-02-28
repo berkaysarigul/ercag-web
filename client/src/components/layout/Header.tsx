@@ -7,7 +7,7 @@ import MegaMenu from '@/components/layout/MegaMenu';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import MiniCart from '@/components/cart/MiniCart';
-import { ShoppingCart, User, Heart, Search, ChevronDown, LogOut, Package, Phone, MapPin, Clock } from 'lucide-react';
+import { ShoppingCart, User, Heart, Search, ChevronDown, LogOut, Package, Phone, MapPin, Clock, Zap } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useSettings } from '@/context/SettingsContext';
 import SearchAutocomplete from '@/components/search/SearchAutocomplete';
@@ -102,6 +102,9 @@ export default function Header() {
                         </div>
                         <Link href="/products?sort=popular" className={`text-sm font-medium hover:opacity-70 transition-opacity ${(isScrolled || !isHome) ? 'text-gray-800' : 'text-white'}`}>Çok Satanlar</Link>
                         <Link href="/categories" className={`text-sm font-medium hover:opacity-70 transition-opacity ${(isScrolled || !isHome) ? 'text-gray-800' : 'text-white'}`}>Kategoriler</Link>
+                        <Link href="/products?hasDiscount=true" className={`text-sm font-medium hover:opacity-70 transition-opacity flex items-center gap-1 ${(isScrolled || !isHome) ? 'text-red-500' : 'text-red-300'}`}>
+                            <Zap size={14} /> Fırsatlar
+                        </Link>
                     </nav>
 
                     {/* Search - Max Width Centered */}

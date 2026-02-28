@@ -28,6 +28,7 @@ const csvUpload = multer({
 // STATIC routes (must be BEFORE /:id)
 router.get('/', productController.getAllProducts);
 router.get('/search/suggestions', productController.searchSuggestions);
+router.get('/discounted', productController.getDiscountedProducts);
 
 // Bulk operations (BEFORE /:id to avoid route conflict)
 router.get('/bulk-template', authenticateToken, isAdmin, productController.downloadBulkTemplate);

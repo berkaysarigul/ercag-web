@@ -2,6 +2,33 @@ const prisma = require('../lib/prisma');
 const { logAudit } = require('../services/auditService');
 const { redisClient } = require('../config/redis.js');
 
+const getDiscountedProducts = async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 8;
+        const products = await prisma.product.findMany({
+            where: {
+                isDeleted: false,
+                compareAtPrice: { not: null },
+            },
+            include: { category: true, images: true, brand: true },
+            orderBy: { updatedAt: 'desc' },
+            take: limit,
+        });
+
+        const discounted = products
+            .filter(p => Number(p.compareAtPrice) > Number(p.price))
+            .map(p => ({
+                ...p,
+                discountPercent: Math.round(((Number(p.compareAtPrice) - Number(p.price)) / Number(p.compareAtPrice)) * 100),
+            }));
+
+        res.json(discounted);
+    } catch (error) {
+        console.error('Discounted Products Error:', error);
+        res.status(500).json({ error: 'İndirimli ürünler getirilemedi' });
+    }
+};
+
 const getAllProducts = async (req, res) => {
     try {
         const { categoryId, minPrice, maxPrice, search, sort, isFeatured } = req.query;
@@ -66,6 +93,10 @@ const getAllProducts = async (req, res) => {
             where.isFeatured = isFeatured === 'true';
         }
 
+        if (req.query.hasDiscount === 'true') {
+            where.compareAtPrice = { not: null };
+        }
+
         if (req.query.brandId) {
             where.brandId = parseInt(req.query.brandId);
         }
@@ -92,8 +123,18 @@ const getAllProducts = async (req, res) => {
             })
         ]);
 
+        // Ürünlere indirim bilgisi ekle (compareAtPrice)
+        const enrichedProducts = products.map(p => {
+            const compareAt = p.compareAtPrice ? Number(p.compareAtPrice) : null;
+            const pPrice = Number(p.price);
+            const discountPercent = compareAt && compareAt > pPrice
+                ? Math.round(((compareAt - pPrice) / compareAt) * 100)
+                : null;
+            return { ...p, discountPercent };
+        });
+
         const responsePayload = {
-            products,
+            products: enrichedProducts,
             pagination: {
                 total: total,
                 page,
@@ -191,6 +232,7 @@ const createProduct = async (req, res) => {
                 sku: sku || null,
                 barcode: barcode || null,
                 lowStockThreshold: lowStockThreshold || 5,
+                compareAtPrice: req.body.compareAtPrice ? parseFloat(req.body.compareAtPrice) : null,
                 image: mainImage,
                 images: {
                     create: files.map((file, index) => ({
@@ -224,6 +266,11 @@ const updateProduct = async (req, res) => {
         const { name, description, price, categoryId, isFeatured, sku, barcode, lowStockThreshold } = req.body;
         const files = req.files || [];
 
+        // compareAtPrice destekle
+        const compareAtPriceVal = req.body.compareAtPrice !== undefined
+            ? (req.body.compareAtPrice ? parseFloat(req.body.compareAtPrice) : null)
+            : undefined;
+
         // Create a data object for update
         const data = {
             name,
@@ -235,6 +282,7 @@ const updateProduct = async (req, res) => {
             sku: sku !== undefined ? (sku || null) : undefined,
             barcode: barcode !== undefined ? (barcode || null) : undefined,
             lowStockThreshold: lowStockThreshold !== undefined ? parseInt(lowStockThreshold) : undefined,
+            ...(compareAtPriceVal !== undefined && { compareAtPrice: compareAtPriceVal }),
         };
 
         // Handle Image Deletion
@@ -798,5 +846,5 @@ const bulkUpdatePrices = async (req, res) => {
     }
 };
 
-module.exports = { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, bulkDeleteProducts, searchSuggestions, downloadBulkTemplate, bulkImportProducts, exportProducts, bulkUpdatePrices };
+module.exports = { getAllProducts, getDiscountedProducts, getProductById, createProduct, updateProduct, deleteProduct, bulkDeleteProducts, searchSuggestions, downloadBulkTemplate, bulkImportProducts, exportProducts, bulkUpdatePrices };
 

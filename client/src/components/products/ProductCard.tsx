@@ -20,6 +20,8 @@ interface Product {
     stock?: number;
     rating?: number;
     reviewCount?: number;
+    compareAtPrice?: string | number | null;
+    discountPercent?: number | null;
 }
 
 export default function ProductCard({ product }: { product: Product }) {
@@ -35,6 +37,12 @@ export default function ProductCard({ product }: { product: Product }) {
     const discount = getProductDiscount(product.id, categoryId, price);
     const displayPrice = discount ? discount.discountedPrice : price;
 
+    // compareAtPrice indirim yüzdesi (kampanya yoksa)
+    const compareAt = product.compareAtPrice ? Number(product.compareAtPrice) : null;
+    const compareDiscount = !discount && compareAt && compareAt > price
+        ? Math.round(((compareAt - price) / compareAt) * 100)
+        : null;
+
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -42,7 +50,6 @@ export default function ProductCard({ product }: { product: Product }) {
             toast.error('Ürün stokta yok');
             return;
         }
-        // Add with potentially discounted price
         addToCart({ ...product, price: displayPrice });
     };
 
@@ -90,6 +97,13 @@ export default function ProductCard({ product }: { product: Product }) {
                                 : <Tag size={10} />
                             }
                             -%{discount.discountPercent} İndirim
+                        </div>
+                    )}
+
+                    {/* compareAtPrice indirimi (kampanya yoksa) */}
+                    {compareDiscount && (
+                        <div className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white text-[10px] uppercase font-bold tracking-wider rounded-full shadow-sm">
+                            -%{compareDiscount}
                         </div>
                     )}
                 </div>
@@ -144,6 +158,15 @@ export default function ProductCard({ product }: { product: Product }) {
                                 </span>
                                 <span className="text-xs text-gray-400 line-through leading-none">
                                     {price.toFixed(2)} ₺
+                                </span>
+                            </>
+                        ) : compareAt && compareAt > price ? (
+                            <>
+                                <span className="text-sm font-bold text-gray-900 leading-none">
+                                    {price.toFixed(2)} ₺
+                                </span>
+                                <span className="text-xs text-gray-400 line-through leading-none">
+                                    {compareAt.toFixed(2)} ₺
                                 </span>
                             </>
                         ) : (

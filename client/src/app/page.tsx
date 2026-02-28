@@ -6,6 +6,7 @@ import api from '@/lib/api';
 import { ArrowRight, ShoppingBag, Clock, CheckCircle2, MapPin, ChevronDown, ChevronUp, Zap, BookOpen, PenTool, Palette, FileText, FolderOpen, Scissors, Backpack, Briefcase, Music, Package, Truck, CreditCard, Shield, Star, Sparkles } from 'lucide-react';
 import HeroSlider from '@/components/home/HeroSlider';
 import FeaturedProducts from '@/components/home/FeaturedProducts';
+import DiscountedProducts from '@/components/home/DiscountedProducts';
 import CampaignBanner from '@/components/ui/CampaignBanner';
 import { useSettings } from '@/context/SettingsContext';
 
@@ -207,6 +208,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ── Fırsat Ürünleri ──────────────────────────────── */}
+      <DiscountedProducts />
 
       {/* ── Featured Products ─────────────────────────── */}
       <FeaturedProducts />
