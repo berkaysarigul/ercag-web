@@ -13,6 +13,7 @@ import ImageUpload from '@/components/admin/ImageUpload';
 interface Category {
     id: number;
     name: string;
+    children?: any[];
 }
 
 interface Brand {
@@ -364,8 +365,17 @@ export default function EditProductPage() {
                                     style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}
                                 >
                                     <option value="">Kategori Seçiniz</option>
-                                    {categories.map(cat => (
-                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                    {categories.map((cat: any) => (
+                                        cat.children && cat.children.length > 0 ? (
+                                            <optgroup key={cat.id} label={cat.name}>
+                                                <option value={cat.id}>📁 {cat.name} (Genel)</option>
+                                                {cat.children.map((sub: any) => (
+                                                    <option key={sub.id} value={sub.id}>↳ {sub.name}</option>
+                                                ))}
+                                            </optgroup>
+                                        ) : (
+                                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                        )
                                     ))}
                                 </select>
                             </div>
