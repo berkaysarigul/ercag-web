@@ -10,6 +10,7 @@ router.get('/', authenticateToken, orderController.getUserOrders);
 router.put('/:id/cancel', authenticateToken, orderController.cancelMyOrder);
 
 // Admin Order Routes (STAFF can manage orders)
+router.get('/counts', authenticateToken, authorize('STAFF', 'ADMIN'), orderController.getOrderCounts);
 router.get('/all', authenticateToken, authorize('STAFF', 'ADMIN'), orderController.getAllOrders);
 router.put('/:id/status', authenticateToken, authorize('STAFF', 'ADMIN'), orderController.updateOrderStatus);
 router.post('/verify-code', authenticateToken, authorize('STAFF', 'ADMIN'), orderController.verifyPickupCode);

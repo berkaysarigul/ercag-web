@@ -67,7 +67,9 @@ const initializeDefaults = async () => {
     const defaults = [
         { key: 'site_title', value: 'Erçağ Kırtasiye', group: 'general' },
         { key: 'site_phone', value: '0212 123 45 67', group: 'contact' },
+        { key: 'site_email', value: 'info@ercag.com', group: 'contact' },
         { key: 'site_address', value: 'Atatürk Caddesi No: 123, Merkez, İstanbul', group: 'contact' },
+        { key: 'working_hours', value: 'Pzt – Cmt: 09:00 – 19:30', group: 'contact' },
         { key: 'social_instagram', value: 'https://instagram.com/ercag', group: 'social' },
     ];
 

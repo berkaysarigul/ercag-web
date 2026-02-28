@@ -5,6 +5,9 @@ import { SlidersHorizontal, ChevronRight, PenTool, Book, Briefcase, Palette } fr
 interface Category {
     id: number;
     name: string;
+    parentId?: number | null;
+    children?: Category[];
+    _count?: { products: number };
 }
 
 interface FilterProps {
@@ -18,7 +21,7 @@ export default function FilterSidebar({ onFilterChange, initialCategory }: Filte
     const [priceRange, setPriceRange] = useState({ minPrice: '', maxPrice: '' });
 
     useEffect(() => {
-        api.get('/categories').then(res => setCategories(res.data));
+        api.get('/categories').then(res => setCategories(res.data)); // Ağaç yapısında gelir
     }, []);
 
     useEffect(() => {
@@ -79,28 +82,45 @@ export default function FilterSidebar({ onFilterChange, initialCategory }: Filte
                     {selectedCategory === null && <ChevronRight className="w-5 h-5 text-primary" />}
                 </button>
 
-                {categories.map(cat => (
-                    <button
-                        key={cat.id}
-                        onClick={() => handleCategoryChange(cat.id)}
-                        className={`
-                            group w-full flex items-center justify-between px-4 py-3 text-left rounded-xl transition-all duration-200 hover:bg-[#e8e8e0]
-                            ${selectedCategory === cat.id ? 'bg-[#e8e8e0] border-2 border-[#d1d1c4]' : 'border-2 border-transparent'}
-                        `}
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className={`
-                                w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110
-                                ${selectedCategory === cat.id ? 'bg-primary text-white shadow-sm' : 'bg-gray-50 text-gray-500'}
-                            `}>
-                                {getCategoryIcon(cat.name)}
+                {categories.map((cat: any) => (
+                    <div key={cat.id}>
+                        {/* Ana Kategori */}
+                        <button
+                            onClick={() => handleCategoryChange(cat.id)}
+                            className={`group w-full flex items-center justify-between px-4 py-3 text-left rounded-xl transition-all duration-200 hover:bg-[#e8e8e0]
+                                ${selectedCategory === cat.id ? 'bg-[#e8e8e0] border-2 border-[#d1d1c4]' : 'border-2 border-transparent'}`}
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110
+                                    ${selectedCategory === cat.id ? 'bg-primary text-white shadow-sm' : 'bg-gray-50 text-gray-500'}`}>
+                                    {getCategoryIcon(cat.name)}
+                                </div>
+                                <span className={`font-medium group-hover:text-primary ${selectedCategory === cat.id ? 'text-primary font-bold' : 'text-gray-700'}`}>
+                                    {cat.name}
+                                </span>
                             </div>
-                            <span className={`font-medium group-hover:text-primary ${selectedCategory === cat.id ? 'text-primary font-bold' : 'text-gray-700'}`}>
-                                {cat.name}
-                            </span>
-                        </div>
-                        {selectedCategory === cat.id && <ChevronRight className="w-5 h-5 text-primary" />}
-                    </button>
+                            {selectedCategory === cat.id && <ChevronRight className="w-5 h-5 text-primary" />}
+                        </button>
+
+                        {/* Alt Kategoriler */}
+                        {cat.children && cat.children.length > 0 && (
+                            <div className="ml-14 mt-1 mb-2 space-y-0.5">
+                                {cat.children.map((sub: any) => (
+                                    <button
+                                        key={sub.id}
+                                        onClick={() => handleCategoryChange(sub.id)}
+                                        className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors
+                                            ${selectedCategory === sub.id ? 'bg-primary/10 text-primary font-semibold' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+                                    >
+                                        {sub.name}
+                                        {sub._count?.products !== undefined && (
+                                            <span className="text-xs text-gray-400 ml-1">({sub._count.products})</span>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 ))}
             </div>
 

@@ -25,7 +25,16 @@ const getAllProducts = async (req, res) => {
             isDeleted: false // FIX-08: Enable soft delete filter
         };
 
-        if (categoryId) where.categoryId = parseInt(categoryId);
+        if (categoryId) {
+            const catId = parseInt(categoryId);
+            // Alt kategorilerin ürünlerini de dahil et
+            const childCategories = await prisma.category.findMany({
+                where: { parentId: catId },
+                select: { id: true },
+            });
+            const categoryIds = [catId, ...childCategories.map(c => c.id)];
+            where.categoryId = { in: categoryIds };
+        }
 
         if (minPrice || maxPrice) {
             where.price = {};
@@ -399,20 +408,24 @@ const downloadBulkTemplate = async (req, res) => {
 
         const templateData = [
             {
+                'ID': '',
                 'Ürün Adı': 'Faber-Castell 12li Boya Kalemi',
                 'Açıklama': 'Yüksek pigmentli, kırılmaya dayanıklı boya kalemleri',
                 'Fiyat': '89.90',
                 'Kategori': categories[0]?.name || 'Yazı Gereçleri',
+                'Mevcut Stok': '100',
                 'Stok': '100',
                 'SKU': 'FC-BK-012',
                 'Barkod': '8690826012345',
                 'Düşük Stok Eşiği': '5',
             },
             {
+                'ID': '',
                 'Ürün Adı': 'Kraf Spiralli Defter A4',
                 'Açıklama': '100 yaprak, çizgili, polipropilen kapak',
                 'Fiyat': '34.50',
                 'Kategori': categories[1]?.name || 'Defterler',
+                'Mevcut Stok': '200',
                 'Stok': '200',
                 'SKU': 'KRF-DEF-A4',
                 'Barkod': '8690826054321',
@@ -424,10 +437,12 @@ const downloadBulkTemplate = async (req, res) => {
 
         // Sütun genişlikleri
         ws['!cols'] = [
+            { wch: 8 },  // ID
             { wch: 35 }, // Ürün Adı
             { wch: 50 }, // Açıklama
             { wch: 10 }, // Fiyat
             { wch: 20 }, // Kategori
+            { wch: 12 }, // Mevcut Stok
             { wch: 8 },  // Stok
             { wch: 15 }, // SKU
             { wch: 18 }, // Barkod
@@ -438,7 +453,7 @@ const downloadBulkTemplate = async (req, res) => {
         XLSX.utils.sheet_add_aoa(ws, [
             [],
             ['Mevcut Kategoriler:', categoryNames],
-            ['NOT:', 'Kategori adlarını tam olarak yukarıdaki listeden yazınız. Büyük/küçük harf duyarlıdır.']
+            ['NOT:', 'Kategori adlarını tam olarak yukarıdaki listeden yazınız. Büyük/küçük harf duyarlıdır.', 'ID doluysa güncelleme, boşsa yeni kayıt yapılır.']
         ], { origin: -1 });
 
         const wb = XLSX.utils.book_new();
@@ -491,17 +506,18 @@ const bulkImportProducts = async (req, res) => {
             if (p.barcode) existingBarcodes.add(p.barcode);
         });
 
-        const results = { created: 0, skipped: 0, errors: [] };
+        const results = { created: 0, updated: 0, skipped: 0, errors: [] };
         const batchSkus = new Set(); // Bu dosya içindeki SKU'lar (dosya içi çakışma)
         const batchBarcodes = new Set();
 
         // Header mapping (Türkçe → İngilizce)
         const headerMap = {
+            'ID': 'id', 'id': 'id',
             'Ürün Adı': 'name', 'Urun Adi': 'name', 'name': 'name',
             'Açıklama': 'description', 'Aciklama': 'description', 'description': 'description',
             'Fiyat': 'price', 'price': 'price',
             'Kategori': 'categoryName', 'category': 'categoryName', 'categoryName': 'categoryName',
-            'Stok': 'stock', 'stock': 'stock',
+            'Stok': 'stock', 'stock': 'stock', 'Mevcut Stok': 'stock',
             'SKU': 'sku', 'sku': 'sku',
             'Barkod': 'barcode', 'barcode': 'barcode',
             'Düşük Stok Eşiği': 'lowStockThreshold', 'Dusuk Stok Esigi': 'lowStockThreshold', 'lowStockThreshold': 'lowStockThreshold',
@@ -523,7 +539,7 @@ const bulkImportProducts = async (req, res) => {
                 continue;
             }
 
-            // Zod validasyonu
+            // Zod validasyonu (Kategori ID'sini daha esnek yönetebilir)
             const validation = bulkProductRowSchema.safeParse(row);
             if (!validation.success) {
                 const errorMessages = Object.entries(validation.error.flatten().fieldErrors)
@@ -544,8 +560,8 @@ const bulkImportProducts = async (req, res) => {
                 continue;
             }
 
-            // SKU çakışma kontrolü
-            if (data.sku) {
+            // SKU çakışma kontrolü (yeni ürünse veya dosya içi çakışmaysa)
+            if (data.sku && !row.id) {
                 if (existingSkus.has(data.sku) || batchSkus.has(data.sku)) {
                     results.errors.push({ row: rowNum, name: data.name, error: `SKU zaten mevcut: ${data.sku}` });
                     results.skipped++;
@@ -554,8 +570,8 @@ const bulkImportProducts = async (req, res) => {
                 batchSkus.add(data.sku);
             }
 
-            // Barkod çakışma kontrolü
-            if (data.barcode) {
+            // Barkod çakışma kontrolü (yeni ürünse)
+            if (data.barcode && !row.id) {
                 if (existingBarcodes.has(data.barcode) || batchBarcodes.has(data.barcode)) {
                     results.errors.push({ row: rowNum, name: data.name, error: `Barkod zaten mevcut: ${data.barcode}` });
                     results.skipped++;
@@ -564,23 +580,44 @@ const bulkImportProducts = async (req, res) => {
                 batchBarcodes.add(data.barcode);
             }
 
-            // Ürünü oluştur
+            // Ürünü oluştur veya Güncelle (Upsert)
             try {
-                await prisma.product.create({
-                    data: {
-                        name: data.name,
-                        description: data.description || '',
-                        price: data.price,
-                        categoryId,
-                        stock: data.stock,
-                        sku: data.sku || null,
-                        barcode: data.barcode || null,
-                        lowStockThreshold: data.lowStockThreshold || 5,
-                    }
-                });
-                results.created++;
+                if (row.id) {
+                    await prisma.product.update({
+                        where: { id: parseInt(row.id) },
+                        data: {
+                            name: data.name,
+                            description: data.description || '',
+                            price: data.price,
+                            categoryId: categoryId || undefined,
+                            stock: data.stock,
+                            sku: data.sku || null,
+                            barcode: data.barcode || null,
+                            lowStockThreshold: data.lowStockThreshold || 5,
+                        }
+                    });
+                    results.updated++;
+                } else {
+                    await prisma.product.create({
+                        data: {
+                            name: data.name,
+                            description: data.description || '',
+                            price: data.price,
+                            categoryId,
+                            stock: data.stock,
+                            sku: data.sku || null,
+                            barcode: data.barcode || null,
+                            lowStockThreshold: data.lowStockThreshold || 5,
+                        }
+                    });
+                    results.created++;
+                }
             } catch (dbError) {
-                results.errors.push({ row: rowNum, name: data.name, error: dbError.message });
+                if (dbError.code === 'P2025') {
+                    results.errors.push({ row: rowNum, name: data.name, error: `Belirtilen ID (${row.id}) bulunamadı` });
+                } else {
+                    results.errors.push({ row: rowNum, name: data.name, error: dbError.message });
+                }
                 results.skipped++;
             }
         }
@@ -591,11 +628,11 @@ const bulkImportProducts = async (req, res) => {
 
         // Audit log
         logAudit(req.user?.id, 'product.bulk_import', 'Product', null, {
-            created: results.created, skipped: results.skipped, errorCount: results.errors.length
+            created: results.created, updated: results.updated, skipped: results.skipped, errorCount: results.errors.length
         }, req.ip);
 
         res.json({
-            message: `${results.created} ürün başarıyla eklendi, ${results.skipped} satır atlandı.`,
+            message: `${results.updated + results.created} ürün başarıyla işlendi (Eklendi: ${results.created}, Güncellendi: ${results.updated}). ${results.skipped} satır atlandı.`,
             ...results
         });
     } catch (error) {

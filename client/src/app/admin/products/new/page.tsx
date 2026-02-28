@@ -13,6 +13,7 @@ import ImageUpload from '@/components/admin/ImageUpload';
 interface Category {
     id: number;
     name: string;
+    children?: { id: number; name: string }[];
 }
 
 export default function NewProductPage() {
@@ -250,8 +251,17 @@ export default function NewProductPage() {
                                     onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
                                 >
                                     <option value="">Kategori Seçiniz</option>
-                                    {categories.map(cat => (
-                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                    {categories.map((cat: any) => (
+                                        cat.children && cat.children.length > 0 ? (
+                                            <optgroup key={cat.id} label={cat.name}>
+                                                <option value={cat.id}>📁 {cat.name} (Genel)</option>
+                                                {cat.children.map((sub: any) => (
+                                                    <option key={sub.id} value={sub.id}>↳ {sub.name}</option>
+                                                ))}
+                                            </optgroup>
+                                        ) : (
+                                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                        )
                                     ))}
                                 </select>
                             </div>

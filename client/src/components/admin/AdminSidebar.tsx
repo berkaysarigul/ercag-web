@@ -18,7 +18,6 @@ export default function AdminSidebar() {
         { name: 'Teslimat Doğrula', href: '/admin/verify-pickup', icon: ScanBarcode, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] },
         { name: 'Siparişler', href: '/admin/orders', icon: ShoppingBag, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] }, // UI-21: ShoppingBag (Ürünler'den ayrı)
         { name: 'Ürünler', href: '/admin/products', icon: Package, roles: ['SUPER_ADMIN', 'ADMIN'] },
-        { name: 'Stok Yönetimi', href: '/admin/stock', icon: BarChart3, roles: ['SUPER_ADMIN', 'ADMIN'] }, // UI-21: BarChart3 → ayrı
         { name: 'Kategoriler', href: '/admin/categories', icon: FolderTree, roles: ['SUPER_ADMIN', 'ADMIN'] }, // UI-21: Package → FolderTree
         { name: 'Kuponlar', href: '/admin/coupons', icon: Ticket, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Değerlendirmeler', href: '/admin/reviews', icon: MessageSquare, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] },

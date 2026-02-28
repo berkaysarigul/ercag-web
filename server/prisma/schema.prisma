@@ -53,11 +53,12 @@ model AuditLog {
 }
 
 model Cart {
-  id        Int        @id @default(autoincrement())
-  userId    Int        @unique
-  user      User       @relation(fields: [userId], references: [id])
-  items     CartItem[]
-  updatedAt DateTime   @updatedAt
+  id           Int              @id @default(autoincrement())
+  userId       Int              @unique
+  user         User             @relation(fields: [userId], references: [id])
+  items        CartItem[]
+  variantItems CartItemVariant[]
+  updatedAt    DateTime         @updatedAt
 }
 
 model CartItem {
@@ -71,13 +72,20 @@ model CartItem {
   @@unique([cartId, productId])
 }
 
+// ═══ CATEGORY — Alt Kategori Desteği ═══
 model Category {
-  id        Int       @id @default(autoincrement())
-  name      String    @unique
+  id        Int        @id @default(autoincrement())
+  name      String
   image     String?
+  parentId  Int?
+  parent    Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children  Category[] @relation("CategoryTree")
   products  Product[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  sortOrder Int        @default(0)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@unique([name, parentId])
 }
 
 model Product {
@@ -91,23 +99,29 @@ model Product {
   category    Category @relation(fields: [categoryId], references: [id])
 
   // Relations
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
   orderItems        OrderItem[]
   reviews           Review[]
   wishlist          Wishlist[]
-  stock             Int             @default(0)
+  stock             Int              @default(0)
   stockAlerts       StockAlert[]
-  isFeatured        Boolean         @default(false)
+  isFeatured        Boolean          @default(false)
   cartItems         CartItem[]
   images            ProductImage[]
-  isDeleted         Boolean         @default(false)
-  rating            Float           @default(0)
-  numReviews        Int             @default(0)
-  sku               String?         @unique
-  barcode           String?         @unique
-  lowStockThreshold Int             @default(5)
+  isDeleted         Boolean          @default(false)
+  rating            Float            @default(0)
+  numReviews        Int              @default(0)
+  sku               String?          @unique
+  barcode           String?          @unique
+  lowStockThreshold Int              @default(5)
   stockMovements    StockMovement[]
+
+  // ═══ YENİ ALANLAR ═══
+  brandId        Int?
+  brand          Brand?           @relation(fields: [brandId], references: [id])
+  compareAtPrice Decimal?         // Eski fiyat (üstü çizili gösterilecek)
+  variants       ProductVariant[]
 }
 
 model ProductImage {
@@ -166,6 +180,11 @@ model Order {
   items     OrderItem[]
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+
+  // ═══ YENİ ALANLAR ═══
+  branchId     Int?
+  branch       Branch?          @relation(fields: [branchId], references: [id])
+  variantItems OrderItemVariant[]
 }
 
 model OrderItem {
@@ -284,4 +303,165 @@ model SearchLog {
 
   @@index([query])
   @@index([createdAt])
+}
+
+// ═══ ŞUBE SİSTEMİ ═══
+model Branch {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique // "Uydukent Şubesi", "Fatih Şubesi"
+  address      String
+  phone        String?
+  district     String?  // "Selçuklu Mah.", "Fatih Mah."
+  city         String   @default("Afyonkarahisar")
+  latitude     Float?
+  longitude    Float?
+  workingHours String?  // JSON: {"mon":"09:00-18:00", ...}
+  isActive     Boolean  @default(true)
+  orders       Order[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ═══ MARKA SİSTEMİ ═══
+model Brand {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  logo      String?
+  isActive  Boolean   @default(true)
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// ═══ DİNAMİK VARYANT SİSTEMİ ═══
+
+// Özellik tipleri: "Renk", "Boyut", "Gramaj", "Uç Kalınlığı", vb.
+model AttributeType {
+  id        Int              @id @default(autoincrement())
+  name      String           @unique // "Renk", "Boyut", "Kalem Ucu"
+  sortOrder Int              @default(0)
+  values    AttributeValue[]
+  createdAt DateTime         @default(now())
+}
+
+// Özellik değerleri: "Kırmızı", "A4", "0.7mm", vb.
+model AttributeValue {
+  id              Int                @id @default(autoincrement())
+  attributeTypeId Int
+  attributeType   AttributeType      @relation(fields: [attributeTypeId], references: [id], onDelete: Cascade)
+  value           String             // "Kırmızı", "A4", "0.7mm"
+  colorHex        String?            // Renk tipi için: "#FF0000"
+  sortOrder       Int                @default(0)
+  variantValues   VariantAttribute[]
+
+  @@unique([attributeTypeId, value])
+}
+
+// Ürün varyantları: Belirli bir ürünün belirli özellik kombinasyonu
+model ProductVariant {
+  id         Int                @id @default(autoincrement())
+  productId  Int
+  product    Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku        String?            @unique
+  barcode    String?            @unique
+  price      Decimal?           // null ise ana ürün fiyatı kullanılır
+  stock      Int                @default(0)
+  image      String?            // Varyanta özel görsel
+  isActive   Boolean            @default(true)
+  attributes VariantAttribute[]
+  cartItems  CartItemVariant[]
+  orderItems OrderItemVariant[]
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+}
+
+// Varyant-Özellik ilişkisi (many-to-many)
+model VariantAttribute {
+  id               Int            @id @default(autoincrement())
+  variantId        Int
+  variant          ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  attributeValueId Int
+  attributeValue   AttributeValue @relation(fields: [attributeValueId], references: [id])
+
+  @@unique([variantId, attributeValueId])
+}
+
+// Sepetteki varyant bilgisi
+model CartItemVariant {
+  id         Int            @id @default(autoincrement())
+  variantId  Int
+  variant    ProductVariant @relation(fields: [variantId], references: [id])
+  quantity   Int
+  cartId     Int
+  cart       Cart           @relation(fields: [cartId], references: [id])
+
+  @@unique([cartId, variantId])
+}
+
+// Siparişteki varyant bilgisi
+model OrderItemVariant {
+  id          Int            @id @default(autoincrement())
+  variantId   Int
+  variant     ProductVariant @relation(fields: [variantId], references: [id])
+  quantity    Int
+  price       Decimal
+  orderId     Int
+  order       Order          @relation(fields: [orderId], references: [id])
+  // Sipariş anındaki özellik snapshot'ı
+  attributes  String?        // JSON: [{"type":"Renk","value":"Kırmızı"},{"type":"Boyut","value":"A4"}]
+}
+
+// ═══ HEDİYE ÇARKI SİSTEMİ ═══
+
+// Çark tanımı
+model SpinWheel {
+  id             Int         @id @default(autoincrement())
+  name           String      // "3000 TL Çarkı", "Yılbaşı Özel Çarkı"
+  minOrderAmount Decimal     // Minimum sipariş tutarı (0 = mağaza içi manuel)
+  isActive       Boolean     @default(true)
+  isManualOnly   Boolean     @default(false) // true = sadece admin kod üretebilir
+  validFrom      DateTime?
+  validUntil     DateTime?
+  prizes         SpinPrize[]
+  codes          SpinCode[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+// Çarktaki ödüller ve olasılıkları
+model SpinPrize {
+  id          Int        @id @default(autoincrement())
+  wheelId     Int
+  wheel       SpinWheel  @relation(fields: [wheelId], references: [id], onDelete: Cascade)
+  name        String     // "50 TL İndirim Kuponu", "Silgi Seti", "Boş"
+  type        String     // "COUPON", "PRODUCT", "POINTS", "EMPTY"
+  value       String?    // Kupon kodu prefix, ürün ID, puan miktarı
+  probability Float      // 0.0 - 1.0 (toplam 1.0 olmalı)
+  color       String?    // Çark dilim rengi
+  icon        String?    // Emoji veya ikon ismi
+  maxWins     Int?       // Maksimum kazanma sayısı (null = sınırsız)
+  winCount    Int        @default(0) // Şu ana kadar kazanılma sayısı
+  isActive    Boolean    @default(true)
+  codes       SpinCode[]
+  sortOrder   Int        @default(0)
+}
+
+// Çevirme kodları
+model SpinCode {
+  id           Int        @id @default(autoincrement())
+  code         String     @unique // "SPIN-A8F3K2"
+  wheelId      Int
+  wheel        SpinWheel  @relation(fields: [wheelId], references: [id])
+  orderId      Int?       // Online sipariş ile oluşturulduysa
+  userId       Int?       // Kullanan kullanıcı
+  isUsed       Boolean    @default(false)
+  usedAt       DateTime?
+  prizeId      Int?       // Kazanılan ödül
+  prize        SpinPrize? @relation(fields: [prizeId], references: [id])
+  prizeResult  String?    // JSON: Kazanılan ödülün detayı
+  // Manuel oluşturma bilgisi
+  createdById  Int?       // Admin ID (manuel oluşturulduysa)
+  customerNote String?    // "3200TL alışveriş - Ahmet Bey"
+  expiresAt    DateTime?
+  createdAt    DateTime   @default(now())
 }

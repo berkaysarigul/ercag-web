@@ -5,11 +5,12 @@ import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@
 import { Fragment } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { toast } from 'sonner';
 
 interface OrderDetailsModalProps {
     isOpen: boolean;
     onClose: () => void;
-    order: { id: number; createdAt: string; fullName?: string; phoneNumber?: string; email?: string; user?: { name?: string; phone?: string; email?: string }; items: { id: number; quantity: number; price: number | string; product: { name: string } }[]; totalAmount: number | string; discountAmount?: number | string; couponCode?: string; note?: string; status: string; statusHistory?: string | { status: string; date: string; user?: string; note?: string; timestamp?: string }[]; pickupCode?: string; completedAt?: string };
+    order: { id: number; createdAt: string; fullName?: string; phoneNumber?: string; email?: string; user?: { name?: string; phone?: string; email?: string }; items: { id: number; quantity: number; price: number | string; product: { name: string } }[]; totalAmount: number | string; discountAmount?: number | string; campaignDiscount?: number | string; campaignDetails?: string; couponCode?: string; note?: string; status: string; statusHistory?: string | { status: string; date: string; user?: string; note?: string; timestamp?: string }[]; pickupCode?: string; completedAt?: string; readyAt?: string };
     onStatusChange: (orderId: number, status: string) => Promise<void>;
 }
 
@@ -73,14 +74,25 @@ export default function OrderDetailsModal({ isOpen, onClose, order, onStatusChan
         // @ts-ignore
         const finalY = doc.lastAutoTable.finalY + 10;
 
-        doc.text(`Ara Toplam: ${(Number(order.totalAmount) + (Number(order.discountAmount) || 0)).toFixed(2)} TL`, 140, finalY);
-        if (order.discountAmount && Number(order.discountAmount) > 0) {
-            doc.text(`İndirim: -${Number(order.discountAmount).toFixed(2)} TL`, 140, finalY + 5);
+        doc.text(`Ara Toplam: ${(Number(order.totalAmount) + (Number(order.discountAmount) || 0) + (Number(order.campaignDiscount) || 0)).toFixed(2)} TL`, 140, finalY);
+
+        let yOffset = 0;
+
+        if (order.campaignDiscount && Number(order.campaignDiscount) > 0) {
+            yOffset += 5;
+            doc.text(`Kampanya Indirimi: -${Number(order.campaignDiscount).toFixed(2)} TL`, 140, finalY + yOffset);
         }
+
+        if (order.discountAmount && Number(order.discountAmount) > 0) {
+            yOffset += 5;
+            doc.text(`Kupon Indirimi: -${Number(order.discountAmount).toFixed(2)} TL`, 140, finalY + yOffset);
+        }
+
+        yOffset += 7;
         doc.setFontSize(12);
         // doc.setFont('helvetica', 'bold'); // Switch back to standard if needed or keep Roboto
         doc.setFont('Roboto', 'normal'); // Keep Roboto for consistency
-        doc.text(`Genel Toplam: ${Number(order.totalAmount).toFixed(2)} TL`, 140, finalY + 12);
+        doc.text(`Genel Toplam: ${Number(order.totalAmount).toFixed(2)} TL`, 140, finalY + yOffset);
 
         doc.save(`ercag-siparis-${order.id}.pdf`);
     };
@@ -182,9 +194,15 @@ export default function OrderDetailsModal({ isOpen, onClose, order, onStatusChan
                                                             <span>{order.phoneNumber || order.user?.phone}</span>
                                                         </div>
                                                         {order.pickupCode && (
-                                                            <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100 text-center">
-                                                                <p className="text-xs text-blue-600 mb-1">Teslimat Kodu</p>
-                                                                <p className="text-xl font-mono font-bold text-blue-800 tracking-widest">{order.pickupCode}</p>
+                                                            <div className="mt-4 p-3 bg-brand-50 rounded-lg border border-primary/10 text-center">
+                                                                <p className="text-xs text-primary mb-1">Teslimat Kodu</p>
+                                                                <button
+                                                                    onClick={() => { navigator.clipboard.writeText(order.pickupCode || ''); toast?.('Kod kopyalandı!'); }}
+                                                                    className="text-xl font-mono font-bold text-primary tracking-widest hover:opacity-70 transition-opacity cursor-pointer"
+                                                                    title="Tıkla kopyala"
+                                                                >
+                                                                    {order.pickupCode}
+                                                                </button>
                                                             </div>
                                                         )}
                                                     </div>
@@ -223,6 +241,12 @@ export default function OrderDetailsModal({ isOpen, onClose, order, onStatusChan
                                                 </div>
 
                                                 <div className="mt-4 space-y-2 flex flex-col items-end">
+                                                    {order.campaignDiscount && Number(order.campaignDiscount) > 0 && (
+                                                        <div className="flex justify-between w-48 text-sm text-orange-600">
+                                                            <span>Kampanya</span>
+                                                            <span>-₺{Number(order.campaignDiscount).toFixed(2)}</span>
+                                                        </div>
+                                                    )}
                                                     {order.discountAmount && Number(order.discountAmount) > 0 && (
                                                         <div className="flex justify-between w-48 text-sm text-green-600">
                                                             <span>İndirim ({order.couponCode})</span>

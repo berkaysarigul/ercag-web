@@ -1,6 +1,11 @@
+'use client';
 import React from 'react';
+import { useSettings } from '@/context/SettingsContext';
 
 export default function TermsPage() {
+    const { settings } = useSettings();
+    const companyName = settings.site_title || 'Erçağ Kırtasiye';
+
     return (
         <div className="container mx-auto px-4 py-8 max-w-4xl">
             <h1 className="text-3xl font-bold mb-6">Kullanım Koşulları</h1>
@@ -12,7 +17,7 @@ export default function TermsPage() {
 
                 <h2 className="text-xl font-semibold mt-6 mb-3">1. Genel Hükümler</h2>
                 <p>
-                    Erçağ Kırtasiye, bu sitede yer alan bilgileri dilediği zaman değiştirme hakkını saklı tutar.
+                    {companyName}, bu sitede yer alan bilgileri dilediği zaman değiştirme hakkını saklı tutar.
                 </p>
 
                 <h2 className="text-xl font-semibold mt-6 mb-3">2. Hesap Güvenliği</h2>
@@ -27,7 +32,7 @@ export default function TermsPage() {
 
                 <h2 className="text-xl font-semibold mt-6 mb-3">4. Fikri Mülkiyet</h2>
                 <p>
-                    Site içerisindeki tüm görseller, tasarımlar ve içerikler Erçağ Kırtasiye'ye aittir. İzinsiz kullanılamaz.
+                    Site içerisindeki tüm görseller, tasarımlar ve içerikler {companyName}'ye aittir. İzinsiz kullanılamaz.
                 </p>
             </div>
         </div>

@@ -186,6 +186,17 @@ export default function AdminSettings() {
                             />
                         </div>
                         <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Çalışma Saatleri</label>
+                            <input
+                                type="text"
+                                name="working_hours"
+                                value={settings.working_hours || ''}
+                                onChange={handleChange}
+                                placeholder="Pzt – Cmt: 09:00 – 19:30"
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 outline-none"
+                            />
+                        </div>
+                        <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1"><MapPin size={14} /> Adres</label>
                             <textarea
                                 name="site_address"

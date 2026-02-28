@@ -1,13 +1,18 @@
+'use client';
 import React from 'react';
+import { useSettings } from '@/context/SettingsContext';
 
 export default function PrivacyPage() {
+    const { settings } = useSettings();
+    const companyName = settings.site_title || 'Erçağ Kırtasiye';
+
     return (
         <div className="container mx-auto px-4 py-8 max-w-4xl">
             <h1 className="text-3xl font-bold mb-6">Gizlilik Politikası (KVKK)</h1>
 
             <div className="prose prose-blue max-w-none">
                 <p className="mb-4">
-                    Bu Gizlilik Politikası, Erçağ Kırtasiye ("Şirket") tarafından işletilen web sitesi ("Site") üzerinden toplanan kişisel verilerinizin nasıl kullanıldığını, saklandığını ve korunduğunu açıklamaktadır.
+                    Bu Gizlilik Politikası, {companyName} ("Şirket") tarafından işletilen web sitesi ("Site") üzerinden toplanan kişisel verilerinizin nasıl kullanıldığını, saklandığını ve korunduğunu açıklamaktadır.
                     6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca, veri sorumlusu sıfatıyla kişisel verilerinizi aşağıda belirtilen çerçevede işlemekteyiz.
                 </p>
 

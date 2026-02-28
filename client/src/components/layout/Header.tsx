@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import MegaMenu from '@/components/layout/MegaMenu';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import MiniCart from '@/components/cart/MiniCart';
@@ -17,6 +18,8 @@ export default function Header() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const [megaMenuOpen, setMegaMenuOpen] = useState(false);
+    const megaMenuTimer = useRef<NodeJS.Timeout | null>(null);
     const { items } = useCart();
     const { user, logout } = useAuth();
     const router = useRouter();
@@ -39,6 +42,17 @@ export default function Header() {
         return () => window.removeEventListener('click', close, true);
     }, [userMenuOpen]);
 
+    const handleProductsMouseEnter = () => {
+        if (megaMenuTimer.current) clearTimeout(megaMenuTimer.current);
+        setMegaMenuOpen(true);
+    };
+
+    const handleProductsMouseLeave = () => {
+        megaMenuTimer.current = setTimeout(() => {
+            setMegaMenuOpen(false);
+        }, 150);
+    };
+
     return (
         <>
             <header className={`fixed top-4 left-0 right-0 z-50 transition-all duration-300 px-4 md:px-8`}>
@@ -49,14 +63,43 @@ export default function Header() {
 
                     {/* Logo Section */}
                     <Link href="/" className="flex items-center gap-2 group shrink-0">
-                        <span className={`font-serif text-2xl tracking-tight transition-colors ${(isScrolled || !isHome) ? 'text-gray-900' : 'text-white'}`}>
-                            Erçağ<span className="italic opacity-80 font-serif">Kırtasiye</span>
-                        </span>
+                        {settings.site_logo ? (
+                            <div className="relative h-16 w-48 md:h-20 md:w-64 -ml-2 flex items-center">
+                                <img
+                                    src={settings.site_logo.startsWith('http') ? settings.site_logo : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${settings.site_logo}`}
+                                    alt={settings.site_title || "Logo"}
+                                    className={`max-h-[140%] max-w-full object-contain transition-all duration-300 scale-125 origin-left ${(!isScrolled && isHome) ? 'brightness-0 invert opacity-90' : 'brightness-100 opacity-100'}`}
+                                />
+                            </div>
+                        ) : (
+                            <span className={`font-serif text-2xl tracking-tight transition-colors ${(isScrolled || !isHome) ? 'text-gray-900' : 'text-white'}`}>
+                                {settings.site_title ? (
+                                    <>
+                                        {settings.site_title.split(' ')[0]}
+                                        <span className="italic opacity-80 font-serif"> {settings.site_title.split(' ').slice(1).join(' ')}</span>
+                                    </>
+                                ) : (
+                                    <>Erçağ<span className="italic opacity-80 font-serif">Kırtasiye</span></>
+                                )}
+                            </span>
+                        )}
                     </Link>
 
                     {/* Desktop Navigation */}
                     <nav className="hidden lg:flex items-center gap-8">
-                        <Link href="/products" className={`text-sm font-medium hover:opacity-70 transition-opacity ${(isScrolled || !isHome) ? 'text-gray-800' : 'text-white'}`}>Ürünler</Link>
+                        <div
+                            className="relative"
+                            onMouseEnter={handleProductsMouseEnter}
+                            onMouseLeave={handleProductsMouseLeave}
+                        >
+                            <Link
+                                href="/products"
+                                className={`text-sm font-medium hover:opacity-70 transition-opacity flex items-center gap-1 ${(isScrolled || !isHome) ? 'text-gray-800' : 'text-white'}`}
+                            >
+                                Ürünler
+                                <ChevronDown size={14} className={`transition-transform duration-200 ${megaMenuOpen ? 'rotate-180' : ''}`} />
+                            </Link>
+                        </div>
                         <Link href="/products?sort=popular" className={`text-sm font-medium hover:opacity-70 transition-opacity ${(isScrolled || !isHome) ? 'text-gray-800' : 'text-white'}`}>Çok Satanlar</Link>
                         <Link href="/categories" className={`text-sm font-medium hover:opacity-70 transition-opacity ${(isScrolled || !isHome) ? 'text-gray-800' : 'text-white'}`}>Kategoriler</Link>
                     </nav>
@@ -71,7 +114,7 @@ export default function Header() {
                                 type="text"
                                 placeholder="Ürün Ara..."
                                 className={`w-full py-2 pl-9 pr-4 text-sm bg-transparent border-none focus:ring-0 outline-none ${(isScrolled || !isHome) ? 'text-gray-900 placeholder-gray-500' : 'text-white placeholder-white/70'}`}
-                                onClick={() => setMobileSearchOpen(v => !v)}
+                                onClick={() => { setMobileSearchOpen(v => !v); setMegaMenuOpen(false); }}
                                 readOnly
                             />
                         </div>
@@ -148,6 +191,19 @@ export default function Header() {
                             )}
                         </button>
                     </div>
+                </div>
+
+                {/* Mega Menu */}
+                <div
+                    className="relative max-w-7xl mx-auto"
+                    onMouseEnter={() => { if (megaMenuTimer.current) clearTimeout(megaMenuTimer.current); }}
+                    onMouseLeave={handleProductsMouseLeave}
+                >
+                    <MegaMenu
+                        isOpen={megaMenuOpen}
+                        onClose={() => setMegaMenuOpen(false)}
+                        isDark={!isScrolled && isHome}
+                    />
                 </div>
             </header>
 

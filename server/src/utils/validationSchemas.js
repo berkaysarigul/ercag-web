@@ -49,6 +49,7 @@ const updateSettingsSchema = z.record(z.string(), z.any()); // Simple record che
 
 // Bulk Import Row Schema
 const bulkProductRowSchema = z.object({
+    id: z.any().optional(),
     name: z.string().min(1, 'Ürün adı gereklidir'),
     description: z.string().optional().default(''),
     price: z.preprocess((val) => parseFloat(val), z.number().positive('Fiyat pozitif olmalıdır')),

@@ -1,7 +1,12 @@
+'use client';
 import React from 'react';
 import Link from 'next/link';
+import { useSettings } from '@/context/SettingsContext';
 
 export default function DistanceSalesPage() {
+    const { settings } = useSettings();
+    const companyName = settings.site_title || 'Erçağ Kırtasiye';
+
     return (
         <div className="container mx-auto px-4 py-8 max-w-4xl pt-36 pb-12">
             <h1 className="text-3xl font-bold mb-6">Mesafeli Satış Sözleşmesi</h1>
@@ -12,10 +17,10 @@ export default function DistanceSalesPage() {
                 <h2 className="text-xl font-semibold mt-6 mb-3">1. Taraflar</h2>
                 <p><strong>SATICI:</strong></p>
                 <p>
-                    Unvan: Erçağ Kırtasiye<br />
-                    Adres: [Mağaza adresi]<br />
-                    Telefon: [Mağaza telefonu]<br />
-                    E-posta: [Mağaza e-postası]
+                    Unvan: {companyName}<br />
+                    Adres: {settings.site_address || '[Mağaza adresi]'}<br />
+                    Telefon: {settings.site_phone || '[Mağaza telefonu]'}<br />
+                    E-posta: {settings.site_email || '[Mağaza e-postası]'}
                 </p>
                 <p><strong>ALICI:</strong> Sipariş formunda bilgileri girilen kişi.</p>
 

@@ -463,6 +463,30 @@ const trackOrder = async (req, res) => {
     }
 };
 
+/**
+ * GET /api/orders/counts
+ * Her durum için sipariş sayısını döner (tab badge'leri için)
+ */
+const getOrderCounts = async (req, res) => {
+    try {
+        const counts = await prisma.order.groupBy({
+            by: ['status'],
+            _count: true,
+        });
+
+        const result = { ALL: 0, PENDING: 0, PREPARING: 0, READY: 0, COMPLETED: 0, CANCELLED: 0 };
+        counts.forEach(c => {
+            result[c.status] = c._count;
+            result.ALL += c._count;
+        });
+
+        res.json(result);
+    } catch (error) {
+        console.error('Order Counts Error:', error);
+        res.status(500).json({ error: 'Sayaçlar alınamadı' });
+    }
+};
+
 module.exports = {
     createOrder,
     getUserOrders,
@@ -470,5 +494,6 @@ module.exports = {
     updateOrderStatus,
     verifyPickupCode,
     cancelMyOrder,
-    trackOrder
+    trackOrder,
+    getOrderCounts
 };
