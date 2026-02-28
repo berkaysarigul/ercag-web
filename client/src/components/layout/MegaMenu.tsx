@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import {
     BookOpen, PenTool, Palette, FileText, FolderOpen, Scissors,
@@ -63,6 +64,7 @@ export default function MegaMenu({ isOpen, onClose, isDark }: MegaMenuProps) {
     const [fetched, setFetched] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const router = useRouter();
 
     // İlk açılışta veri çek (sadece 1 kere)
     useEffect(() => {
@@ -142,7 +144,7 @@ export default function MegaMenu({ isOpen, onClose, isDark }: MegaMenuProps) {
                                         <button
                                             key={cat.id}
                                             onMouseEnter={() => setActiveCategory(cat.id)}
-                                            onClick={() => { onClose(); }}
+                                            onClick={() => { onClose(); router.push(`/products?category=${cat.id}`); }}
                                             className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-150 group relative ${isActive
                                                 ? 'bg-white shadow-sm'
                                                 : 'hover:bg-white/60'
@@ -170,93 +172,53 @@ export default function MegaMenu({ isOpen, onClose, isDark }: MegaMenuProps) {
                         )}
                     </div>
 
-                    {/* ── Sağ Panel: Ürünler ── */}
-                    <div className="flex-1 p-5 overflow-y-auto">
+                    {/* ── Sağ Panel: Alt Kategoriler ── */}
+                    <div className="flex-1 p-6 overflow-y-auto bg-white">
                         {activeCat ? (
                             <>
-                                <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
+                                <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
                                     <div>
-                                        <h3 className="font-bold text-gray-900 text-lg">{activeCat.name}</h3>
-                                        <p className="text-xs text-gray-400">{(activeCat as any).totalProducts || activeCat._count.products} ürün mevcut</p>
+                                        <h3 className="font-bold text-gray-900 text-xl">{activeCat.name}</h3>
+                                        <p className="text-sm text-gray-500 mt-1">Toplam {(activeCat as any).totalProducts || activeCat._count.products} ürün mevcut</p>
                                     </div>
-                                    <Link
-                                        href={`/products?category=${activeCat.id}`}
-                                        onClick={onClose}
-                                        className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+                                    <button
+                                        onClick={() => { onClose(); router.push(`/products?category=${activeCat.id}`); }}
+                                        className="text-sm font-semibold text-primary hover:bg-primary hover:text-white transition-colors flex items-center gap-1.5 bg-primary/10 px-4 py-2 rounded-full"
                                     >
-                                        Tümünü Gör <ArrowRight size={12} />
-                                    </Link>
+                                        Tüm {activeCat.name} Ürünleri <ArrowRight size={14} />
+                                    </button>
                                 </div>
 
-                                {/* Alt Kategoriler */}
-                                {activeCat.children && activeCat.children.length > 0 && (
-                                    <div className="flex flex-wrap gap-1.5 mb-4">
-                                        {activeCat.children.map((sub) => (
-                                            <Link
-                                                key={sub.id}
-                                                href={`/products?category=${sub.id}`}
-                                                onClick={onClose}
-                                                className="px-3 py-1.5 bg-gray-100 hover:bg-primary/10 hover:text-primary rounded-lg text-xs font-medium text-gray-600 transition-colors"
-                                            >
-                                                {sub.name}
-                                                <span className="text-gray-400 ml-1">({sub._count?.products || 0})</span>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {/* Ürün Grid */}
-                                {activeCat.products.length > 0 ? (
-                                    <div className="grid grid-cols-4 gap-3">
-                                        {activeCat.products.map(product => {
-                                            const imgSrc = getProductImage(product.image);
+                                {/* Alt Kategori Grid */}
+                                {activeCat.children && activeCat.children.length > 0 ? (
+                                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {activeCat.children.map((sub, idx) => {
+                                            const SubIcon = getCategoryIcon(sub.name);
+                                            const subColor = CATEGORY_COLORS[idx % CATEGORY_COLORS.length];
                                             return (
                                                 <Link
-                                                    key={product.id}
-                                                    href={`/products/${product.id}`}
+                                                    key={sub.id}
+                                                    href={`/products?category=${sub.id}`}
                                                     onClick={onClose}
-                                                    className="group flex flex-col items-center text-center p-3 rounded-xl hover:bg-gray-50 transition-colors"
+                                                    className="group flex flex-col p-5 bg-white border border-gray-100 rounded-2xl hover:border-primary/30 hover:shadow-md transition-all duration-300"
                                                 >
-                                                    {/* Ürün Görseli */}
-                                                    <div className="w-full aspect-square bg-gray-100 rounded-xl overflow-hidden mb-2.5 flex items-center justify-center">
-                                                        {imgSrc ? (
-                                                            <img
-                                                                src={imgSrc}
-                                                                alt={product.name}
-                                                                className="w-full h-full object-contain p-2 group-hover:scale-110 transition-transform duration-300"
-                                                                loading="lazy"
-                                                            />
-                                                        ) : (
-                                                            <Package size={28} className="text-gray-300" />
-                                                        )}
+                                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-colors ${subColor} group-hover:bg-primary group-hover:text-white shadow-sm`}>
+                                                        <SubIcon size={28} strokeWidth={1.5} />
                                                     </div>
-                                                    {/* Ürün Bilgisi */}
-                                                    <p className="text-xs font-medium text-gray-700 line-clamp-2 leading-tight group-hover:text-primary transition-colors">
-                                                        {product.name}
-                                                    </p>
-                                                    <p className="text-xs font-bold text-primary mt-1">
-                                                        {Number(product.price).toFixed(2)} ₺
+                                                    <h4 className="font-bold text-gray-800 group-hover:text-primary transition-colors text-base mb-1.5 line-clamp-1">
+                                                        {sub.name}
+                                                    </h4>
+                                                    <p className="text-sm font-medium text-gray-400 group-hover:text-gray-500 transition-colors">
+                                                        {sub._count?.products || 0} Ürün
                                                     </p>
                                                 </Link>
                                             );
                                         })}
                                     </div>
                                 ) : (
-                                    <div className="flex items-center justify-center h-48 text-gray-400 text-sm">
-                                        Bu kategoride henüz ürün yok
-                                    </div>
-                                )}
-
-                                {/* Daha fazla varsa alt link */}
-                                {activeCat._count.products > 8 && (
-                                    <div className="mt-4 pt-3 border-t border-gray-100 text-center">
-                                        <Link
-                                            href={`/products?category=${activeCat.id}`}
-                                            onClick={onClose}
-                                            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-                                        >
-                                            +{activeCat._count.products - 8} ürün daha <ArrowRight size={14} />
-                                        </Link>
+                                    <div className="flex flex-col items-center justify-center h-48 text-gray-400">
+                                        <FolderOpen size={48} className="mb-4 opacity-20" />
+                                        <p className="text-sm font-medium text-gray-500">Bu kategoriye ait alt kategori bulunmuyor.</p>
                                     </div>
                                 )}
                             </>
