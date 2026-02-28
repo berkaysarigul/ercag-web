@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useAdmin } from '@/context/AdminContext';
 import { cn } from '@/lib/utils';
 // UI-21: Duplicate ikonlar düzeltildi — FolderTree Kategoriler için, ShoppingBag Ürünler için, Package Stok için
-import { LayoutDashboard, Package, ShoppingBag, Users, FolderTree, Ticket, MessageSquare, LogOut, Settings, ScanBarcode, BarChart3, TrendingUp, Shield, Menu, X, Star, GalleryHorizontal, PieChart, Tag, MapPin, Palette, DollarSign } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingBag, Users, FolderTree, Ticket, MessageSquare, LogOut, Settings, ScanBarcode, BarChart3, TrendingUp, Shield, Menu, X, Star, GalleryHorizontal, PieChart, Tag, MapPin, Palette, DollarSign, Gift } from 'lucide-react';
 
 export default function AdminSidebar() {
     const pathname = usePathname();
@@ -22,6 +22,7 @@ export default function AdminSidebar() {
         { name: 'Kategoriler', href: '/admin/categories', icon: FolderTree, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Markalar', href: '/admin/brands', icon: Tag, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Özellikler', href: '/admin/attributes', icon: Palette, roles: ['SUPER_ADMIN', 'ADMIN'] }, // UI-21: Package → FolderTree
+        { name: 'Hediye Çarkı', href: '/admin/spin-wheel', icon: Gift, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Kuponlar', href: '/admin/coupons', icon: Ticket, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Değerlendirmeler', href: '/admin/reviews', icon: MessageSquare, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] },
         { name: 'Müşteriler', href: '/admin/customers', icon: Users, roles: ['SUPER_ADMIN', 'ADMIN'] },

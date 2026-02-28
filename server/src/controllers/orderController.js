@@ -332,7 +332,27 @@ const updateOrderStatus = async (req, res) => {
                 await awardPointsForOrder(order.userId, Number(order.totalAmount), order.id);
             } catch (err) {
                 console.error('Loyalty puan ekleme hatası:', err);
-                // Puan hatası sipariş akışını bozmasın
+            }
+
+            // Hediye çarkı kodu üret (uygun çark varsa)
+            try {
+                const appUrl = process.env.APP_URL || 'http://localhost:3001';
+                const spinRes = await fetch(`${appUrl}/api/spin/codes/generate-for-order`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': req.headers.authorization || '',
+                    },
+                    body: JSON.stringify({ orderId: order.id, orderAmount: Number(order.totalAmount) }),
+                });
+                const spinData = await spinRes.json();
+                if (spinData.generated) {
+                    console.log(`[SpinWheel] Çark kodu üretildi: ${spinData.code} (Sipariş #${order.id})`);
+                    // İsteğe bağlı: WhatsApp ile kodu gönder
+                    // whatsappQueue.add('send-msg', { action: 'sendSpinCode', payload: { phone, code: spinData.code } });
+                }
+            } catch (err) {
+                console.error('Spin code generation failed:', err);
             }
         }
 
