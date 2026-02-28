@@ -102,6 +102,9 @@ export default function Header() {
                         </div>
                         <Link href="/products?sort=popular" className={`text-sm font-medium hover:opacity-70 transition-opacity ${(isScrolled || !isHome) ? 'text-gray-800' : 'text-white'}`}>Çok Satanlar</Link>
                         <Link href="/categories" className={`text-sm font-medium hover:opacity-70 transition-opacity ${(isScrolled || !isHome) ? 'text-gray-800' : 'text-white'}`}>Kategoriler</Link>
+                        <Link href="/order-track" className={`text-sm font-medium hover:opacity-70 transition-opacity flex items-center gap-1 ${(isScrolled || !isHome) ? 'text-gray-800' : 'text-white'}`}>
+                            <Package size={14} /> Sipariş Takibi
+                        </Link>
                         <Link href="/products?hasDiscount=true" className={`text-sm font-medium hover:opacity-70 transition-opacity flex items-center gap-1 ${(isScrolled || !isHome) ? 'text-red-500' : 'text-red-300'}`}>
                             <Zap size={14} /> Fırsatlar
                         </Link>
@@ -137,6 +140,13 @@ export default function Header() {
                             className={`hidden sm:flex relative p-2 rounded-full transition-colors ${(isScrolled || !isHome) ? 'text-gray-700 hover:bg-gray-100' : 'text-white hover:bg-white/20'}`}
                             title="Favorilerim">
                             <Heart size={18} />
+                        </Link>
+
+                        {/* Order Track (Mobile & Tablet) */}
+                        <Link href="/order-track"
+                            className={`lg:hidden relative p-2 rounded-full transition-colors ${(isScrolled || !isHome) ? 'text-gray-700 hover:bg-gray-100' : 'text-white hover:bg-white/20'}`}
+                            title="Sipariş Takibi">
+                            <Package size={18} />
                         </Link>
 
                         {/* User Menu */}
