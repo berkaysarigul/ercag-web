@@ -15,11 +15,17 @@ interface Category {
     name: string;
 }
 
+interface Brand {
+    id: number;
+    name: string;
+}
+
 export default function EditProductPage() {
     const router = useRouter();
     const params = useParams();
     const id = params.id;
     const [categories, setCategories] = useState<Category[]>([]);
+    const [brands, setBrands] = useState<Brand[]>([]);
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(true);
     const [formData, setFormData] = useState({
@@ -28,6 +34,7 @@ export default function EditProductPage() {
         price: '',
         stock: '',
         categoryId: '',
+        brandId: '',
         sku: '',
         barcode: '',
         lowStockThreshold: '5',
@@ -49,11 +56,13 @@ export default function EditProductPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [catRes, prodRes] = await Promise.all([
+                const [catRes, prodRes, brandRes] = await Promise.all([
                     api.get('/categories'),
-                    api.get(`/products/${id}`)
+                    api.get(`/products/${id}`),
+                    api.get('/brands?active=true'),
                 ]);
                 setCategories(catRes.data);
+                setBrands(brandRes.data);
 
                 const product = prodRes.data;
                 setFormData({
@@ -62,6 +71,7 @@ export default function EditProductPage() {
                     price: product.price,
                     stock: (product.stock || 0).toString(),
                     categoryId: product.categoryId.toString(),
+                    brandId: product.brandId ? product.brandId.toString() : '',
                     sku: product.sku || '',
                     barcode: product.barcode || '',
                     lowStockThreshold: (product.lowStockThreshold || 5).toString(),
@@ -119,6 +129,7 @@ export default function EditProductPage() {
         data.append('price', formData.price);
         data.append('stock', formData.stock);
         data.append('categoryId', formData.categoryId);
+        if (formData.brandId) data.append('brandId', formData.brandId);
         data.append('sku', formData.sku);
         data.append('barcode', formData.barcode);
         data.append('lowStockThreshold', formData.lowStockThreshold);
@@ -355,6 +366,23 @@ export default function EditProductPage() {
                                     <option value="">Kategori Seçiniz</option>
                                     {categories.map(cat => (
                                         <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Marka <span className="text-gray-400 font-normal">(opsiyonel)</span>
+                                </label>
+                                <select
+                                    className="input w-full"
+                                    value={formData.brandId}
+                                    onChange={e => setFormData({ ...formData, brandId: e.target.value })}
+                                    style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}
+                                >
+                                    <option value="">Marka Seçiniz</option>
+                                    {brands.map(b => (
+                                        <option key={b.id} value={b.id}>{b.name}</option>
                                     ))}
                                 </select>
                             </div>

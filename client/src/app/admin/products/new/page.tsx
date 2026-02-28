@@ -269,6 +269,22 @@ export default function NewProductPage() {
                                     ))}
                                 </select>
                             </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Marka <span className="text-gray-400 font-normal">(opsiyonel)</span>
+                                </label>
+                                <select
+                                    className="input w-full"
+                                    value={formData.brandId}
+                                    onChange={e => setFormData({ ...formData, brandId: e.target.value })}
+                                >
+                                    <option value="">Marka Seçiniz</option>
+                                    {brands.map(b => (
+                                        <option key={b.id} value={b.id}>{b.name}</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
                     </div>
 

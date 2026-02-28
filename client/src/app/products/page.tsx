@@ -33,7 +33,8 @@ function ProductList() {
         minPrice: searchParams.get('minPrice') || '',
         maxPrice: searchParams.get('maxPrice') || '',
         search: searchParams.get('search') || '',
-        sort: searchParams.get('sort') || 'newest'
+        sort: searchParams.get('sort') || 'newest',
+        hasDiscount: searchParams.get('hasDiscount') || '',
     });
 
     const [pagination, setPagination] = useState({
@@ -50,8 +51,10 @@ function ProductList() {
             ...prev,
             search: searchParams.get('search') || '',
             categoryId: searchParams.get('category') || null,
+            brandId: searchParams.get('brand') || null,
+            hasDiscount: searchParams.get('hasDiscount') || '',
         }));
-        setPagination(prev => ({ ...prev, page: 1 })); // Reset page on filter change
+        setPagination(prev => ({ ...prev, page: 1 }));
     }, [searchParams]);
 
     const fetchProducts = useCallback(async () => {
@@ -64,6 +67,7 @@ function ProductList() {
             if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
             if (filters.search) params.append('search', filters.search);
             if (filters.sort) params.append('sort', filters.sort);
+            if (filters.hasDiscount) params.append('hasDiscount', filters.hasDiscount);
             params.append('page', pagination.page.toString());
             params.append('limit', '12');
 
@@ -90,8 +94,15 @@ function ProductList() {
         fetchProducts();
     }, [fetchProducts]);
 
-    const handleFilterChange = (newFilters: { search?: string; category?: string; sort?: string; inStock?: boolean }) => {
-        setFilters(prev => ({ ...prev, ...newFilters }));
+    const handleFilterChange = (newFilters: { inStock?: boolean; categoryId?: number | null; brandId?: number | null; sort?: string; minPrice?: string; maxPrice?: string }) => {
+        setFilters(prev => ({
+            ...prev,
+            categoryId: newFilters.categoryId !== undefined ? (newFilters.categoryId ? String(newFilters.categoryId) : null) : prev.categoryId,
+            brandId: newFilters.brandId !== undefined ? (newFilters.brandId ? String(newFilters.brandId) : null) : prev.brandId,
+            minPrice: newFilters.minPrice ?? prev.minPrice,
+            maxPrice: newFilters.maxPrice ?? prev.maxPrice,
+            sort: newFilters.sort ?? prev.sort,
+        }));
         setPagination(prev => ({ ...prev, page: 1 }));
     };
 
