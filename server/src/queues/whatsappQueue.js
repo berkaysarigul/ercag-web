@@ -27,6 +27,9 @@ if (redisClient && process.env.NODE_ENV !== 'test') {
                 case 'sendOrderCompleted':
                     await whatsappService.sendOrderCompleted(payload.phone, payload.orderId);
                     break;
+                case 'sendSpinCode':
+                    await whatsappService.sendSpinCode(payload.phone, payload.orderId, payload.code, payload.spinUrl);
+                    break;
                 case 'sendCustomMessage':
                     await whatsappService.sendWhatsAppMessage(payload.phone, payload.message, payload.templateName);
                     break;
@@ -66,6 +69,9 @@ if (redisClient && process.env.NODE_ENV !== 'test') {
                         break;
                     case 'sendOrderCompleted':
                         await whatsappService.sendOrderCompleted(payload.phone, payload.orderId);
+                        break;
+                    case 'sendSpinCode':
+                        await whatsappService.sendSpinCode(payload.phone, payload.orderId, payload.code, payload.spinUrl);
                         break;
                     case 'sendCustomMessage':
                         await whatsappService.sendWhatsAppMessage(payload.phone, payload.message, payload.templateName);

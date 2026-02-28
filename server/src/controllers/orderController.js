@@ -134,6 +134,39 @@ const createOrder = async (req, res) => {
             });
         }
 
+        // Hediye Çarkı Otomatik Kod Üretimi
+        let generatedSpinCode = null;
+        try {
+            const wheel = await prisma.spinWheel.findFirst({
+                where: {
+                    isActive: true,
+                    isManualOnly: false,
+                    minOrderAmount: { lte: finalAmount },
+                    OR: [
+                        { validUntil: null },
+                        { validUntil: { gte: new Date() } },
+                    ],
+                },
+                orderBy: { minOrderAmount: 'desc' },
+            });
+
+            if (wheel) {
+                const newCodeStr = 'SPIN-' + crypto.randomBytes(3).toString('hex').toUpperCase();
+                const code = await prisma.spinCode.create({
+                    data: {
+                        code: newCodeStr,
+                        wheelId: wheel.id,
+                        orderId: order.id,
+                        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+                    },
+                });
+                generatedSpinCode = code.code;
+                console.log(`[SpinWheel] Otomatik Çark kodu üretildi: ${code.code} (Sipariş #${order.id}, Çark: ${wheel.name})`);
+            }
+        } catch (err) {
+            console.error('Spin code autogeneration failed during createOrder:', err);
+        }
+
         // 5. Asenkron WhatsApp Onay Mesajı (Kuyruk üzerinden)
         if (phoneNumber) {
             whatsappQueue.add('send-msg', {
@@ -143,6 +176,18 @@ const createOrder = async (req, res) => {
                 attempts: 3,
                 backoff: { type: 'exponential', delay: 2000 }
             });
+
+            // Eğer çark kazanıldıysa ayrıca bir WhatsApp mesajı daha at
+            if (generatedSpinCode) {
+                const appUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+                whatsappQueue.add('send-msg', {
+                    action: 'sendSpinCode',
+                    payload: { phone: phoneNumber, orderId: order.id, code: generatedSpinCode, spinUrl: `${appUrl}/spin` }
+                }, {
+                    attempts: 3,
+                    backoff: { type: 'exponential', delay: 2000 }
+                });
+            }
         }
         res.status(201).json(order);
     } catch (error) {
@@ -337,26 +382,8 @@ const updateOrderStatus = async (req, res) => {
                 console.error('Loyalty puan ekleme hatası:', err);
             }
 
-            // Hediye çarkı kodu üret (uygun çark varsa)
-            try {
-                const appUrl = process.env.APP_URL || 'http://localhost:3001';
-                const spinRes = await fetch(`${appUrl}/api/spin/codes/generate-for-order`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': req.headers.authorization || '',
-                    },
-                    body: JSON.stringify({ orderId: order.id, orderAmount: Number(order.totalAmount) }),
-                });
-                const spinData = await spinRes.json();
-                if (spinData.generated) {
-                    console.log(`[SpinWheel] Çark kodu üretildi: ${spinData.code} (Sipariş #${order.id})`);
-                    // İsteğe bağlı: WhatsApp ile kodu gönder
-                    // whatsappQueue.add('send-msg', { action: 'sendSpinCode', payload: { phone, code: spinData.code } });
-                }
-            } catch (err) {
-                console.error('Spin code generation failed:', err);
-            }
+            // Hediye çarkı kodu eskiden burada fetch ile üretiliyordu. Artık createOrder aşamasında veriliyor (satın alım anında).
+            // Kod tekrarlanmaması için burası devre dışı bırakıldı.
         }
 
         // Socket Notification

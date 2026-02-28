@@ -66,4 +66,9 @@ const sendOrderCompleted = async (phone, orderId) => {
     return sendWhatsAppMessage(phone, message);
 };
 
-module.exports = { sendWhatsAppMessage, sendOrderConfirmation, sendOrderReady, sendOrderCompleted };
+const sendSpinCode = async (phone, orderId, code, spinUrl) => {
+    const message = `🎁 Tebrikler!\n\nSiparişiniz (#${orderId}) üzerinden Hediye Çarkı çevirme hakkı kazandınız!\n\nÇark Kodunuz: ${code}\nHemen Çevir: ${spinUrl}\n\n— Erçağ Kırtasiye`;
+    return sendWhatsAppMessage(phone, message);
+};
+
+module.exports = { sendWhatsAppMessage, sendOrderConfirmation, sendOrderReady, sendOrderCompleted, sendSpinCode };
