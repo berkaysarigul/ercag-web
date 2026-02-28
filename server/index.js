@@ -54,6 +54,7 @@ const stockAlertRoutes = require('./src/routes/stockAlertRoutes'); // Kept exist
 const heroSlideRoutes = require('./src/routes/heroSlideRoutes'); // Kept existing
 const auditRoutes = require('./src/routes/auditRoutes'); // Kept existing
 const loyaltyRoutes = require('./src/routes/loyaltyRoutes'); // FIX-K06 // Kept existing
+const brandRoutes = require('./src/routes/brandRoutes');
 
 // Important: import the newly created rate limiters!
 const { apiLimiter, authLimiter } = require('./src/middleware/rateLimiter');
@@ -76,6 +77,7 @@ app.use('/api/hero-slides', heroSlideRoutes);
 app.use('/api/stock', stockRoutes);
 app.use('/api/audit', auditRoutes);
 app.use('/api/campaigns', campaignRoutes);
+app.use('/api/brands', brandRoutes);
 
 app.get('/', (req, res) => {
     res.send('Erçağ Kırtasiye API is running');

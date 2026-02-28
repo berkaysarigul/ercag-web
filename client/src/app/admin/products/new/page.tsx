@@ -19,6 +19,7 @@ interface Category {
 export default function NewProductPage() {
     const router = useRouter();
     const [categories, setCategories] = useState<Category[]>([]);
+    const [brands, setBrands] = useState<{ id: number; name: string }[]>([]);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
@@ -26,6 +27,7 @@ export default function NewProductPage() {
         price: '',
         stock: '100', // Default stock
         categoryId: '',
+        brandId: '',
         sku: '',
         barcode: '',
         lowStockThreshold: '5',
@@ -36,6 +38,7 @@ export default function NewProductPage() {
 
     useEffect(() => {
         api.get('/categories').then(res => setCategories(res.data));
+        api.get('/brands?active=true').then(res => setBrands(res.data));
     }, []);
 
     // handleImageChange removed as ImageUpload handles it
@@ -61,6 +64,7 @@ export default function NewProductPage() {
         data.append('price', formData.price);
         data.append('stock', formData.stock);
         data.append('categoryId', formData.categoryId);
+        if (formData.brandId) data.append('brandId', formData.brandId);
         if (formData.sku) data.append('sku', formData.sku);
         if (formData.barcode) data.append('barcode', formData.barcode);
         data.append('lowStockThreshold', formData.lowStockThreshold);

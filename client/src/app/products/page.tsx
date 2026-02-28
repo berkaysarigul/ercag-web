@@ -29,6 +29,7 @@ function ProductList() {
 
     const [filters, setFilters] = useState({
         categoryId: searchParams.get('category') || null,
+        brandId: searchParams.get('brand') || null,
         minPrice: searchParams.get('minPrice') || '',
         maxPrice: searchParams.get('maxPrice') || '',
         search: searchParams.get('search') || '',
@@ -58,6 +59,7 @@ function ProductList() {
         try {
             const params = new URLSearchParams();
             if (filters.categoryId) params.append('categoryId', filters.categoryId.toString());
+            if (filters.brandId) params.append('brandId', filters.brandId.toString());
             if (filters.minPrice) params.append('minPrice', filters.minPrice);
             if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
             if (filters.search) params.append('search', filters.search);

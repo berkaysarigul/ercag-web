@@ -66,6 +66,10 @@ const getAllProducts = async (req, res) => {
             where.isFeatured = isFeatured === 'true';
         }
 
+        if (req.query.brandId) {
+            where.brandId = parseInt(req.query.brandId);
+        }
+
         let orderBy = {};
         if (sort === 'price_asc') orderBy = { price: 'asc' };
         else if (sort === 'price_desc') orderBy = { price: 'desc' };
@@ -79,7 +83,8 @@ const getAllProducts = async (req, res) => {
                 where,
                 include: {
                     category: true,
-                    images: true
+                    images: true,
+                    brand: true,
                 },
                 orderBy,
                 skip,

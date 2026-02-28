@@ -11,7 +11,7 @@ interface Category {
 }
 
 interface FilterProps {
-    onFilterChange: (filters: { inStock?: boolean; categoryId?: number | null; sort?: string; minPrice?: string; maxPrice?: string }) => void;
+    onFilterChange: (filters: { inStock?: boolean; categoryId?: number | null; brandId?: number | null; sort?: string; minPrice?: string; maxPrice?: string }) => void;
     initialCategory: number | null;
 }
 
@@ -19,9 +19,12 @@ export default function FilterSidebar({ onFilterChange, initialCategory }: Filte
     const [categories, setCategories] = useState<Category[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<number | null>(initialCategory);
     const [priceRange, setPriceRange] = useState({ minPrice: '', maxPrice: '' });
+    const [brands, setBrands] = useState<{ id: number; name: string; _count?: { products: number } }[]>([]);
+    const [selectedBrand, setSelectedBrand] = useState<number | null>(null);
 
     useEffect(() => {
         api.get('/categories').then(res => setCategories(res.data)); // Ağaç yapısında gelir
+        api.get('/brands?active=true').then(res => setBrands(res.data));
     }, []);
 
     useEffect(() => {
@@ -30,11 +33,11 @@ export default function FilterSidebar({ onFilterChange, initialCategory }: Filte
 
     const handleCategoryChange = (id: number | null) => {
         setSelectedCategory(id);
-        onFilterChange({ categoryId: id, ...priceRange });
+        onFilterChange({ categoryId: id, brandId: selectedBrand, ...priceRange });
     };
 
     const handlePriceApply = () => {
-        onFilterChange({ categoryId: selectedCategory, ...priceRange });
+        onFilterChange({ categoryId: selectedCategory, brandId: selectedBrand, ...priceRange });
     };
 
     // Helper to get icon based on category name (simple mapping)
@@ -152,6 +155,30 @@ export default function FilterSidebar({ onFilterChange, initialCategory }: Filte
                     </button>
                 </div>
             </div>
+
+            {/* Marka Filtresi */}
+            {brands.length > 0 && (
+                <div className="mt-8 pt-6 border-t border-gray-100">
+                    <h3 className="font-bold text-gray-900 mb-4">Markalar</h3>
+                    <div className="space-y-0.5 max-h-48 overflow-y-auto">
+                        <button
+                            onClick={() => { setSelectedBrand(null); onFilterChange({ categoryId: selectedCategory, brandId: null, ...priceRange }); }}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${!selectedBrand ? 'bg-primary/10 text-primary font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}
+                        >
+                            Tüm Markalar
+                        </button>
+                        {brands.map(b => (
+                            <button
+                                key={b.id}
+                                onClick={() => { setSelectedBrand(b.id); onFilterChange({ categoryId: selectedCategory, brandId: b.id, ...priceRange }); }}
+                                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${selectedBrand === b.id ? 'bg-primary/10 text-primary font-semibold' : 'text-gray-600 hover:bg-gray-50'}`}
+                            >
+                                {b.name} <span className="text-gray-400">({b._count?.products || 0})</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
         </aside>
     );
 }
