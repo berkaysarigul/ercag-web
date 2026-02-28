@@ -77,8 +77,8 @@ function ProductList() {
                 setProducts(res.data.products);
                 setPagination(prev => ({
                     ...prev,
-                    totalPages: res.data.totalPages,
-                    total: res.data.total
+                    totalPages: res.data.pagination.totalPages,
+                    total: res.data.pagination.total
                 }));
             } else if (Array.isArray(res.data)) {
                 setProducts(res.data);
