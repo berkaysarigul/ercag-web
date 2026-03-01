@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Search, ShoppingCart, User, Heart } from 'lucide-react';
+import { Home, Search, ShoppingCart, User, Heart, Zap } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
 export default function MobileBottomNav() {
@@ -12,7 +12,7 @@ export default function MobileBottomNav() {
 
     const navItems = [
         { href: '/', icon: Home, label: 'Ana Sayfa' },
-        { href: '/products', icon: Search, label: 'Ara' },
+        { href: '/products?hasDiscount=true', icon: Zap, label: 'Fırsatlar' },
         { href: '/wishlist', icon: Heart, label: 'Favoriler' },
         { href: '/cart', icon: ShoppingCart, label: 'Sepet', badge: cartItemCount },
         { href: '/profile', icon: User, label: 'Hesabım' }

@@ -215,10 +215,35 @@ export default function MegaMenu({ isOpen, onClose, isDark }: MegaMenuProps) {
                                             );
                                         })}
                                     </div>
+                                ) : activeCat.products && activeCat.products.length > 0 ? (
+                                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                                        {activeCat.products.slice(0, 8).map(product => (
+                                            <Link
+                                                key={product.id}
+                                                href={`/products/${product.id}`}
+                                                onClick={onClose}
+                                                className="group flex flex-col p-3 bg-white border border-gray-100 rounded-2xl hover:border-primary/30 hover:shadow-md transition-all duration-300"
+                                            >
+                                                <div className="w-full aspect-square bg-gray-50 rounded-xl mb-3 overflow-hidden relative">
+                                                    {product.image ? (
+                                                        <img src={getProductImage(product.image)!} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-gray-300"><Package size={24} /></div>
+                                                    )}
+                                                </div>
+                                                <h4 className="font-medium text-gray-800 group-hover:text-primary transition-colors text-sm mb-1 line-clamp-2 leading-tight">
+                                                    {product.name}
+                                                </h4>
+                                                <p className="text-sm font-bold text-primary mt-auto">
+                                                    {Number(product.price).toFixed(2)} ₺
+                                                </p>
+                                            </Link>
+                                        ))}
+                                    </div>
                                 ) : (
                                     <div className="flex flex-col items-center justify-center h-48 text-gray-400">
                                         <FolderOpen size={48} className="mb-4 opacity-20" />
-                                        <p className="text-sm font-medium text-gray-500">Bu kategoriye ait alt kategori bulunmuyor.</p>
+                                        <p className="text-sm font-medium text-gray-500">Bu kategoriye ait alt kategori veya ürün bulunmuyor.</p>
                                     </div>
                                 )}
                             </>

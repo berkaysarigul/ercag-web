@@ -21,7 +21,8 @@ export default function AdminSidebar() {
         { name: 'Fiyat Güncelle', href: '/admin/products/pricing', icon: DollarSign, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Kategoriler', href: '/admin/categories', icon: FolderTree, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Markalar', href: '/admin/brands', icon: Tag, roles: ['SUPER_ADMIN', 'ADMIN'] },
-        { name: 'Özellikler', href: '/admin/attributes', icon: Palette, roles: ['SUPER_ADMIN', 'ADMIN'] }, // UI-21: Package → FolderTree
+        { name: 'Özellikler', href: '/admin/attributes', icon: Palette, roles: ['SUPER_ADMIN', 'ADMIN'] },
+        { name: 'Stok Yönetimi', href: '/admin/stock', icon: BarChart3, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Hediye Çarkı', href: '/admin/spin-wheel', icon: Gift, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Kuponlar', href: '/admin/coupons', icon: Ticket, roles: ['SUPER_ADMIN', 'ADMIN'] },
         { name: 'Değerlendirmeler', href: '/admin/reviews', icon: MessageSquare, roles: ['SUPER_ADMIN', 'ADMIN', 'STAFF'] },

@@ -23,6 +23,7 @@ interface Product {
     image: string | null;
     images?: { url: string; isMain: boolean }[];
     category: { id?: number; name: string };
+    brand?: { id: number; name: string } | null;
     stock: number;
     rating?: number;
     numReviews?: number;
@@ -322,7 +323,14 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                 <div className="space-y-6">
                     <div>
                         <div className="flex justify-between items-start">
-                            <span className="text-sm text-gray-500 uppercase tracking-wider">{product.category?.name}</span>
+                            <div className="flex flex-col">
+                                {product.brand && (
+                                    <Link href={`/brands/${product.brand.id}`} className="text-sm font-bold text-primary hover:underline uppercase tracking-wide mb-1">
+                                        {product.brand.name}
+                                    </Link>
+                                )}
+                                <span className="text-xs text-gray-500 uppercase tracking-wider">{product.category?.name}</span>
+                            </div>
                             {getStockBadge(displayStock)}
                         </div>
                         <h1 className="text-3xl font-bold text-gray-900 mt-1">{product.name}</h1>

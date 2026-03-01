@@ -9,14 +9,20 @@ interface CartItem {
     price: number;
     quantity: number;
     image?: string | null;
+    variantId?: number | null;
+    variantLabel?: string | null;
 }
 
 interface CartContextType {
     items: CartItem[];
-    addToCart: (product: { id: number; name: string; price: number; image?: string | null; quantity?: number; category?: any }) => void;
-    updateQuantity: (id: number, quantity: number) => void;
-    decreaseQuantity: (id: number) => void;
-    removeFromCart: (id: number) => void;
+    addToCart: (product: {
+        id: number; name: string; price: number; image?: string | null;
+        quantity?: number; category?: any;
+        variantId?: number | null; variantLabel?: string | null;
+    }) => void;
+    updateQuantity: (id: number, quantity: number, variantId?: number | null) => void;
+    decreaseQuantity: (id: number, variantId?: number | null) => void;
+    removeFromCart: (id: number, variantId?: number | null) => void;
     clearCart: () => Promise<void>;
     total: number;
     discountAmount: number;
@@ -115,15 +121,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
     }, [items, loaded, user]);
 
-    const addToCart = async (product: { id: number; name: string; price: number; image?: string | null; quantity?: number; category?: any }) => {
-        // Optimistic update for UI speed
-        const existing = items.find((item) => item.id === product.id);
+    const addToCart = async (product: {
+        id: number; name: string; price: number; image?: string | null;
+        quantity?: number; category?: any;
+        variantId?: number | null; variantLabel?: string | null;
+    }) => {
         const quantityToAdd = product.quantity || 1;
 
-        let newItems = [];
+        // Unique key: productId + variantId
+        const matchKey = (item: CartItem) =>
+            item.id === product.id && (item.variantId || null) === (product.variantId || null);
+
+        const existing = items.find(matchKey);
+
+        let newItems: CartItem[];
         if (existing) {
             newItems = items.map((item) =>
-                item.id === product.id ? { ...item, quantity: item.quantity + quantityToAdd } : item
+                matchKey(item) ? { ...item, quantity: item.quantity + quantityToAdd, price: Number(product.price) } : item
             );
         } else {
             newItems = [...items, {
@@ -131,7 +145,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                 name: product.name,
                 price: Number(product.price),
                 quantity: quantityToAdd,
-                image: product.image
+                image: product.image,
+                variantId: product.variantId || null,
+                variantLabel: product.variantLabel || null,
             }];
         }
         setItems(newItems);
@@ -141,36 +157,32 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             try {
                 await api.post('/cart/add', {
                     productId: product.id,
-                    quantity: quantityToAdd
+                    quantity: quantityToAdd,
+                    variantId: product.variantId || null,
                 });
-                // In a perfect world we would re-fetch to ensure sync, but optimistic is fine for now
             } catch (error) {
                 console.error("Failed to add to cart API", error);
                 toast.error('Sepete eklenirken hata oluştu');
-                // Revert? For now let's hope it works.
             }
         }
     };
 
-    const updateQuantity = async (id: number, quantity: number) => {
+    const updateQuantity = async (id: number, quantity: number, variantId?: number | null) => {
         if (quantity < 1) {
-            removeFromCart(id);
+            removeFromCart(id, variantId);
             return;
         }
 
-        const existing = items.find((item) => item.id === id);
-        if (!existing) return;
+        const matchKey = (item: CartItem) =>
+            item.id === id && (item.variantId || null) === (variantId || null);
 
         setItems((prev) => prev.map((item) =>
-            item.id === id ? { ...item, quantity } : item
+            matchKey(item) ? { ...item, quantity } : item
         ));
 
         if (user) {
             try {
-                // Assuming backend has /cart/update route that takes productId and absolute quantity
-                // Or we calculate diff? 
-                // Let's assume standard PUT /cart/update with productId and quantity
-                await api.put('/cart/update', { productId: id, quantity });
+                await api.put('/cart/update', { productId: id, quantity, variantId: variantId || null });
             } catch (error) {
                 console.error("Failed to update quantity", error);
                 toast.error('Adet güncellenemedi');
@@ -178,19 +190,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    const decreaseQuantity = async (id: number) => {
-        const existing = items.find((item) => item.id === id);
+    const decreaseQuantity = async (id: number, variantId?: number | null) => {
+        const existing = items.find((item) =>
+            item.id === id && (item.variantId || null) === (variantId || null)
+        );
         if (!existing) return;
-        updateQuantity(id, existing.quantity - 1);
+        updateQuantity(id, existing.quantity - 1, variantId);
     };
 
-    const removeFromCart = async (id: number) => {
-        setItems((prev) => prev.filter((item) => item.id !== id));
+    const removeFromCart = async (id: number, variantId?: number | null) => {
+        setItems((prev) => prev.filter((item) =>
+            !(item.id === id && (item.variantId || null) === (variantId || null))
+        ));
         toast.error('Ürün sepetten çıkarıldı');
 
         if (user) {
             try {
-                await api.delete(`/cart/remove/${id}`);
+                await api.delete(`/cart/remove/${id}${variantId ? `?variantId=${variantId}` : ''}`);
             } catch (error) {
                 console.error("Failed to remove from cart API", error);
             }

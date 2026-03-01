@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 interface OrderDetailsModalProps {
     isOpen: boolean;
     onClose: () => void;
-    order: { id: number; createdAt: string; fullName?: string; phoneNumber?: string; email?: string; user?: { name?: string; phone?: string; email?: string }; branch?: { name: string } | null; items: { id: number; quantity: number; price: number | string; product: { name: string } }[]; totalAmount: number | string; discountAmount?: number | string; campaignDiscount?: number | string; campaignDetails?: string; couponCode?: string; note?: string; status: string; statusHistory?: string | { status: string; date: string; user?: string; note?: string; timestamp?: string }[]; pickupCode?: string; completedAt?: string; readyAt?: string };
+    order: { id: number; createdAt: string; fullName?: string; phoneNumber?: string; email?: string; user?: { name?: string; phone?: string; email?: string }; branch?: { name: string } | null; items: { id: number; quantity: number; price: number | string; product: { name: string }; variantItems?: any[] }[]; totalAmount: number | string; discountAmount?: number | string; campaignDiscount?: number | string; campaignDetails?: string; couponCode?: string; note?: string; status: string; statusHistory?: string | { status: string; date: string; user?: string; note?: string; timestamp?: string }[]; pickupCode?: string; completedAt?: string; readyAt?: string };
     onStatusChange: (orderId: number, status: string) => Promise<void>;
 }
 
@@ -50,7 +50,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order, onStatusChan
         const tableColumn = ["Ürün", "Adet", "Birim Fiyat", "Toplam"];
         const tableRows: (string | number)[][] = [];
 
-        order.items.forEach((item: { quantity: number; price: number | string; product: { name: string } }) => {
+        order.items.forEach((item: any) => {
             const itemData = [
                 item.product.name,
                 item.quantity,
@@ -231,17 +231,43 @@ export default function OrderDetailsModal({ isOpen, onClose, order, onStatusChan
                                             <div>
                                                 <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4 border-b pb-2">Ürünler ({order.items.length})</h4>
                                                 <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                                                    {order.items.map((item: { id: number; quantity: number; price: number | string; product: { name: string } }) => (
-                                                        <div key={item.id} className="flex justify-between items-start border-b border-gray-200 pb-3 last:border-0 last:pb-0">
-                                                            <div className="flex gap-3">
-                                                                <span className="font-mono bg-white px-2 rounded border border-gray-200 text-sm text-gray-600 h-fit shadow-sm">
-                                                                    {item.quantity}x
+                                                    {order.items.map((item: any) => (
+                                                        <div key={item.id} className="flex flex-col border-b border-gray-200 pb-3 last:border-0 last:pb-0">
+                                                            <div className="flex justify-between items-start">
+                                                                <div className="flex gap-3">
+                                                                    <span className="font-mono bg-white px-2 rounded border border-gray-200 text-sm text-gray-600 h-fit shadow-sm">
+                                                                        {item.quantity}x
+                                                                    </span>
+                                                                    <span className="text-sm font-medium text-gray-900 line-clamp-2">{item.product.name}</span>
+                                                                </div>
+                                                                <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">
+                                                                    ₺{Number(item.price).toFixed(2)}
                                                                 </span>
-                                                                <span className="text-sm font-medium text-gray-900 line-clamp-2">{item.product.name}</span>
                                                             </div>
-                                                            <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">
-                                                                ₺{Number(item.price).toFixed(2)}
-                                                            </span>
+                                                            {item.variantItems && item.variantItems.length > 0 && (
+                                                                <div className="mt-2 pl-12 pr-4">
+                                                                    <div className="bg-gray-100 rounded-md p-2 space-y-1">
+                                                                        {item.variantItems.map((vi: any, idx: number) => {
+                                                                            let attrString = "Seçenek";
+                                                                            try {
+                                                                                const attrs = typeof vi.attributes === 'string' ? JSON.parse(vi.attributes) : vi.attributes;
+                                                                                if (Array.isArray(attrs)) {
+                                                                                    attrString = attrs.map(a => a.value).join(' / ');
+                                                                                }
+                                                                            } catch (e) { }
+                                                                            return (
+                                                                                <div key={idx} className="flex justify-between items-center text-xs">
+                                                                                    <div className="flex items-center gap-2">
+                                                                                        <span className="font-mono text-gray-500">{vi.quantity}x</span>
+                                                                                        <span className="text-gray-600 font-medium">{attrString}</span>
+                                                                                    </div>
+                                                                                    <span className="text-gray-500">₺{Number(vi.price).toFixed(2)}</span>
+                                                                                </div>
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     ))}
                                                 </div>

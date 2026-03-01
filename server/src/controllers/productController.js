@@ -167,6 +167,7 @@ const getProductById = async (req, res) => {
             include: {
                 category: true,
                 images: true,
+                brand: true,
                 variants: {
                     where: { isActive: true },
                     include: {
@@ -203,7 +204,7 @@ const createProduct = async (req, res) => {
             });
         }
 
-        const { name, description, price, categoryId, stock, isFeatured, sku, barcode, lowStockThreshold } = validation.data;
+        const { name, description, price, categoryId, stock, isFeatured, sku, barcode, lowStockThreshold, brandId, compareAtPrice } = validation.data;
         const files = req.files || [];
 
         // SKU/Barkod benzersizlik kontrolü
@@ -232,7 +233,8 @@ const createProduct = async (req, res) => {
                 sku: sku || null,
                 barcode: barcode || null,
                 lowStockThreshold: lowStockThreshold || 5,
-                compareAtPrice: req.body.compareAtPrice ? parseFloat(req.body.compareAtPrice) : null,
+                brandId: brandId || null,
+                compareAtPrice: compareAtPrice || null,
                 image: mainImage,
                 images: {
                     create: files.map((file, index) => ({
@@ -283,6 +285,7 @@ const updateProduct = async (req, res) => {
             barcode: barcode !== undefined ? (barcode || null) : undefined,
             lowStockThreshold: lowStockThreshold !== undefined ? parseInt(lowStockThreshold) : undefined,
             ...(compareAtPriceVal !== undefined && { compareAtPrice: compareAtPriceVal }),
+            ...(req.body.brandId !== undefined && { brandId: req.body.brandId ? parseInt(req.body.brandId) : null }),
         };
 
         // Handle Image Deletion
@@ -825,12 +828,10 @@ const bulkUpdatePrices = async (req, res) => {
         );
 
         // Redis cache temizle
-        if (redisClient) {
-            try {
-                const keys = await redisClient.keys('products_all_*');
-                if (keys.length > 0) await redisClient.del(keys);
-            } catch (_) { }
-        }
+        try {
+            const { invalidateCache } = require('../config/redis.js');
+            await invalidateCache('products_all_*');
+        } catch (_) { }
 
         // Audit log
         await logAudit(

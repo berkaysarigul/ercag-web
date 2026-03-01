@@ -18,6 +18,7 @@ interface Product {
     sku: string | null;
     barcode: string | null;
     lowStockThreshold: number;
+    brand?: { id: number; name: string };
 }
 
 interface Category {
@@ -223,6 +224,7 @@ export default function AdminProductsPage() {
                                 </th>
                                 <th className="px-4 py-3 font-semibold text-gray-600 text-sm">Ürün</th>
                                 <th className="px-4 py-3 font-semibold text-gray-600 text-sm">SKU</th>
+                                <th className="px-4 py-3 font-semibold text-gray-600 text-sm">Marka</th>
                                 <th className="px-4 py-3 font-semibold text-gray-600 text-sm">Kategori</th>
                                 <th className="px-4 py-3 font-semibold text-gray-600 text-sm">Fiyat</th>
                                 <th className="px-4 py-3 font-semibold text-gray-600 text-sm">Stok</th>
@@ -235,6 +237,7 @@ export default function AdminProductsPage() {
                                 <tr key={i}>
                                     <td className="px-4 py-3 text-center"><Skeleton width={18} height={18} /></td>
                                     <td className="px-4 py-3"><div className="flex items-center gap-3"><Skeleton width={40} height={40} className="rounded-lg" /><Skeleton variant="text" width={150} /></div></td>
+                                    <td className="px-4 py-3"><Skeleton variant="text" width={80} /></td>
                                     <td className="px-4 py-3"><Skeleton variant="text" width={80} /></td>
                                     <td className="px-4 py-3"><Skeleton variant="text" width={100} /></td>
                                     <td className="px-4 py-3"><Skeleton variant="text" width={60} /></td>
@@ -261,6 +264,9 @@ export default function AdminProductsPage() {
                                     <td className="px-4 py-3">
                                         {product.sku ? <code className="text-xs bg-gray-100 px-2 py-0.5 rounded font-mono">{product.sku}</code> : <span className="text-gray-300 text-xs">—</span>}
                                     </td>
+                                    <td className="px-4 py-3 text-sm text-gray-500">
+                                        {product.brand?.name || <span className="text-gray-300 text-xs">—</span>}
+                                    </td>
                                     <td className="px-4 py-3 text-sm text-gray-600">{product.category?.name}</td>
                                     <td className="px-4 py-3 font-medium text-gray-900 text-sm">{Number(product.price).toFixed(2)} ₺</td>
                                     <td className="px-4 py-3">
@@ -284,7 +290,7 @@ export default function AdminProductsPage() {
                                 </tr>
                             ))}
                             {products.length === 0 && !loading && (
-                                <tr><td colSpan={8} className="px-4 py-12 text-center text-gray-400">
+                                <tr><td colSpan={9} className="px-4 py-12 text-center text-gray-400">
                                     {searchQuery || categoryFilter ? 'Arama kriterlerine uygun ürün bulunamadı.' : 'Henüz ürün eklenmemiş.'}
                                 </td></tr>
                             )}

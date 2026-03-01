@@ -167,6 +167,40 @@ const createOrder = async (req, res) => {
             console.error('Spin code autogeneration failed during createOrder:', err);
         }
 
+        // 4. Varyant bilgilerini kaydet (eğer gönderildiyse)
+        if (req.body.variantItems && Array.isArray(req.body.variantItems)) {
+            for (const vi of req.body.variantItems) {
+                if (!vi.variantId || !vi.quantity) continue;
+                try {
+                    const variant = await prisma.productVariant.findUnique({
+                        where: { id: parseInt(vi.variantId) },
+                        include: {
+                            attributes: {
+                                include: { attributeValue: { include: { attributeType: true } } }
+                            }
+                        }
+                    });
+                    if (variant) {
+                        const attrSnapshot = variant.attributes.map(a => ({
+                            type: a.attributeValue.attributeType.name,
+                            value: a.attributeValue.value,
+                        }));
+                        await prisma.orderItemVariant.create({
+                            data: {
+                                orderId: order.id,
+                                variantId: parseInt(vi.variantId),
+                                quantity: parseInt(vi.quantity),
+                                price: variant.price || order.items?.find(i => i.productId === variant.productId)?.price || 0,
+                                attributes: JSON.stringify(attrSnapshot),
+                            },
+                        });
+                    }
+                } catch (err) {
+                    console.error('OrderItemVariant kayıt hatası:', err);
+                }
+            }
+        }
+
         // 5. Asenkron WhatsApp Onay Mesajı (Kuyruk üzerinden)
         if (phoneNumber) {
             whatsappQueue.add('send-msg', {

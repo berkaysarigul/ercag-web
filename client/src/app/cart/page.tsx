@@ -13,7 +13,7 @@ import { Trash2, Plus, Minus, ArrowRight, Store, ShoppingBag, User, Phone, Mail,
 import AuthModal from '@/components/auth/AuthModal';
 
 export default function CartPage() {
-    const { items, removeFromCart, updateQuantity, total, discountAmount, finalAmount, appliedCampaigns, clearCart, loaded, refreshCart } = useCart();
+    const { items, removeFromCart, updateQuantity, decreaseQuantity, total, discountAmount, finalAmount, appliedCampaigns, clearCart, loaded, refreshCart } = useCart();
     const { user } = useAuth();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -110,6 +110,10 @@ export default function CartPage() {
                     id: item.id,
                     quantity: item.quantity
                 })),
+                variantItems: items.filter(item => item.variantId).map(item => ({
+                    variantId: item.variantId,
+                    quantity: item.quantity
+                })),
                 couponCode: appliedCoupon?.code,
                 branchId: selectedBranch,
                 ...formData
@@ -197,16 +201,19 @@ export default function CartPage() {
                                         <Link href={`/products/${item.id}`} className="font-semibold text-lg text-gray-900 hover:text-primary transition-colors">
                                             {item.name}
                                         </Link>
+                                        {(item as any).variantLabel && (
+                                            <span className="text-xs text-gray-500 block mt-0.5">{(item as any).variantLabel}</span>
+                                        )}
                                         <p className="text-xs text-gray-500 font-medium tracking-wide uppercase mt-1">{(item as any).category?.name}</p>
                                         <div className="mt-2 text-lg font-bold text-primary">{Number(item.price).toFixed(2)} ₺</div>
                                     </div>
                                     <div className="flex flex-col items-end gap-3">
                                         <div className="flex items-center border border-gray-200 rounded-lg bg-gray-50">
-                                            <button onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))} className="p-2 hover:bg-gray-200 text-gray-600 transition-colors"><Minus size={16} /></button>
+                                            <button onClick={() => decreaseQuantity(item.id, (item as any).variantId)} className="p-2 hover:bg-gray-200 text-gray-600 transition-colors"><Minus size={16} /></button>
                                             <span className="w-8 text-center font-medium">{item.quantity}</span>
-                                            <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-2 hover:bg-gray-200 text-gray-600 transition-colors"><Plus size={16} /></button>
+                                            <button onClick={() => updateQuantity(item.id, item.quantity + 1, (item as any).variantId)} className="p-2 hover:bg-gray-200 text-gray-600 transition-colors"><Plus size={16} /></button>
                                         </div>
-                                        <button onClick={() => removeFromCart(item.id)} className="text-gray-400 hover:text-red-500 transition-colors p-1" title="Sepetten Kaldır"><Trash2 size={20} /></button>
+                                        <button onClick={() => removeFromCart(item.id, (item as any).variantId)} className="text-gray-400 hover:text-red-500 transition-colors p-1" title="Sepetten Kaldır"><Trash2 size={20} /></button>
                                     </div>
                                 </div>
                             ))}
@@ -224,8 +231,8 @@ export default function CartPage() {
                                         {branches.map(b => (
                                             <button key={b.id} type="button" onClick={() => setSelectedBranch(b.id)}
                                                 className={`w-full text-left p-4 rounded-xl border-2 transition-all ${selectedBranch === b.id
-                                                        ? 'border-primary bg-primary/5 shadow-sm'
-                                                        : 'border-gray-200 hover:border-gray-300'
+                                                    ? 'border-primary bg-primary/5 shadow-sm'
+                                                    : 'border-gray-200 hover:border-gray-300'
                                                     }`}>
                                                 <div className="flex items-center gap-3">
                                                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedBranch === b.id ? 'border-primary' : 'border-gray-300'

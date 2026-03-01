@@ -25,6 +25,7 @@ export default function NewProductPage() {
         name: '',
         description: '',
         price: '',
+        compareAtPrice: '',
         stock: '100', // Default stock
         categoryId: '',
         brandId: '',
@@ -62,6 +63,7 @@ export default function NewProductPage() {
         data.append('name', formData.name);
         data.append('description', formData.description);
         data.append('price', formData.price);
+        if (formData.compareAtPrice) data.append('compareAtPrice', formData.compareAtPrice);
         data.append('stock', formData.stock);
         data.append('categoryId', formData.categoryId);
         if (formData.brandId) data.append('brandId', formData.brandId);
@@ -160,7 +162,7 @@ export default function NewProductPage() {
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-3 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Fiyat (TL)</label>
                                     <input
@@ -173,6 +175,21 @@ export default function NewProductPage() {
                                         value={formData.price}
                                         onChange={e => setFormData({ ...formData, price: e.target.value })}
                                     />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Eski Fiyat <span className="text-gray-400 font-normal">(opsiyonel)</span>
+                                    </label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        className="input w-full"
+                                        placeholder="0.00"
+                                        value={formData.compareAtPrice}
+                                        onChange={e => setFormData({ ...formData, compareAtPrice: e.target.value })}
+                                    />
+                                    <p className="text-xs text-gray-400 mt-1">Doluysa üstü çizili eski fiyat gösterilir.</p>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Stok Adedi</label>

@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import RichTextEditor from '@/components/admin/RichTextEditor';
 import ImageUpload from '@/components/admin/ImageUpload';
+import VariantManager from '@/components/admin/VariantManager';
 
 interface Category {
     id: number;
@@ -33,6 +34,7 @@ export default function EditProductPage() {
         name: '',
         description: '',
         price: '',
+        compareAtPrice: '',
         stock: '',
         categoryId: '',
         brandId: '',
@@ -70,6 +72,7 @@ export default function EditProductPage() {
                     name: product.name,
                     description: product.description,
                     price: product.price,
+                    compareAtPrice: product.compareAtPrice ? product.compareAtPrice.toString() : '',
                     stock: (product.stock || 0).toString(),
                     categoryId: product.categoryId.toString(),
                     brandId: product.brandId ? product.brandId.toString() : '',
@@ -128,6 +131,7 @@ export default function EditProductPage() {
         data.append('name', formData.name);
         data.append('description', formData.description);
         data.append('price', formData.price);
+        data.append('compareAtPrice', formData.compareAtPrice || '');
         data.append('stock', formData.stock);
         data.append('categoryId', formData.categoryId);
         if (formData.brandId) data.append('brandId', formData.brandId);
@@ -264,7 +268,7 @@ export default function EditProductPage() {
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-3 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Fiyat (TL)</label>
                                     <input
@@ -278,6 +282,22 @@ export default function EditProductPage() {
                                         onChange={e => setFormData({ ...formData, price: e.target.value })}
                                         style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}
                                     />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Eski Fiyat <span className="text-gray-400 font-normal">(opsiyonel)</span>
+                                    </label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        className="input w-full"
+                                        placeholder="0.00"
+                                        value={formData.compareAtPrice}
+                                        onChange={e => setFormData({ ...formData, compareAtPrice: e.target.value })}
+                                        style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}
+                                    />
+                                    <p className="text-xs text-gray-400 mt-1">Doluysa üstü çizili eski fiyat gösterilir.</p>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Stok Adedi</label>
@@ -414,6 +434,9 @@ export default function EditProductPage() {
                     </div>
                 </form>
             </div>
+
+            {/* ═══ VARYANT YÖNETİMİ ═══ */}
+            {id && <VariantManager productId={parseInt(id as string)} />}
         </div>
     );
 }
